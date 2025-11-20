@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 /// <summary>
 /// PlayerController: Contiene las logicas de movimiento del jugador con suavizado de velocidad completo. 
@@ -17,7 +16,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Rotation Config")]
     [SerializeField] float rotationSpeed = 10f; //suavizado de rotación
-    [SerializeField] float minSpeedForIntent = 0.2f; //input domina cuando la velocidad es baja
     [SerializeField] float minSpeedForRotation = 0.05f; //mínima velocidad para permitir rotación
     [SerializeField] float inertiaFactor = 0.15f; //amortiguación del cambio de dirección
     [SerializeField] float rotationNoise = 0.02f; //variación humana sutil
@@ -109,53 +107,37 @@ public class PlayerController : MonoBehaviour
     #region Rotation Logic
     void HandleRotation()
     {
-        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        //Velocidad planaer y magnitud
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speed = planarVelocity.magnitude;
 
-        //Dirección natural basada en velocidad
-        Vector3 velocityDir = speed > minSpeedForRotation ? planarVelocity.normalized : Vector3.zero;
+        //Si no hay movimiento (vel) significativo, no rotamos (mantener orientación actual)
+        if (speed < minSpeedForRotation) return;
 
-        //Dirección basada en la intención del input
-        Vector3 inputDir = new Vector3(inputMovement.x, 0, inputMovement.y).normalized;
+        //Dirección pura basada únicamente en la velocidad real
+        Vector3 velocityDir = planarVelocity.normalized;
 
-        //Selección inteligente entre velocidad o intención
-        Vector3 targetDir = lastMoveDirection;
+        float dynamicInertia = Mathf.Lerp(inertiaFactor, inertiaFactor * 1.5f, 1f - Mathf.Clamp01(speed)); //dinamizamos el valor de inerciaFactor.
+        //Aplicar inercia: Entre la última dirección y la nueva dirección por velocidad
+        Vector3 inertialDir = Vector3.Slerp(lastMoveDirection, velocityDir, 1f - dynamicInertia);
 
-        if(speed > minSpeedForIntent)
+        //Añadir micro-ruido humanoide solo si estamo moviéndonos
+        if(speed > 0.5f)
         {
-            //Cuando hay movimiento claro se usa la dirección real
-            targetDir = velocityDir;
-        }
-        else if(inputDir.sqrMagnitude > 0.1f)
-        {
-            //El jugador ya no se mueve mucho pero aún "quiere" ir hacia una dirección
-            targetDir = inputDir;
+            float noiseFactor = Mathf.Clamp01(speed / runSpeed);
+            inertialDir += new Vector3(Random.Range(-rotationNoise, rotationNoise), 0f, Random.Range(-rotationNoise, rotationNoise));
         }
 
-        //Inercia (amortiguación del cambio), humaniza al player
-        targetDir = Vector3.Slerp(lastMoveDirection, targetDir, 1f - inertiaFactor);
+        //Normalizar y validar
+        if (inertialDir.sqrMagnitude <= 0.05f) return;
+        inertialDir.Normalize();
 
-        //Micro impredecibilidad en la rotación del jugador
-        if(speed > 0.1f)
-        {
-            targetDir += new Vector3(Random.Range(-rotationNoise, rotationNoise), 0, Random.Range(-rotationNoise, rotationNoise));
-        }
+        //Guardar última dirección válida
+        lastMoveDirection = inertialDir;
 
-        //Noramlizamos
-        targetDir.Normalize();
-
-        //Guardamos última dirección válida
-        if(targetDir.sqrMagnitude > 0.01f)
-        {
-            lastMoveDirection = targetDir;
-        }
-
-        //Aplicamos rotación suave
-        if(lastMoveDirection.sqrMagnitude > 0.01f)
-        {
-            Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
-        }
+        //Aplicar rotación suave hacia la dirección resultante
+        Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
     }
     #endregion
 
