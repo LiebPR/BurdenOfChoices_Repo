@@ -8,12 +8,19 @@ using UnityEngine.InputSystem.XR;
 public class PlayerController : MonoBehaviour
 {
     #region General Variables
-    [Header("Movement")]
+    [Header("Movement Config")]
     [SerializeField] float walkSpeed = 5f; //velocidad al caminar
     [SerializeField] float runSpeed = 8f; //velocidad al correr
     [SerializeField] float crouchSpeed = 2.5f; //velocidad agachado
     [SerializeField] float accelerationTime = 0.2f; //timepo para acelerar
     [SerializeField] float decelerationTime = 0.3f; //tiempo para desacelerar
+
+    [Header("Rotation Config")]
+    [SerializeField] float rotationSpeed = 10f; //suavizado de rotación
+    [SerializeField] float minSpeedForIntent = 0.2f; //input domina cuando la velocidad es baja
+    [SerializeField] float minSpeedForRotation = 0.05f; //mínima velocidad para permitir rotación
+    [SerializeField] float inertiaFactor = 0.15f; //amortiguación del cambio de dirección
+    [SerializeField] float rotationNoise = 0.02f; //variación humana sutil
     #endregion
 
     #region Internal States
@@ -26,9 +33,14 @@ public class PlayerController : MonoBehaviour
     bool isRuning; //estado interno que indica que el player esta corriendo.
     
     //AGACHARSE:
-    bool isCrouching; //estado interno que indica que el player esta agachado. 
-    bool lastCrouchState;
-    int hashIsCrouching;
+    bool isCrouching; //estado interno que indica que el player esta agachado.
+
+    //ROTACIÓN:
+    Vector3 lastMoveDirection; //ultima dirección válida de movimiento
+    #endregion
+
+    #region Getters
+    public bool IsCrouching => isCrouching;
     #endregion
 
     #region References
@@ -40,12 +52,11 @@ public class PlayerController : MonoBehaviour
     {
         //REFERENCES:
         rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+    }
 
-        //Caches de hashes
-        hashIsCrouching = Animator.StringToHash("isCrouching");
-
-        lastCrouchState = false; //evitar trigger inicial
+    private void Update()
+    {
+        HandleRotation();
     }
 
     #region Input Event Subscriptions
@@ -55,9 +66,6 @@ public class PlayerController : MonoBehaviour
         InputManager.OnMoveChanged += OnMoveChanged;
         InputManager.OnRunChanged += OnRunChanged;
         InputManager.OnCrouchChanged += OnCrouchChanged;
-
-        //Asegurar que el animator empieza en un estado coherente
-        animator.SetBool(hashIsCrouching, false);
     }
 
     private void OnDisable()
@@ -73,11 +81,6 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         HandleMovementSpeed();
-    }
-
-    private void Update()
-    {
-        HandleCrouchAnimation();
     }
 
     #region Movement Logic
@@ -103,22 +106,56 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Crouch Animation
-    void HandleCrouchAnimation()
+    #region Rotation Logic
+    void HandleRotation()
     {
-        if (animator == null) return;
-        if (lastCrouchState == isCrouching) return;
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        float speed = planarVelocity.magnitude;
 
-        if (isCrouching)
+        //Dirección natural basada en velocidad
+        Vector3 velocityDir = speed > minSpeedForRotation ? planarVelocity.normalized : Vector3.zero;
+
+        //Dirección basada en la intención del input
+        Vector3 inputDir = new Vector3(inputMovement.x, 0, inputMovement.y).normalized;
+
+        //Selección inteligente entre velocidad o intención
+        Vector3 targetDir = lastMoveDirection;
+
+        if(speed > minSpeedForIntent)
         {
-            animator.SetBool(hashIsCrouching, true);
+            //Cuando hay movimiento claro se usa la dirección real
+            targetDir = velocityDir;
         }
-        else
+        else if(inputDir.sqrMagnitude > 0.1f)
         {
-            animator.SetBool(hashIsCrouching, false);
+            //El jugador ya no se mueve mucho pero aún "quiere" ir hacia una dirección
+            targetDir = inputDir;
         }
 
-        lastCrouchState = isCrouching;
+        //Inercia (amortiguación del cambio), humaniza al player
+        targetDir = Vector3.Slerp(lastMoveDirection, targetDir, 1f - inertiaFactor);
+
+        //Micro impredecibilidad en la rotación del jugador
+        if(speed > 0.1f)
+        {
+            targetDir += new Vector3(Random.Range(-rotationNoise, rotationNoise), 0, Random.Range(-rotationNoise, rotationNoise));
+        }
+
+        //Noramlizamos
+        targetDir.Normalize();
+
+        //Guardamos última dirección válida
+        if(targetDir.sqrMagnitude > 0.01f)
+        {
+            lastMoveDirection = targetDir;
+        }
+
+        //Aplicamos rotación suave
+        if(lastMoveDirection.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+        }
     }
     #endregion
 

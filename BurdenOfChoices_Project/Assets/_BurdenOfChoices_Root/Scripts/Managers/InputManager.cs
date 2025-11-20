@@ -22,6 +22,7 @@ public class InputManager : MonoBehaviour
     public static event Action OnAttack;
     public static event Action OnThrow;
     public static event Action OnGather;
+    public static event Action OnGatherCanceled;
     #endregion
 
     private void Awake()
@@ -52,6 +53,7 @@ public class InputManager : MonoBehaviour
         inputA.GamePlay.Atacar.performed += OnAttackPerformed;
         inputA.GamePlay.Throw.performed += OnThrowPerformed;
         inputA.GamePlay.Gather.performed += OnGatherPerformed;
+        inputA.GamePlay.Gather.canceled += OnGatherCanceledPerformed;
     }
 
     private void OnDisable()
@@ -81,6 +83,7 @@ public class InputManager : MonoBehaviour
     static void OnAttackPerformed(InputAction.CallbackContext ctx) => OnAttack?.Invoke();
     static void OnThrowPerformed(InputAction.CallbackContext ctx) => OnThrow?.Invoke();
     static void OnGatherPerformed(InputAction.CallbackContext ctx) => OnGather?.Invoke();
+    static void OnGatherCanceledPerformed(InputAction.CallbackContext ctx) => OnGatherCanceled?.Invoke();
     #endregion
 
     #region Helper Methods
