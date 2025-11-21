@@ -20,7 +20,8 @@ public class InputManager : MonoBehaviour
 
     // ACCIONES
     public static event Action OnAttack;
-    public static event Action OnThrow;
+    public static event Action OnThrowPressed;   // cuando empieza a presionar
+    public static event Action OnThrowReleased;  // cuando suelta
     public static event Action OnGather;
     public static event Action OnGatherCanceled;
     #endregion
@@ -51,9 +52,12 @@ public class InputManager : MonoBehaviour
 
         // ACCIONES
         inputA.GamePlay.Atacar.performed += OnAttackPerformed;
-        inputA.GamePlay.Throw.performed += OnThrowPerformed;
         inputA.GamePlay.Gather.performed += OnGatherPerformed;
         inputA.GamePlay.Gather.canceled += OnGatherCanceledPerformed;
+
+        //LANZAR
+        inputA.GamePlay.Throw.started += OnThrowStarted;
+        inputA.GamePlay.Throw.canceled += OnThrowCanceled;
     }
 
     private void OnDisable()
@@ -81,7 +85,8 @@ public class InputManager : MonoBehaviour
     static void OnCrouchCanceled(InputAction.CallbackContext ctx) => OnCrouchChanged?.Invoke(false);
 
     static void OnAttackPerformed(InputAction.CallbackContext ctx) => OnAttack?.Invoke();
-    static void OnThrowPerformed(InputAction.CallbackContext ctx) => OnThrow?.Invoke();
+    static void OnThrowStarted(InputAction.CallbackContext ctx) => OnThrowPressed?.Invoke();
+    static void OnThrowCanceled(InputAction.CallbackContext ctx) => OnThrowReleased?.Invoke();
     static void OnGatherPerformed(InputAction.CallbackContext ctx) => OnGather?.Invoke();
     static void OnGatherCanceledPerformed(InputAction.CallbackContext ctx) => OnGatherCanceled?.Invoke();
     #endregion
@@ -105,8 +110,12 @@ public class InputManager : MonoBehaviour
 
         // ACCIONES
         inputA.GamePlay.Atacar.performed -= OnAttackPerformed;
-        inputA.GamePlay.Throw.performed -= OnThrowPerformed;
+        
         inputA.GamePlay.Gather.performed -= OnGatherPerformed;
+
+        //LANZAR
+        inputA.GamePlay.Throw.started -= OnThrowStarted;
+        inputA.GamePlay.Throw.canceled -= OnThrowCanceled;
     }
     #endregion
 }

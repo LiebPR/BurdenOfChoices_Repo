@@ -1,9 +1,12 @@
-using System;
 using UnityEngine;
+using System;
 
+/// <summary>
+/// PickableBehaviour: Es el que gestiona la logica de recoger un objeto, soltarlo o reseteralo.
+/// </summary>
 public class PickableBehaviour : MonoBehaviour
 {
-    [SerializeField] Transform catchPoint;
+    Transform catchPoint;
 
     #region Internal States
     bool isCatched;
@@ -22,6 +25,11 @@ public class PickableBehaviour : MonoBehaviour
     public bool IsCatched => isCatched;
     #endregion
 
+    #region Eventos
+    public static event Action<PickableBehaviour> OnEquipped;
+    public static event Action<PickableBehaviour> OnDropped;
+    #endregion
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -34,8 +42,16 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Equip
     //Coloca el obejto en la mano del jugador. 
-    public void OnEquip()
+    public void OnEquip(ICatcher catcher)
     {
+        if(catcher == null)
+        {
+            Debug.LogWarning("No se proporcionó un ICatcher válido");
+            return;
+        }
+
+        catchPoint = catcher.GetCatchPoint();
+
         isCatched = true;
 
         //Desactivar la física completamente
@@ -46,6 +62,8 @@ public class PickableBehaviour : MonoBehaviour
         transform.SetParent(catchPoint);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
+
+        OnEquipped?.Invoke(this); //notifica que se equipó
     }
     #endregion
 
@@ -64,6 +82,8 @@ public class PickableBehaviour : MonoBehaviour
 
         //Restauramos el tamaño si se a alterado
         transform.localScale = originalScale;
+
+        OnDropped?.Invoke(this); //notifica que se soltó
     }
     #endregion
 
