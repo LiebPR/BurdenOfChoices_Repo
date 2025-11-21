@@ -1,97 +1,94 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// PickableBehaviour:
-///     - Guarda posición, rotación y escala originales.
-///     - Permite Pick/Drop sin hacer el objeto hijo del player.
-///     - Sigue al target usando Rigidbody.Move para evitar atravesar paredes.
-/// </summary>
 public class PickableBehaviour : MonoBehaviour
 {
-    #region Internal State
+    [SerializeField] Transform catchPoint;
+
+    #region Internal States
+    bool isCatched;
+
+    //Original States:
     Vector3 originalPosition;
     Quaternion originalRotation;
     Vector3 originalScale;
-    Transform originalParent;
-
-    Transform followTarget;
-    bool isPicked;
-
-    Rigidbody rb;
     #endregion
 
-    #region Events
-    public event Action OnPicked;
-    public event Action OnDropped;
+    #region Rferences
+    public Rigidbody rb;
     #endregion
 
-    void Awake()
+    #region Getters
+    public bool IsCatched => isCatched;
+    #endregion
+
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
+        //Guardamos el estado original del objeto
         originalPosition = transform.position;
         originalRotation = transform.rotation;
         originalScale = transform.localScale;
-        originalParent = transform.parent;
-
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
-    private void FixedUpdate()
+    #region Equip
+    //Coloca el obejto en la mano del jugador. 
+    public void OnEquip()
     {
-        if (!isPicked || followTarget == null) return;
+        isCatched = true;
 
-        //Seguimiento suave al target sin hacer hijo
-        Vector3 targetPos = followTarget.position;
-        Quaternion targetRot = followTarget.rotation;
-
-        rb.MovePosition(targetPos);
-        rb.MoveRotation(targetRot);
-    }
-
-    //Recoge el objeto y lo prepara para seguir al target
-    public void Pick(Transform target)
-    {
-        if (target == null) return;
-
-        followTarget = target;
-        isPicked = true;
-
+        //Desactivar la física completamente
+        rb.isKinematic = true;
         rb.useGravity = false;
 
-        transform.localScale = originalScale;
-
-        OnPicked?.Invoke();
+        //Parent al catchPoint
+        transform.SetParent(catchPoint);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
     }
+    #endregion
 
-    public void Drop()
+    #region Drop
+    //Suelta el objeto en el mundo.
+    public void OnDrop()
     {
-        if(!isPicked) return;
+        isCatched = false;
 
-        isPicked = false;
-        followTarget = null;
-
-        rb.useGravity = true;
-
+        //Quita el parent
         transform.SetParent(null);
 
+        //Activa la física
+        rb.isKinematic = false;
+        rb.useGravity = true;
+
+        //Restauramos el tamaño si se a alterado
         transform.localScale = originalScale;
-
-        OnDropped?.Invoke();  
     }
+    #endregion
 
-    //Devuelve al objeto EXACTAMENTE a su estado inicial.
-    public void ResetToOriginalState()
+    #region Restore
+    //Suelta y restaura tras un tiempo
+    public void OnRestoreWithTime(float delay)
     {
-        isPicked = false;
-        followTarget = null;
-
-        transform.SetParent(originalParent);
-        transform.position = originalPosition;
-        transform.rotation = originalRotation;
-        transform.localScale = originalScale;
-
-        rb.useGravity = true; 
+        OnDrop();
+        Invoke(nameof(RestoreInternal), delay);
     }
+
+    //Suelta y restaura inmediatamente
+    public void OnRestore()
+    {
+        OnDrop();
+        RestoreInternal();
+    }
+
+    void RestoreInternal()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        transform.localPosition = originalPosition;
+        transform.rotation = originalRotation;
+    }
+    #endregion
 }

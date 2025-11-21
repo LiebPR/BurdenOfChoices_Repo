@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
-    #region General Variables
+    #region Inspector Variables
     [Header("Movement Config")]
     [SerializeField] float walkSpeed = 5f; //velocidad al caminar
     [SerializeField] float runSpeed = 8f; //velocidad al correr
