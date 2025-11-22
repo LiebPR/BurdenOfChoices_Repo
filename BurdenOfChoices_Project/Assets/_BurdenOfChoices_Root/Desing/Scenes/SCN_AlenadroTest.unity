@@ -1662,11 +1662,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   throwDirectionSource: {fileID: 1335318403}
   throwPreview: {fileID: 931242093}
-  maxHoldTime: 2
-  minThrowForce: 2
-  maxThrowForce: 7
-  minPreviewDistance: 1
-  maxPreviewDistance: 2.5
+  holdSpeed: 1.5
+  minThrowDistance: 2
+  maxThrowDistance: 8
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -8,16 +8,12 @@ public class PlayerThrowController : MonoBehaviour
     #region Inspector Variables
     [Header("Refs")]
     [SerializeField] Transform throwDirectionSource; //transform que indica la dirección de lanzamiento
-    [SerializeField] Transform throwPreview; //Imagen que indica el punto final del lanzamiento
+    [SerializeField] Transform throwPreview; //imagen que indica el punto final del lanzamiento
 
     [Header("Hold Settings")]
-    [SerializeField] float maxHoldTime = 2f; //tiempo máximo de carga
-    [SerializeField] float minThrowForce = 2f; //fuerza mínima
-    [SerializeField] float maxThrowForce = 10f; //fuerza máxima
-
-    [Header("HoldPreview Settings")]
-    [SerializeField] float minPreviewDistance = 2f;
-    [SerializeField] float maxPreviewDistance = 10f;
+    [SerializeField] float holdSpeed = 0.5f; //velocidad de carga
+    [SerializeField] float minThrowDistance = 2f; //fuerza mínima
+    [SerializeField] float maxThrowDistance = 10f; //fuerza máxima
     #endregion
 
     #region Internal States
@@ -61,13 +57,8 @@ public class PlayerThrowController : MonoBehaviour
     {
         if(isHolding && pickable != null)
         {
-            holdTime += Time.deltaTime;
-
-            //Limitar el tiempo máximo
-            if(holdTime > maxHoldTime)
-            {
-                holdTime = maxHoldTime;
-            }
+            holdTime += Time.deltaTime * holdSpeed;
+            holdTime = Mathf.Clamp01(holdTime); //siempre entre 0 y 1
 
             UpdateThrowPreview();
         }
@@ -103,7 +94,7 @@ public class PlayerThrowController : MonoBehaviour
             throwPreview.gameObject.SetActive(true);
 
             // Lo colocamos EXACTAMENTE en el mínimo desde el primer frame
-            Vector3 minPos = throwDirectionSource.position + throwDirectionSource.forward * minPreviewDistance;
+            Vector3 minPos = throwDirectionSource.position + throwDirectionSource.forward * minThrowDistance * 0.35f;
             throwPreview.position = minPos;
         }
     }
@@ -113,52 +104,33 @@ public class PlayerThrowController : MonoBehaviour
         if (!isHolding) return;
 
         isHolding = false;
-
-        if (throwPreview != null)
-            throwPreview.gameObject.SetActive(false);
+        throwPreview.gameObject.SetActive(false);
 
         if (pickable == null || throwable == null) return;
 
-        float force = Mathf.Lerp(minThrowForce, maxThrowForce, holdTime / maxHoldTime);
-        Vector3 direction = throwDirectionSource.forward;
+        float throwDistance = Mathf.Lerp(minThrowDistance, maxThrowDistance, holdTime);
 
-        throwable.OnThrow(direction, force);
+        Vector3 direction = throwDirectionSource.forward;
+        throwable.OnThrow(direction, throwDistance); //el objeto decidirá cómo usarlo
+
+        holdTime = 0f;
     }
 
     void UpdateThrowPreview()
     {
-        if (throwPreview == null || throwDirectionSource == null || pickable == null) return;
+        if (throwPreview == null || throwDirectionSource == null) return;
 
-        // Fuerza proporcional al tiempo de carga
-        float currentForce = Mathf.Lerp(minThrowForce, maxThrowForce, holdTime / maxHoldTime);
+        // Distancias reducidas a la mitad para el preview
+        float previewMin = minThrowDistance * 0.35f;
+        float previewMax = maxThrowDistance * 0.35f;
 
-        // Distancia proyectada según la fuerza actual
-        float projectedDistance = currentForce; // o multiplicar por una constante si quieres escalar visualmente
+        float previewDistance = Mathf.Lerp(previewMin, previewMax, holdTime);
 
-        // Si aún no alcanza la mínima distancia, no mostrar preview
-        if (projectedDistance < minThrowForce)
-        {
-            throwPreview.gameObject.SetActive(false);
-            return;
-        }
+        Vector3 pos = throwDirectionSource.position + throwDirectionSource.forward * previewDistance;
+
+        throwPreview.position = pos;
 
         if (!throwPreview.gameObject.activeSelf)
             throwPreview.gameObject.SetActive(true);
-
-        // Limitar la distancia para que no supere el máximo
-        projectedDistance = Mathf.Min(projectedDistance, maxThrowForce);
-
-        // Calcular distancia relativa desde mínimo
-        float relativeDistance = projectedDistance - minThrowForce;
-
-        // Posición base del lanzamiento
-        Vector3 basePos = throwDirectionSource.position + throwDirectionSource.forward * minPreviewDistance;
-
-        // Posición final del preview (desde minPreviewDistance hasta maxPreviewDistance)
-        float maxRelative = maxPreviewDistance - minPreviewDistance;
-        float t = Mathf.Clamp01(relativeDistance / (maxThrowForce - minThrowForce));
-        Vector3 previewPos = basePos + throwDirectionSource.forward * (maxRelative * t);
-
-        throwPreview.position = previewPos;
     }
 }
