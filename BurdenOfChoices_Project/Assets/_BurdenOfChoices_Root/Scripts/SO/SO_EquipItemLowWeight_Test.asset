@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4063d7576d52f0d4bbe72a97c69f0526, type: 3}
-  m_Name: SO_EquipDataTest
+  m_Name: SO_EquipItemLowWeight_Test
   m_EditorClassIdentifier: 
-  itemName: Test
-  waight: 0
-  isEquipped: 0
+  itemName: Item
+  weight: 1
+  highlightMaterial: {fileID: 2100000, guid: d34708841ea379f43b0101bc6ae39c98, type: 2}
+  originalMaterial: {fileID: 2100000, guid: 0e7752ee48a7a2f4ca659df57eb87dcd, type: 2}

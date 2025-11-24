@@ -5,7 +5,7 @@ public class EquipableData : ScriptableObject
 {
     [Header("Gneral")]
     public string itemName = "Item";
-    public float waight = 1f; //peso del objeto
+    public float weight = 1f; //peso del objeto
     public Material highlightMaterial; //material de cuando puedes interactuar con el objeto
     public Material originalMaterial; //material original del objeto. 
 }

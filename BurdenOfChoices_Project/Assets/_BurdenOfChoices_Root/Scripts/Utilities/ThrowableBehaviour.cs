@@ -15,7 +15,7 @@ public class ThrowableBehaviour : MonoBehaviour
     }
 
     #region Throw
-    public void OnThrow (Vector3 direction, float force)
+    public void OnThrow (Vector3 direction, float horizontalForce, float verticalForce)
     {
         //No lanzar si no está equipado
         if (!pickable.IsCatched) return;
@@ -23,8 +23,10 @@ public class ThrowableBehaviour : MonoBehaviour
         //Priemro dropeamos para reactivar física
         pickable.OnDrop();
 
+        Vector3 appliedForce = direction.normalized * horizontalForce + Vector3.up * verticalForce;
+
         //Aplicamos fuerza limpia
-        pickable.rb.AddForce(direction * force, ForceMode.Impulse);
+        pickable.rb.AddForce(appliedForce, ForceMode.Impulse);
     }
     #endregion
 }
