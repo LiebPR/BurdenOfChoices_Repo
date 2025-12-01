@@ -9,14 +9,14 @@ public class EnemyEventManager : MonoBehaviour
     VisionSystem visionSystem;
 
     //States
-    EnemyMoveController enemyMove;
+    TurnToTargetState turnPatrolState;
     #endregion
 
     private void Awake()
     {
         fsm = GetComponent<EnemyFSM>();
-        visionSystem = GetComponentInChildren<VisionSystem>();
-        enemyMove = GetComponent<EnemyMoveController>();
+        visionSystem = GetComponentInChildren<VisionSystem>(); 
+        turnPatrolState = GetComponent<TurnToTargetState>();
     }
 
     #region Subscription Events
@@ -25,10 +25,7 @@ public class EnemyEventManager : MonoBehaviour
         //Vision System
         visionSystem.OnSeeTarget += HandleTargetSee;
         visionSystem.OnLoseTarget += HandleTargetLost;
-
-        //Move Controller
-        enemyMove.OnIdleStarted += HandleIdleStart;
-        enemyMove.OnIdleEnded += HandleIdleEnd;
+        visionSystem.OnEnterPerception += HandleEnterPerception;
     }
 
     private void OnDisable()
@@ -36,10 +33,7 @@ public class EnemyEventManager : MonoBehaviour
         //Vision System
         visionSystem.OnSeeTarget -= HandleTargetSee;
         visionSystem.OnLoseTarget -= HandleTargetLost;
-
-        //Move Controller
-        enemyMove.OnIdleStarted -= HandleIdleStart;
-        enemyMove.OnIdleEnded -= HandleIdleEnd;
+        visionSystem.OnEnterPerception -= HandleEnterPerception;
     }
     #endregion
 
@@ -52,17 +46,11 @@ public class EnemyEventManager : MonoBehaviour
     {
         fsm.OnPatrol();
     }
-    #endregion
-
-    #region Move Handlers
-    void HandleIdleStart()
+    void HandleEnterPerception(Transform target)
     {
-        fsm.OnIdle();
-    }
-
-    void HandleIdleEnd()
-    {
-        fsm.OnPatrol();
+        turnPatrolState.SetTarget(target);
+        fsm.OnTurnTuTarget();
     }
     #endregion
+
 }

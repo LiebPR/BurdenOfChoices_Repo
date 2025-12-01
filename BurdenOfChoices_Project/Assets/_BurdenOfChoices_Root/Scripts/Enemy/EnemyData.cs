@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(fileName = "EnemyData", menuName = "EnemyData/Enemy")]
 public class EnemyData : ScriptableObject
@@ -29,6 +30,10 @@ public class EnemyData : ScriptableObject
     public float chaseSpeed = 5f; //velocidad de persecución del enemigo
     public float rotationSpeed = 8f; //velocidad de rotación del enemigo
     public float destinationUpdateThreshold = 0.2f;
+
+    [Header("Chasing Setting")]
+    public float rotationChaseStiffness = 12f;
+    public float rotationChaseDamping = 20f;
 
     [Header("Rotation Damp Settings")]
     public float rotationStiffness = 6f; //fuerza del resorte

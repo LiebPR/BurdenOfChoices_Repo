@@ -20,6 +20,7 @@ public class VisionSystem : MonoBehaviour
 
     bool canSeePlayer; // indica si el enemigo puede ver al jugador
     bool isPlayerInPerceptionArea; // indica si el jugador está en el área de parada
+    bool previousPerceptionState; 
 
     RaycastHit rayObstacleDetector; // rayo para detectar obstáculos
     #endregion
@@ -38,6 +39,8 @@ public class VisionSystem : MonoBehaviour
     #region Events
     public event Action<Transform> OnSeeTarget; // evento que se dispara al ver al jugador
     public event Action<Transform> OnLoseTarget; // evento que se dispara al perder al jugador
+    public event Action<Transform> OnEnterPerception;
+    public event Action<Transform> OnExitPerception;
     #endregion
 
     private void Awake()
@@ -81,17 +84,19 @@ public class VisionSystem : MonoBehaviour
             //Si ve, resetea lostTimer y marca visión
             lostTimer = enemyData.lostDelay;
             canSeePlayer = true;
-            LastKnownPosition = Target.position;
         }
         else
         {
             //Si no ve frontalmente, decrementa timer de pérdida
-            lostTimer -= Time.deltaTime;
-            if(lostTimer <= 0f)
+            if (lostTimer > 0f)
+            {
+                lostTimer -= Time.deltaTime;
+            }
+            else
             {
                 canSeePlayer = false;
-                lostTimer = 0f;
             }
+            
         }
 
         //Perception Area - solo si no se ve en el cono
@@ -112,19 +117,30 @@ public class VisionSystem : MonoBehaviour
                 perceptionTimer = enemyData.perceptionDelay; //reset para la próxima vez
             }
         }
-        else
+        else if (isPlayerInPerceptionArea)
         {
-            //fuera del área de percepción -> reset de estado de percepción
             isPlayerInPerceptionArea = false;
             perceptionTimer = enemyData.perceptionDelay;
         }
 
+
+        if (isPlayerInPerceptionArea && !previousPerceptionState && enemyData.perceptionDelay == 0f)
+        {
+            OnEnterPerception?.Invoke(Target);
+        }
+        else if(!isPlayerInPerceptionArea && previousPerceptionState)
+        {
+            OnExitPerception?.Invoke(Target);
+        }
+
+        previousPerceptionState = isPlayerInPerceptionArea;
+
         //Eventos - solo cuando hay cambio real
-        if(canSeePlayer && !previusSee)
+        if (canSeePlayer && !previusSee)
         {
             OnSeeTarget?.Invoke(Target);
         }
-        else if(!canSeePlayer && previusSee)
+        else if (!canSeePlayer && previusSee)
         {
             OnLoseTarget?.Invoke(Target);
         }

@@ -18,18 +18,20 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  perceptionDelay: 0.5
+  perceptionDelay: 2
   lostDelay: 2
-  stopAreaRadius: 2
-  minStopDistance: 1
-  maxStopDistance: 2
+  stopAreaRadius: 1
+  minStopDistance: 0.2
+  maxStopDistance: 0.3
   stopTransitionTime: 0.5
   patrolSpeed: 1
-  chaseSpeed: 3
+  chaseSpeed: 2
   rotationSpeed: 8
   destinationUpdateThreshold: 0.2
-  rotationStiffness: 6
-  rotationDamping: 10
+  rotationChaseStiffness: 20
+  rotationChaseDamping: 5
+  rotationStiffness: 8
+  rotationDamping: 4
   normalAcceleration: 8
   breackAcceleration: 25
-  idleTime: 3
+  idleTime: 2
