@@ -18,12 +18,6 @@ public class EnemyData : ScriptableObject
     public float perceptionDelay = 0.5f; //tiempo de retraso para detectar el área
     public float lostDelay = 1f; //tiempo de retraso para perder al jugador
 
-    [Header("Stop Area")]
-    public float stopAreaRadius = 2f; //radio del área donde el enemigo se detiene
-    public float minStopDistance = 1.5f; //distancia minima de parada
-    public float maxStopDistance = 3.5f; //distancia máxima de parada
-    public float stopTransitionTime = 0.5f; //tiempo de transición al frenar
-
     //States 
     [Header("Movement Settings")]
     public float patrolSpeed = 3f; //velocidad de patrulla del enemigo

@@ -20,7 +20,8 @@ public class VisionSystem : MonoBehaviour
 
     bool canSeePlayer; // indica si el enemigo puede ver al jugador
     bool isPlayerInPerceptionArea; // indica si el jugador está en el área de parada
-    bool previousPerceptionState; 
+    bool previousPerceptionState;
+    bool perceptionTriggered; 
 
     RaycastHit rayObstacleDetector; // rayo para detectar obstáculos
     #endregion
@@ -33,7 +34,6 @@ public class VisionSystem : MonoBehaviour
     #region Getters
     public Transform Target { get; private set; } //player
     public Vector3 LastKnownPosition { get; private set; } // última posición conocida del jugador
-    public bool IsPlayerInStopArea { get; private set; } // indica si el jugador está en el área de parada
     #endregion
 
     #region Events
@@ -71,7 +71,6 @@ public class VisionSystem : MonoBehaviour
         bool obstacleRay = CheckObstacle(dirToTarget, distToTarget, out rayObstacleDetector);
 
         UpdateVisionState(inCone, inPerception, obstacleRay);
-        CheckStopArea(distToTarget);
     }
 
     void UpdateVisionState(bool inCone, bool inPerception, bool obstacleRay)
@@ -102,35 +101,37 @@ public class VisionSystem : MonoBehaviour
         //Perception Area - solo si no se ve en el cono
         if(!canSeePlayer && inPerception)
         {
-            //Si acabamos de entrar en área de percepción, inicializamos el temporizador
             if (!isPlayerInPerceptionArea)
             {
                 isPlayerInPerceptionArea = true;
                 perceptionTimer = enemyData.perceptionDelay;
+                perceptionTriggered = false;
+                Debug.Log("Player is IN perception area");
             }
 
-            perceptionTimer -= Time.deltaTime;
-            if(perceptionTimer <= 0f)
+            //Cuenta atras hacia la percepción real
+            if (!perceptionTriggered)
             {
-                canSeePlayer = true;
-                LastKnownPosition = Target.position;
-                perceptionTimer = enemyData.perceptionDelay; //reset para la próxima vez
+                perceptionTimer -= Time.deltaTime;
+                if(perceptionTimer <= 0f && !perceptionTriggered)
+                {
+                    perceptionTriggered = true;
+                    Debug.Log("Player está Mucho tiempo en la percepción - percepción activada");
+                    LastKnownPosition = Target.position;
+                    OnEnterPerception?.Invoke(Target);
+                }
             }
         }
-        else if (isPlayerInPerceptionArea)
+        else
         {
+            if (isPlayerInPerceptionArea)
+            {
+                Debug.Log("Player is OUT perception area");
+            }
+
             isPlayerInPerceptionArea = false;
+            perceptionTriggered = false;
             perceptionTimer = enemyData.perceptionDelay;
-        }
-
-
-        if (isPlayerInPerceptionArea && !previousPerceptionState && enemyData.perceptionDelay == 0f)
-        {
-            OnEnterPerception?.Invoke(Target);
-        }
-        else if(!isPlayerInPerceptionArea && previousPerceptionState)
-        {
-            OnExitPerception?.Invoke(Target);
         }
 
         previousPerceptionState = isPlayerInPerceptionArea;
@@ -184,11 +185,6 @@ public class VisionSystem : MonoBehaviour
 
         return true;
     }
-
-    void CheckStopArea(float distToTarget)
-    {
-        IsPlayerInStopArea = distToTarget <= enemyData.stopAreaRadius;
-    }
     #endregion
 
     #region Utilities
@@ -234,9 +230,6 @@ public class VisionSystem : MonoBehaviour
             Vector3 rayEnd = rayObstacleDetector.collider != null ? rayObstacleDetector.point : Target.position;
             Gizmos.DrawLine(visionPoint.position, rayEnd);
         }
-
-        // Área de parada
-        Gizmos.DrawWireSphere(visionPoint.position, enemyData.stopAreaRadius);
     }
     #endregion
 }

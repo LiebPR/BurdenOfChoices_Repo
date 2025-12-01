@@ -36,24 +36,9 @@ public class ChaseState : MonoBehaviour, IEnemyState
 
         Vector3 targetPos = visionSystem.Target.position;
 
-        if (!visionSystem.IsPlayerInStopArea)
-        {
-            // Si no está en stop area nos aseguramos de reanudar (propietario)
-            movementCommands.ResumeMovement(stopOwnerId, enemyData.chaseSpeed, enemyData.normalAcceleration);
-            movementCommands.MoveTo(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold, enemyData.rotationStiffness, enemyData.rotationDamping);
-        }
-        else
-        {
-            // Iniciamos la fase de frenado con nuestro ownerId
-            movementCommands.StartStopping(stopOwnerId, enemyData.minStopDistance, enemyData.maxStopDistance, enemyData.breackAcceleration);
-            bool stillStopping = movementCommands.UpdateStopping(stopOwnerId, targetPos, enemyData.chaseSpeed, enemyData.stopTransitionTime);
-            if (!stillStopping)
-            {
-                // Si ya no está en fase de frenado, reanudamos
-                movementCommands.ResumeMovement(stopOwnerId, enemyData.chaseSpeed, enemyData.normalAcceleration);
-                movementCommands.MoveTo(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold, enemyData.rotationStiffness, enemyData.rotationDamping);
-            }
-        }
+        //Persecucion constante
+        movementCommands.ResumeMovement(stopOwnerId, enemyData.chaseSpeed, enemyData.normalAcceleration);
+        movementCommands.MoveTo(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold, enemyData.rotationStiffness, enemyData.rotationDamping);
 
         movementCommands.RotateTowards(targetPos, enemyData.rotationChaseStiffness, enemyData.rotationChaseDamping);
     }
