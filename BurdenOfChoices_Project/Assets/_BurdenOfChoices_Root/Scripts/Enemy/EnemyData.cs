@@ -33,6 +33,10 @@ public class EnemyData : ScriptableObject
     public float rotationStiffness = 6f; //fuerza del resorte
     public float rotationDamping = 10f; //fricción angular
 
+    [Header("Stop Area Settings")]
+    public float stopStartDistance = 6f; //comienza a frenar a esta distancia
+    public float stopHardDistance = 3f; //se detiene totalmente a esta distancia
+
     [Header("Acceleration Settings")]
     public float normalAcceleration = 8f;
     public float breackAcceleration = 25f;

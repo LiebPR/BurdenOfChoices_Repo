@@ -9,7 +9,7 @@ public enum EnemyState
     Chase,
     Stun,
     Death,
-    TurnToTarget,
+    TurnToTarget
 }
 
 public class EnemyFSM : MonoBehaviour

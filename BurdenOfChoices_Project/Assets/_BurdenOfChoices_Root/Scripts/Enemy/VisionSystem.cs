@@ -14,6 +14,9 @@ public class VisionSystem : MonoBehaviour
 
     [SerializeField] EnemyData enemyData; // datos del enemigo
 
+    [Header("Debug Actives")]
+    [SerializeField] bool perceptionDebuging;
+
     #region Internal States
     float lostTimer = 0f; // temporizador para perder al jugador
     float perceptionTimer; // temporizador para la percepción
@@ -21,7 +24,8 @@ public class VisionSystem : MonoBehaviour
     bool canSeePlayer; // indica si el enemigo puede ver al jugador
     bool isPlayerInPerceptionArea; // indica si el jugador está en el área de parada
     bool previousPerceptionState;
-    bool perceptionTriggered; 
+    bool perceptionTriggered;
+    bool isPlayerInStopArea; //indica si está en área de parada
 
     RaycastHit rayObstacleDetector; // rayo para detectar obstáculos
     #endregion
@@ -34,13 +38,13 @@ public class VisionSystem : MonoBehaviour
     #region Getters
     public Transform Target { get; private set; } //player
     public Vector3 LastKnownPosition { get; private set; } // última posición conocida del jugador
+    public bool IsPlayerInStopArea => isPlayerInStopArea; //indíca si el jugador está dentro del área de parada
     #endregion
 
     #region Events
     public event Action<Transform> OnSeeTarget; // evento que se dispara al ver al jugador
     public event Action<Transform> OnLoseTarget; // evento que se dispara al perder al jugador
     public event Action<Transform> OnEnterPerception;
-    public event Action<Transform> OnExitPerception;
     #endregion
 
     private void Awake()
@@ -70,6 +74,8 @@ public class VisionSystem : MonoBehaviour
         bool inPerception = PerceptionArea();
         bool obstacleRay = CheckObstacle(dirToTarget, distToTarget, out rayObstacleDetector);
 
+        EvaluateStopArea(distToTarget);
+
         UpdateVisionState(inCone, inPerception, obstacleRay);
     }
 
@@ -98,7 +104,7 @@ public class VisionSystem : MonoBehaviour
             
         }
 
-        //Perception Area - solo si no se ve en el cono
+        //PERCEPTION ÁREA - solo si no se ve en el cono
         if(!canSeePlayer && inPerception)
         {
             if (!isPlayerInPerceptionArea)
@@ -106,7 +112,7 @@ public class VisionSystem : MonoBehaviour
                 isPlayerInPerceptionArea = true;
                 perceptionTimer = enemyData.perceptionDelay;
                 perceptionTriggered = false;
-                Debug.Log("Player is IN perception area");
+                if(perceptionDebuging) Debug.Log("Player is IN perception area");
             }
 
             //Cuenta atras hacia la percepción real
@@ -116,7 +122,7 @@ public class VisionSystem : MonoBehaviour
                 if(perceptionTimer <= 0f && !perceptionTriggered)
                 {
                     perceptionTriggered = true;
-                    Debug.Log("Player está Mucho tiempo en la percepción - percepción activada");
+                    if(perceptionDebuging) Debug.Log("Player está Mucho tiempo en la percepción - percepción activada");
                     LastKnownPosition = Target.position;
                     OnEnterPerception?.Invoke(Target);
                 }
@@ -126,7 +132,7 @@ public class VisionSystem : MonoBehaviour
         {
             if (isPlayerInPerceptionArea)
             {
-                Debug.Log("Player is OUT perception area");
+                if(perceptionDebuging) Debug.Log("Player is OUT perception area");
             }
 
             isPlayerInPerceptionArea = false;
@@ -187,6 +193,23 @@ public class VisionSystem : MonoBehaviour
     }
     #endregion
 
+    #region Stop Area Evaluation
+    //Evalua si el enemigo está dentro del área de parada, 
+    //usando stopStartDistance y stopHardDistance del EnemyData
+    void EvaluateStopArea(float distToTarget)
+    {
+        //El enemigo empieza a frenar dentro de esta distancia
+        if(distToTarget <= enemyData.stopStartDistance)
+        {
+            isPlayerInStopArea = true;
+        }
+        else
+        {
+            isPlayerInStopArea = false;
+        }
+    }
+    #endregion
+
     #region Utilities
     void FindPlayer()
     {
@@ -222,6 +245,12 @@ public class VisionSystem : MonoBehaviour
         Gizmos.color = baseColor;
         Gizmos.DrawLine(visionPoint.position, visionPoint.position + rightDir * enemyData.visionRadius);
         Gizmos.DrawLine(visionPoint.position, visionPoint.position + leftDir * enemyData.visionRadius);
+
+        //Stop area
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(visionPoint.position, enemyData.perceptionRadius);
+
+        
 
         // Raycast de obstáculos
         if (Target != null)
