@@ -15,7 +15,7 @@ Material:
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
+  m_DoubleSidedGI: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses:
@@ -26,6 +26,14 @@ Material:
     m_TexEnvs:
     - _BaseMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BloodMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BloodTex:
+        m_Texture: {fileID: 2800000, guid: 0c9a946ef6022074fa36d01772792894, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BloodTex1:
@@ -77,11 +85,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 51cad9722ffcea34982ab388ecb69e46, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 0c9a946ef6022074fa36d01772792894, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -116,6 +128,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BloodAmount: 1
+    - _BloodCoef: 1
     - _BloodCount: 10
     - _BloodScale1: 0.907
     - _BloodScale2: 1
@@ -127,22 +140,36 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
+    - _DripFactor: 0
+    - _DripLength: 0.1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EdgeSoftness: 0.103
     - _EnvironmentReflections: 1
+    - _FadeSoftness: 0.01
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MaxScale: 0.719
+    - _MaxScale: 0.563
+    - _MaxSplatSize: 0.25
     - _Metallic: 0
-    - _MinScale: 0.078
+    - _MinScale: 0.155
+    - _NumSplats: 15
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.5
+    - _Scale: 20
+    - _Scale1: 1.1
+    - _Scale2: 50
+    - _ScaleBig: 10
+    - _ScaleSmall: 50
+    - _Smoothness: 0.1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
+    - _SplatMaxSize: 0.05
+    - _SplatScale: 0.1
+    - _SplatSize: 0.05
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
@@ -151,12 +178,12 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BloodColor: {r: 1, g: 0, b: 0, a: 1}
-    - _BloodColor1: {r: 0.8018868, g: 0, b: 0, a: 1}
-    - _BloodColor2: {r: 0.8679245, g: 0, b: 0, a: 1}
-    - _BloodColor3: {r: 0.4716981, g: 0, b: 0, a: 1}
+    - _BloodColor: {r: 0.6698113, g: 0.16745283, b: 0.16745283, a: 1}
+    - _BloodColor1: {r: 0.24528301, g: 0, b: 0, a: 1}
+    - _BloodColor2: {r: 0.3301887, g: 0.026477396, b: 0, a: 1}
+    - _BloodColor3: {r: 0.3679245, g: 0.2204076, b: 0.2204076, a: 1}
     - _BloodColor4: {r: 0.4339623, g: 0.06755074, b: 0.06755074, a: 1}
-    - _BloodColor5: {r: 0.7169812, g: 0.24688502, b: 0.24688502, a: 1}
+    - _BloodColor5: {r: 0.3773585, g: 0.062299743, b: 0.062299743, a: 1}
     - _BloodColor6: {r: 0.31132078, g: 0.024964407, b: 0.024964407, a: 1}
     - _BloodOffset1: {r: 3.02, g: 0.76, b: 0.21, a: 0}
     - _BloodOffset2: {r: 6.08, g: 0.99, b: 0.6, a: 0.45}
@@ -164,6 +191,8 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Tiling: {r: 2.04, g: -0.86, b: 0, a: 0}
+    - _Tint: {r: 1, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &8600250620071810643
