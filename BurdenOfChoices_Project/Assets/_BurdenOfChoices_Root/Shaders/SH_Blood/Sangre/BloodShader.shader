@@ -1,6 +1,6 @@
 ﻿Shader "Custom/BloodShader"
 {
-    Properties
+     Properties
     {
         _BloodTex1("Blood Texture 1", 2D) = "white" {}
         _BloodTex2("Blood Texture 2", 2D) = "white" {}
@@ -20,8 +20,6 @@
         _BloodCount("Max Blood Count per Texture", Range(1,10)) = 5
         _MinScale("Min Scale", Range(0.05,0.5)) = 0.08
         _MaxScale("Max Scale", Range(0.1,1)) = 0.2
-        _DripFactor("Drip Factor", Range(0,1)) = 0.5
-        _Smoothness("Appearance Smoothness", Range(0.1,5)) = 2.0
     }
 
     SubShader
@@ -37,23 +35,14 @@
             #pragma fragment frag
             #include "UnityCG.cginc"
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
+            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
+            struct v2f { float2 uv : TEXCOORD0; float4 vertex : SV_POSITION; };
 
             sampler2D _BloodTex1,_BloodTex2,_BloodTex3,_BloodTex4,_BloodTex5,_BloodTex6;
             float4 _BloodColor1,_BloodColor2,_BloodColor3,_BloodColor4,_BloodColor5,_BloodColor6;
             float _BloodAmount;
             int _BloodCount;
-            float _MinScale,_MaxScale,_DripFactor,_Smoothness;
+            float _MinScale,_MaxScale;
 
             float Hash21(float2 p)
             {
@@ -81,11 +70,11 @@
 
                 for (int i=0; i<_BloodCount; i++)
                 {
-                    // Aparece de menos a más
+                    // Progresión de aparición
                     float appearThreshold = ((float)(i+1)/_BloodCount);
                     if(_BloodAmount < appearThreshold) continue;
 
-                    // Factor de fundido suave para la mancha
+                    // Alpha suavizado para fundido
                     float alphaFactor = smoothstep(appearThreshold-0.05, appearThreshold+0.05, _BloodAmount);
 
                     float2 offset = float2(Hash21(float2(i, seed)), Hash21(float2(i+seed, i)));
@@ -93,9 +82,6 @@
 
                     float scale = lerp(_MinScale, _MaxScale, Hash21(float2(i+seed,i*2)));
                     float2 bloodUV = (uv - offset)/scale + offset;
-
-                    // Goteo vertical según la cantidad de sangre
-                    bloodUV.y -= _DripFactor * pow(_BloodAmount - appearThreshold, 1.5);
 
                     fixed4 sample = tex2D(bloodTex, bloodUV) * bloodColor * alphaFactor;
                     blood = BlendBlood(blood, sample);
