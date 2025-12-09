@@ -149,6 +149,10 @@ public class EnemyFSM : MonoBehaviour
     public void OnChase() => ChangeState(EnemyState.Chase);
     public void OnStun() => ChangeState(EnemyState.Stun);
     public void OnDeath() => ChangeState(EnemyState.Death);
-    public void OnTurnTuTarget() => ChangeState(EnemyState.TurnToTarget);
+    public void OnTurnTuTarget()
+    {
+        if (CurrentState == EnemyState.Alert || CurrentState == EnemyState.Chase || CurrentState == EnemyState.Stun || CurrentState == EnemyState.TurnToTarget) return;
+        ChangeState(EnemyState.TurnToTarget);
+    }
     #endregion
 }

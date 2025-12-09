@@ -3,12 +3,17 @@ using UnityEngine;
 
 public class TurnToTargetState : MonoBehaviour, IEnemyState
 {
+    //Inspector
     [SerializeField] EnemyData enemyData;
+
+    //Internal States
+    Vector3 targetPos;
+    float threshold = 2f; //grados para considerar que ya giró
+
+    //References
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
 
-    Vector3 targetPos;
-    float threshold = 2f; //grados para considerar que ya giró
 
     public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands movement)
     {
@@ -18,7 +23,8 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
 
     public void Enter()
     {
-
+        //Restauramos movimiento al entrar en este estado
+        movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.breackAcceleration);
     }
 
     public void Handle()
@@ -48,6 +54,11 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
     public void SetTarget(Transform t)
     {
         targetPos = t.position;
+    }
+
+    public void SetTargetPoint(Vector3 point)
+    {
+
     }
     #endregion
 }

@@ -10,21 +10,17 @@ using UnityEngine.AI;
 /// </summary>
 public class VisionSystem : MonoBehaviour
 {
+    #region Inspector Variables
     [SerializeField] Transform visionPoint; // punto desde donde se emite la vision.
 
     [SerializeField] EnemyData enemyData; // datos del enemigo
 
     [Header("Debug Actives")]
     [SerializeField] bool perceptionDebuging;
+    #endregion
 
     #region Internal States
-    float lostTimer = 0f; // temporizador para perder al jugador
-    float perceptionTimer; // temporizador para la percepción
-
     bool canSeePlayer; // indica si el enemigo puede ver al jugador
-    bool isPlayerInPerceptionArea; // indica si el jugador está en el área de parada
-    bool previousPerceptionState;
-    bool perceptionTriggered;
     bool isPlayerInStopArea; //indica si está en área de parada
 
     RaycastHit rayObstacleDetector; // rayo para detectar obstáculos
@@ -81,75 +77,33 @@ public class VisionSystem : MonoBehaviour
 
     void UpdateVisionState(bool inCone, bool inPerception, bool obstacleRay)
     {
-        bool previusSee = canSeePlayer;
+        bool previousSee = canSeePlayer;
 
-        //Cone visión - Prioridad alta
-        if(inCone && !obstacleRay)
+        // Visión directa
+        if (inCone && !obstacleRay)
         {
-            //Si ve, resetea lostTimer y marca visión
-            lostTimer = enemyData.lostDelay;
             canSeePlayer = true;
-        }
-        else
-        {
-            //Si no ve frontalmente, decrementa timer de pérdida
-            if (lostTimer > 0f)
-            {
-                lostTimer -= Time.deltaTime;
-            }
-            else
-            {
-                canSeePlayer = false;
-            }
-            
-        }
-
-        //PERCEPTION ÁREA - solo si no se ve en el cono
-        if(!canSeePlayer && inPerception)
-        {
-            if (!isPlayerInPerceptionArea)
-            {
-                isPlayerInPerceptionArea = true;
-                perceptionTimer = enemyData.perceptionDelay;
-                perceptionTriggered = false;
-                if(perceptionDebuging) Debug.Log("Player is IN perception area");
-            }
-
-            //Cuenta atras hacia la percepción real
-            if (!perceptionTriggered)
-            {
-                perceptionTimer -= Time.deltaTime;
-                if(perceptionTimer <= 0f && !perceptionTriggered)
-                {
-                    perceptionTriggered = true;
-                    if(perceptionDebuging) Debug.Log("Player está Mucho tiempo en la percepción - percepción activada");
-                    LastKnownPosition = Target.position;
-                    OnEnterPerception?.Invoke(Target);
-                }
-            }
-        }
-        else
-        {
-            if (isPlayerInPerceptionArea)
-            {
-                if(perceptionDebuging) Debug.Log("Player is OUT perception area");
-            }
-
-            isPlayerInPerceptionArea = false;
-            perceptionTriggered = false;
-            perceptionTimer = enemyData.perceptionDelay;
-        }
-
-        previousPerceptionState = isPlayerInPerceptionArea;
-
-        //Eventos - solo cuando hay cambio real
-        if (canSeePlayer && !previusSee)
-        {
             OnSeeTarget?.Invoke(Target);
         }
-        else if (!canSeePlayer && previusSee)
+        else
         {
-            OnLoseTarget?.Invoke(Target);
+            if (canSeePlayer) // si estaba viendo, ahora pierde
+            {
+                canSeePlayer = false;
+                OnLoseTarget?.Invoke(Target);
+            }
+        }
+
+        // Percepción sin visión directa
+        if (!canSeePlayer && inPerception)
+        {
+            OnEnterPerception?.Invoke(Target);
+        }
+
+        // Debug centralizado
+        if (perceptionDebuging)
+        {
+            Debug.Log($"[VisionDebug] Target:{Target.name} CanSee:{canSeePlayer} InCone:{inCone} Obstacle:{obstacleRay} InPerception:{inPerception}");
         }
     }
     #endregion
@@ -246,10 +200,13 @@ public class VisionSystem : MonoBehaviour
         Gizmos.DrawLine(visionPoint.position, visionPoint.position + rightDir * enemyData.visionRadius);
         Gizmos.DrawLine(visionPoint.position, visionPoint.position + leftDir * enemyData.visionRadius);
 
-        //Stop area
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(visionPoint.position, enemyData.perceptionRadius);
+        //STOP AREA - radio donde empieza a frenar
+        Gizmos.color = new Color(0f, 1f, 1f, 0.5f); //cyan
+        Gizmos.DrawWireSphere(transform.position, enemyData.stopStartDistance);
 
+        //- radio donde debe estar completamente parado
+        Gizmos.color = new Color(1f, 0f, 0f, 0.5f); //rojo
+        Gizmos.DrawWireSphere(transform.position, enemyData.stopHardDistance);
         
 
         // Raycast de obstáculos

@@ -5,9 +5,11 @@ using UnityEngine.AI;
 
 public class EnemyMoveController : MonoBehaviour
 {
+    #region Getters
     public EnemyMovementCommands Commands { get; private set; }
     public NavMeshAgent Agent { get; private set; }
     public VisionSystem Vision { get; private set; }
+    #endregion
 
     private void Awake()
     {
