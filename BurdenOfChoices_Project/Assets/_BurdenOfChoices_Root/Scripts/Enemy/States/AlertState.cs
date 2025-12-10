@@ -1,20 +1,20 @@
 using UnityEngine;
-using UnityEngine.Rendering.RenderGraphModule;
 
 public class AlertState : MonoBehaviour, IEnemyState
 {
-    //Inspector
     [SerializeField] EnemyData enemyData;
 
     #region Internal States
-    Vector3 alertPoint; //ultimo punto donde oyó algo
-    float waitTimer; //temporizador interno
-    float waitDuration; //duración según si jugador corre o camina
-    float threshold = 2f; //precisión del giro en grados
+    Vector3 alertPoint; // último punto donde oyó algo
+    float waitTimer; // temporizador interno
+    float waitDuration; // duración según si el jugador corre o camina
+    float threshold = 2f; // precisión del giro en grados
 
     bool waitingPhase;
     bool rotatingPhase;
     bool movingPhase;
+
+    bool hasReachedAlertPoint; // bandera para verificar si el enemigo ha llegado al último punto
     #endregion
 
     #region References
@@ -30,7 +30,7 @@ public class AlertState : MonoBehaviour, IEnemyState
 
     public void Enter()
     {
-        //Se detiene al entrar en el estado de alerta
+        // Se detiene al entrar en el estado de alerta
         movementCommands.ResumeMovement(0f, enemyData.breackAcceleration);
         movementCommands.ResetAngularVelocity();
 
@@ -39,19 +39,20 @@ public class AlertState : MonoBehaviour, IEnemyState
         rotatingPhase = false;
         movingPhase = false;
 
-        //Seguridad, asigna un valor por defecto
-        if(waitDuration <= 0)
+        hasReachedAlertPoint = false; // resetear la bandera
+
+        // Seguridad, asigna un valor por defecto
+        if (waitDuration <= 0)
             waitDuration = enemyData.hearingDelayWalk;
-        
     }
 
     public void Handle()
     {
-        //ESPERA
+        // Fase de espera
         if (waitingPhase)
         {
             waitTimer += Time.deltaTime;
-            if(waitTimer >= waitDuration)
+            if (waitTimer >= waitDuration)
             {
                 waitingPhase = false;
                 rotatingPhase = true;
@@ -62,44 +63,49 @@ public class AlertState : MonoBehaviour, IEnemyState
             }
         }
 
-        //ROTAR HACIA EL PUNTO
+        // Fase de rotación
         if (rotatingPhase)
         {
             Vector3 dir = alertPoint - movementCommands.Transform.position;
             dir.y = 0f;
 
-            if(dir.sqrMagnitude > 0.001f)
+            if (dir.sqrMagnitude > 0.001f)
             {
                 movementCommands.RotateTowards(alertPoint, enemyData.rotationStiffness, enemyData.rotationDamping);
             }
 
             float angle = Vector3.Angle(movementCommands.Transform.forward, dir.normalized);
 
-            if(angle <= threshold)
+            if (angle <= threshold)
             {
                 rotatingPhase = false;
+                movingPhase = true;
 
-                //Activa movimiento hacia el punto del ruido
                 movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.normalAcceleration);
                 movementCommands.MoveTo(alertPoint, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
-
-                movingPhase = true;
             }
         }
 
-        //IR HACIA EL PUNTO
+        // Fase de movimiento
         if (movingPhase)
         {
             movementCommands.MoveTo(alertPoint, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
 
             float dist = Vector3.Distance(movementCommands.Transform.position, alertPoint);
 
+            // Comprobamos si el enemigo ha llegado al punto asignado
             if (dist <= 0.5f)
             {
-                fsm.OnIdle();
+                hasReachedAlertPoint = true;
+                fsm.OnIdle(); // Si llega al punto, pasa al estado Idle o realiza la acción correspondiente.
             }
-
-            return;
+            else
+            {
+                if (hasReachedAlertPoint)
+                {
+                    hasReachedAlertPoint = false; // Aseguramos que solo se marque como "llegado" una vez
+                }
+            }
         }
     }
 
@@ -109,13 +115,16 @@ public class AlertState : MonoBehaviour, IEnemyState
     }
 
     #region External API
-    //Donde el sistema de percepción asigna el último punto escuchado
+    // Asigna el último punto escuchado
     public void SetAlertPoint(Vector3 point)
     {
-        alertPoint = point;
+        if (hasReachedAlertPoint)
+        {
+            alertPoint = point; // Solo actualiza si el enemigo ha llegado al punto actual
+        }
     }
 
-    //Según si el jugador caminaba o corría
+    // Ajusta la duración de espera dependiendo de si el jugador estaba corriendo o caminando
     public void SetIsPlayerRunning(bool running)
     {
         waitDuration = running ? enemyData.hearingDelayRun : enemyData.hearingDelayWalk;

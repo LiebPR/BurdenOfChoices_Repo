@@ -21,6 +21,7 @@ public class EnemyData : ScriptableObject
 
     [Header("Heraing Settings")]
     public float maxHearingRadius = 5f;
+    public float noiseMemoryTime = 1f;
 
     [Header("Heraing Delys")]
     public float hearingDelayWalk = 1.5f;

@@ -11,7 +11,7 @@ public class PatrolState : MonoBehaviour, IEnemyState
     #region Internal States
     int currentIndex = 0;
     float idleTimer;
-    bool idleInProgress;
+    public bool idleInProgress;
     string stopOwnerId;
     #endregion
 

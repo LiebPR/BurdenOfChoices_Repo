@@ -24,6 +24,10 @@ public class VisionSystem : MonoBehaviour
     bool isPlayerInStopArea; //indica si está en área de parada
 
     RaycastHit rayObstacleDetector; // rayo para detectar obstáculos
+
+    float visionTimer = 0f;
+    float perceptionTimer = 0f;
+    float lostTimer = 0f;
     #endregion
 
     #region References
@@ -35,6 +39,11 @@ public class VisionSystem : MonoBehaviour
     public Transform Target { get; private set; } //player
     public Vector3 LastKnownPosition { get; private set; } // última posición conocida del jugador
     public bool IsPlayerInStopArea => isPlayerInStopArea; //indíca si el jugador está dentro del área de parada
+
+    public bool CanSeeTarget()
+    {
+        return canSeePlayer;
+    }
     #endregion
 
     #region Events
@@ -82,22 +91,50 @@ public class VisionSystem : MonoBehaviour
         // Visión directa
         if (inCone && !obstacleRay)
         {
-            canSeePlayer = true;
-            OnSeeTarget?.Invoke(Target);
+            visionTimer += Time.deltaTime;
+            if(visionTimer >= enemyData.visionDelay)
+            {
+                if (!canSeePlayer)
+                {
+                    canSeePlayer = true;
+                    OnSeeTarget?.Invoke(Target);
+                }
+            }
         }
         else
         {
-            if (canSeePlayer) // si estaba viendo, ahora pierde
+            visionTimer = 0f;
+
+            //Solo si actualmente no lo ve, empezamos el delay de perder
+            if (canSeePlayer)
             {
-                canSeePlayer = false;
-                OnLoseTarget?.Invoke(Target);
+                lostTimer += Time.deltaTime;
+                if(lostTimer >= enemyData.lostDelay)
+                {
+                    canSeePlayer = false;
+                    OnLoseTarget?.Invoke(Target);
+                    lostTimer = 0f;
+                }
+            }
+            else
+            {
+                lostTimer = 0f;
             }
         }
 
         // Percepción sin visión directa
         if (!canSeePlayer && inPerception)
         {
-            OnEnterPerception?.Invoke(Target);
+            perceptionTimer += Time.deltaTime;
+            if(perceptionTimer >= enemyData.perceptionDelay)
+            {
+                perceptionTimer = enemyData.perceptionDelay;
+                OnEnterPerception?.Invoke(Target);
+            }
+        }
+        else
+        {
+            perceptionTimer = 0f;
         }
 
         // Debug centralizado
@@ -152,8 +189,15 @@ public class VisionSystem : MonoBehaviour
     //usando stopStartDistance y stopHardDistance del EnemyData
     void EvaluateStopArea(float distToTarget)
     {
+        // Solo aplica el stop area si el enemigo está persiguiendo
+        if (fsm.CurrentState != EnemyState.Chase)
+        {
+            isPlayerInStopArea = false;
+            return;
+        }
+
         //El enemigo empieza a frenar dentro de esta distancia
-        if(distToTarget <= enemyData.stopStartDistance)
+        if (distToTarget <= enemyData.stopStartDistance)
         {
             isPlayerInStopArea = true;
         }
@@ -202,11 +246,11 @@ public class VisionSystem : MonoBehaviour
 
         //STOP AREA - radio donde empieza a frenar
         Gizmos.color = new Color(0f, 1f, 1f, 0.5f); //cyan
-        Gizmos.DrawWireSphere(transform.position, enemyData.stopStartDistance);
+        Gizmos.DrawWireSphere(visionPoint.position, enemyData.stopStartDistance);
 
         //- radio donde debe estar completamente parado
         Gizmos.color = new Color(1f, 0f, 0f, 0.5f); //rojo
-        Gizmos.DrawWireSphere(transform.position, enemyData.stopHardDistance);
+        Gizmos.DrawWireSphere(visionPoint.position, enemyData.stopHardDistance);
         
 
         // Raycast de obstáculos

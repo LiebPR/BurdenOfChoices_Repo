@@ -7,7 +7,7 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
     [SerializeField] EnemyData enemyData;
 
     //Internal States
-    Vector3 targetPos;
+    Transform target;
     float threshold = 2f; //grados para considerar que ya giró
 
     //References
@@ -23,22 +23,33 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
 
     public void Enter()
     {
-        //Restauramos movimiento al entrar en este estado
+        //Aseguramos que no se congele el movimiento
         movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.breackAcceleration);
     }
 
     public void Handle()
     {
+        if (target == null)
+        {
+            //Si no hay target, no tiene sentido seguir aquí
+            fsm.OnPatrol();
+            return;
+        }
+
+        Vector3 targetPos = target.position;
         Vector3 dir = targetPos - movementCommands.Transform.position;
         dir.y = 0;
 
-        if(dir.sqrMagnitude > 0.0001f)
+        if (dir.sqrMagnitude < 0.0001f)
         {
-            movementCommands.RotateTowards(targetPos, enemyData.rotationStiffness, enemyData.rotationDamping);
+            fsm.OnPatrol();
+            return;
         }
 
+        movementCommands.RotateTowards(targetPos, enemyData.rotationStiffness, enemyData.rotationDamping);
+
         float angle = Vector3.Angle(movementCommands.Transform.forward, dir.normalized);
-        if(angle < threshold)
+        if (angle < threshold)
         {
             fsm.OnPatrol();
         }
@@ -46,19 +57,18 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
 
     public void Exit()
     {
-        //Reset del integrador de rotación
         movementCommands.ResetAngularVelocity();
     }
 
     #region Utilities
     public void SetTarget(Transform t)
     {
-        targetPos = t.position;
+        target = t;
     }
 
     public void SetTargetPoint(Vector3 point)
     {
-
+        //Si quieres girar hacia un punto estático, puedes implementarlo luego
     }
     #endregion
 }

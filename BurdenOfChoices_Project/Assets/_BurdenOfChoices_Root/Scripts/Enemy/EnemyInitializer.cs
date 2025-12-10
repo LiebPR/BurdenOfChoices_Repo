@@ -41,7 +41,6 @@ public class EnemyInitializer : MonoBehaviour
         fsm.RegisterState(EnemyState.Idle, idle);
         fsm.RegisterState(EnemyState.Chase, chase);
         fsm.RegisterState(EnemyState.TurnToTarget, turnState);
-        fsm.RegisterState(EnemyState.Alert, alert);
 
         // Activamos el primer estado
         fsm.ResetState(); // Esto llamará a ChangeState(EnemyState.Patrol) y ejecutará Enter()

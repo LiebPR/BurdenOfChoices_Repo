@@ -51,14 +51,12 @@ public class PlayerController : MonoBehaviour
 
     #region References
     Rigidbody rb;
-    PlayerNoiseEmitter noiseEmitter;
     #endregion
 
     private void Awake()
     {
         //REFERENCES:
         rb = GetComponent<Rigidbody>();
-        noiseEmitter = GetComponent<PlayerNoiseEmitter>();
     }
 
     private void Update()
@@ -120,7 +118,6 @@ public class PlayerController : MonoBehaviour
         //Aplicamos velocidad final manteniendo Y
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
 
-        UpdateNoiseEmitter();
     }
     #endregion
 
@@ -221,39 +218,6 @@ public class PlayerController : MonoBehaviour
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         float multiplier = 1f - penalty;
         currentWeightSpeedMultiplier = Mathf.Clamp(multiplier, weightAccelerationSensitivity, 1f);
-    }
-    #endregion
-
-    #region Noise
-    void UpdateNoiseEmitter()
-    {
-        if (noiseEmitter == null) return;
-
-        // Velocidad planar real
-        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        float speed = planarVelocity.magnitude;
-
-        // Determinar estado de ruido
-        if (isCrouching)
-        {
-            noiseEmitter.currentState = PlayerNoiseEmitter.MovementState.Crouched;
-            noiseEmitter.currentSpeed = 0f; // No hace ruido
-        }
-        else if (speed > 0.01f) // Se está moviendo
-        {
-            noiseEmitter.currentSpeed = speed;
-
-            if (isRuning)
-                noiseEmitter.currentState = PlayerNoiseEmitter.MovementState.Running;
-            else
-                noiseEmitter.currentState = PlayerNoiseEmitter.MovementState.Walking;
-        }
-        else
-        {
-            // No se mueve
-            noiseEmitter.currentSpeed = 0f;
-            noiseEmitter.currentState = isRuning ? PlayerNoiseEmitter.MovementState.Running : PlayerNoiseEmitter.MovementState.Walking;
-        }
     }
     #endregion
 }

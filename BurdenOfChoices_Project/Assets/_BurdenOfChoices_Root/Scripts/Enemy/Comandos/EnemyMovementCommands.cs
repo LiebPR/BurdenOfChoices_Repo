@@ -17,7 +17,6 @@ public class EnemyMovementCommands
 
     //Control de destino
     Vector3 lastSetDestination = Vector3.positiveInfinity;
-    bool destinationLocked;
 
     float stopStartDistance;
     float stopHardDistance;
@@ -52,7 +51,6 @@ public class EnemyMovementCommands
         {
             agent.SetDestination(targetPosition);
             lastSetDestination = targetPosition;
-            destinationLocked = false;
         }
 
         // Lógica de rotación
@@ -181,7 +179,6 @@ public class EnemyMovementCommands
     public void ResetDestination()
     {
         lastSetDestination = Vector3.positiveInfinity;
-        destinationLocked = false;
 
         if(agent !=  null && !agent.isStopped)
         {
