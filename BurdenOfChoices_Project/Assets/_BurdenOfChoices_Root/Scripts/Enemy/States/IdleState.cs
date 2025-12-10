@@ -3,13 +3,18 @@ using UnityEngine;
 
 public class IdleState : MonoBehaviour, IEnemyState
 {
+    //Inpector 
     [SerializeField] EnemyData enemyData;
 
+    //Internal State
     float idleTimer;
+
+    #region References
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
     PatrolState patrolState;
     TurnToTargetState turnState;
+    #endregion
 
     public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, PatrolState patrol, TurnToTargetState turn)
     {
@@ -36,7 +41,7 @@ public class IdleState : MonoBehaviour, IEnemyState
             Transform next = patrolState.GetCurrentPoint();
             turnState.SetTarget(next);
 
-            fsm.OnTurnTuTarget();
+            fsm.OnTurnTuTarget(next);
         }
     }
 

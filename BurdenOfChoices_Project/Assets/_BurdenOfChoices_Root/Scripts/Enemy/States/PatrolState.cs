@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class PatrolState : MonoBehaviour, IEnemyState
 {
+    //Inspector
     [SerializeField] EnemyData enemyData;
     [SerializeField] Transform[] patrolPoints;
 
+    #region Internal States
     int currentIndex = 0;
     float idleTimer;
-    bool idleInProgress;
+    public bool idleInProgress;
     string stopOwnerId;
+    #endregion
 
+    #region References
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
     TurnToTargetState turnState;
     EnemyMoveController moveController;
+    #endregion
 
     public void Initialize(EnemyFSM enemyfsm, EnemyMovementCommands command, TurnToTargetState turn, EnemyMoveController move)
     {
@@ -31,7 +36,7 @@ public class PatrolState : MonoBehaviour, IEnemyState
 
 
         movementCommands.ResetDestination();
-        movementCommands.ResumeMovement(stopOwnerId, enemyData.patrolSpeed, enemyData.normalAcceleration);
+        movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.normalAcceleration);
 
         //Reasigna destino al punto actual
         movementCommands.MoveTo(patrolPoints[currentIndex].position, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);

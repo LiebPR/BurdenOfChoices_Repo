@@ -14,24 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visionRadius: 3
   visionAngle: 60
-  perceptionRadius: 1.5
+  perceptionRadius: 1
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  perceptionDelay: 2
+  perceptionDelay: 1
+  visionDelay: 0.1
   lostDelay: 2
-  stopAreaRadius: 1
-  minStopDistance: 0.2
-  maxStopDistance: 0.3
-  stopTransitionTime: 0.5
+  maxHearingRadius: 15
+  noiseMemoryTime: 3
+  hearingDelayWalk: 1
+  hearingDelayRun: 0.5
   patrolSpeed: 1
-  chaseSpeed: 2
+  chaseSpeed: 2.5
   rotationSpeed: 8
   destinationUpdateThreshold: 0.2
-  rotationChaseStiffness: 20
-  rotationChaseDamping: 5
-  rotationStiffness: 8
-  rotationDamping: 4
+  rotationChaseStiffness: 8
+  rotationChaseDamping: 4
+  rotationStiffness: 25
+  rotationDamping: 15
+  stopStartDistance: 2
+  stopHardDistance: 0.8
   normalAcceleration: 8
   breackAcceleration: 25
   idleTime: 2

@@ -16,7 +16,16 @@ public class EnemyData : ScriptableObject
 
     [Header("Vision Delays")]
     public float perceptionDelay = 0.5f; //tiempo de retraso para detectar el área
+    public float visionDelay = 0.2f;
     public float lostDelay = 1f; //tiempo de retraso para perder al jugador
+
+    [Header("Heraing Settings")]
+    public float maxHearingRadius = 5f;
+    public float noiseMemoryTime = 1f;
+
+    [Header("Heraing Delys")]
+    public float hearingDelayWalk = 1.5f;
+    public float hearingDelayRun = 0.8f;
 
     //States 
     [Header("Movement Settings")]

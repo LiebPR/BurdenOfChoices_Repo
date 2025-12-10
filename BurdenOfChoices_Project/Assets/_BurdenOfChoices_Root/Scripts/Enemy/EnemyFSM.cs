@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public enum EnemyState
 {
@@ -145,10 +146,23 @@ public class EnemyFSM : MonoBehaviour
     #region Public Handlers
     public void OnPatrol() => ChangeState(EnemyState.Patrol);
     public void OnIdle() => ChangeState(EnemyState.Idle);
-    public void OnAlert() => ChangeState(EnemyState.Alert);
     public void OnChase() => ChangeState(EnemyState.Chase);
     public void OnStun() => ChangeState(EnemyState.Stun);
     public void OnDeath() => ChangeState(EnemyState.Death);
-    public void OnTurnTuTarget() => ChangeState(EnemyState.TurnToTarget);
+    public void OnTurnTuTarget(Transform target)
+    {
+        // Obtenemos la instancia del estado TurnToTarget
+        if (stateInstances.TryGetValue(EnemyState.TurnToTarget, out IEnemyState state))
+        {
+            TurnToTargetState turnState = state as TurnToTargetState;
+            if (turnState != null)
+            {
+                turnState.SetTarget(target);
+            }
+        }
+
+        // Cambiamos al estado TurnToTarget
+        ChangeState(EnemyState.TurnToTarget);
+    }
     #endregion
 }

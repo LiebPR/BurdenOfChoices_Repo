@@ -5,16 +5,12 @@ public class ChaseState : MonoBehaviour, IEnemyState
 {
     [SerializeField] EnemyData enemyData;
 
-    string stopOwnerId;
-
+    #region References
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
     VisionSystem visionSystem;
+    #endregion
 
-    private void Awake()
-    {
-        stopOwnerId = Guid.NewGuid().ToString();
-    }
     public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, VisionSystem vision)
     {
         fsm = enemyFsm;
@@ -24,10 +20,14 @@ public class ChaseState : MonoBehaviour, IEnemyState
 
     public void Enter() 
     {
-        // Limpiamos cualquier bloqueo previo pero SIN forzar otros propietarios (no force)
-        movementCommands.ResumeMovement(stopOwnerId, enemyData.chaseSpeed, enemyData.normalAcceleration, force: true);
+        // Reseteamos todo para empezar a perseguir limpio
+        movementCommands.ResumeMovement(enemyData.chaseSpeed, enemyData.normalAcceleration);
         movementCommands.ResetAngularVelocity();
         movementCommands.ResetDestination();
+
+        // Activamos la lógica de frenado progresivo
+        movementCommands.EnableStopLogic(true);
+        movementCommands.ConfigureStopArea(enemyData.stopStartDistance, enemyData.stopHardDistance);
     }
 
     public void Handle()
@@ -35,17 +35,26 @@ public class ChaseState : MonoBehaviour, IEnemyState
         if (visionSystem == null || visionSystem.Target == null) return;
 
         Vector3 targetPos = visionSystem.Target.position;
+        float distance = Vector3.Distance(transform.position, targetPos);
 
-        //Persecucion constante
-        movementCommands.ResumeMovement(stopOwnerId, enemyData.chaseSpeed, enemyData.normalAcceleration);
-        movementCommands.MoveTo(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold, enemyData.rotationStiffness, enemyData.rotationDamping);
+        // Movimiento hacia el jugador
+        movementCommands.MoveTo(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold,
+                                enemyData.rotationChaseStiffness, enemyData.rotationChaseDamping);
 
+        // Aplicamos frenado progresivo si estamos en área de parada
+        movementCommands.ApplyStopLogic(distance, enemyData.chaseSpeed, enemyData.breackAcceleration);
+
+        // Rotación hacia el objetivo
         movementCommands.RotateTowards(targetPos, enemyData.rotationChaseStiffness, enemyData.rotationChaseDamping);
+
     }
 
     public void Exit() 
     {
-        // Al salir liberamos control (otros estados pueden forzar reanudar si lo requieren)
-        movementCommands.ResumeMovement(stopOwnerId, enemyData.chaseSpeed, enemyData.normalAcceleration, force: true);
+        // Desactivamos la lógica de frenado
+        movementCommands.EnableStopLogic(false);
+
+        // Aseguramos que el agente quede listo para el siguiente estado
+        movementCommands.ResumeMovement(enemyData.chaseSpeed, enemyData.normalAcceleration);
     }
 }

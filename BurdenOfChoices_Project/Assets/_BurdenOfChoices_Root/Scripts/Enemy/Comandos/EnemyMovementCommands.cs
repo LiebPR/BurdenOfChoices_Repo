@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
@@ -16,10 +17,10 @@ public class EnemyMovementCommands
 
     //Control de destino
     Vector3 lastSetDestination = Vector3.positiveInfinity;
-    bool destinationLocked;
 
-    string stopOwnerId = null; //quien controla la fase de frenado 
-    bool isFullyStopped = false; //indicador interno parada total
+    float stopStartDistance;
+    float stopHardDistance;
+    bool stopLogicEnabled;
     #endregion
 
     #region References
@@ -44,157 +45,89 @@ public class EnemyMovementCommands
     {
         if (agent == null) return;
 
-        //Actualizar destino solo si cambió suficiente
-        float sqThershold = updateThreshold * updateThreshold;
-        if(lastSetDestination == Vector3.positiveInfinity || Vector3.SqrMagnitude(lastSetDestination - targetPosition) > sqThershold)
+        // Actualizar destino solo si cambió suficiente
+        float sqThreshold = updateThreshold * updateThreshold;
+        if (lastSetDestination == Vector3.positiveInfinity || Vector3.SqrMagnitude(lastSetDestination - targetPosition) > sqThreshold)
         {
             agent.SetDestination(targetPosition);
             lastSetDestination = targetPosition;
-            destinationLocked = false;
         }
 
-        //Calculamos un factor de velocidad influenciado por la rotación para acompasar movimiento y giro.
+        // Lógica de rotación
+        RotateTowards(targetPosition, rotationStiffness, rotationDamping);
+
+        // Calculamos un factor de velocidad influenciado por la rotación
         float finalSpeed = speed;
-        if(rotationStiffness > 0f)
+        if (rotationStiffness > 0f)
         {
             Vector3 toTarget = targetPosition - transform.position;
             toTarget.y = 0f;
-            if(toTarget.sqrMagnitude > 0.0001f)
+            if (toTarget.sqrMagnitude > 0.0001f)
             {
                 Vector3 dir = toTarget.normalized;
-                float alignmet = Vector3.Dot(transform.forward, dir);
+                float alignment = Vector3.Dot(transform.forward, dir);
 
-                //Responsiveness entre 0 y 1
-                float responsivness = rotationStiffness / Mathf.Max(rotationStiffness + rotationDamping, 0.0001f);
-                responsivness = Mathf.Clamp01(responsivness);
+                float responsiveness = rotationStiffness / Mathf.Max(rotationStiffness + rotationDamping, 0.0001f);
+                responsiveness = Mathf.Clamp01(responsiveness);
 
-                float minFactor = Mathf.Lerp(0.4f, 0.8f, responsivness);
+                float minFactor = Mathf.Lerp(0.4f, 0.8f, responsiveness);
 
-                float align01 = (alignmet + 1f) * 0.5f; //tunable
+                float align01 = (alignment + 1f) * 0.5f; // Tunable
 
                 float angVelMag = angularVelocity.magnitude;
                 float angPenalty = Mathf.Clamp01(angVelMag * 0.5f);
 
                 float speedFactor = Mathf.Lerp(minFactor, 1f, align01);
-                speedFactor *= (1f - 0.5f * angPenalty); //penalización por rotación dinámica
+                speedFactor *= (1f - 0.5f * angPenalty); // Penalización por rotación dinámica
 
                 finalSpeed = speed * Mathf.Clamp01(speedFactor);
-             }
+            }
         }
-        //Aplicamos la velocidad objetivo cada frame (evita lentitud en reinicio
-        agent.speed = speed;
 
-        //Si el agente había sido detenido, aseguramos que vuelva a caminar
+        // Aplicamos la velocidad objetivo cada frame (evita lentitud en reinicio)
+        agent.speed = finalSpeed;
+
+        // Si el agente había sido detenido, aseguramos que vuelva a caminar
         agent.isStopped = false;
-    }
-
-    public void ResetDestination()
-    {
-        lastSetDestination = Vector3.positiveInfinity;
-        destinationLocked = false;
     }
     #endregion
 
-    #region Stopping (Frenado progresivo)
-    //Inicializa la fase de frenado. minStopDistance/maxStopDistance son radios, breakeAcceleration es la aceleración de frenado
-    public void StartStopping(string ownerId, float minStopDistance, float maxStopDistance, float brakeAcceleration)
+    #region Stop Logic (Hard / Soft Stop)
+    public void ConfigureStopArea(float startDist, float hardDist)
     {
-        //si hay otro propietario y no es el mismo, no iniciamos (a menos que se fuerce externamente)
-        if (stopOwnerId != null && stopOwnerId != ownerId) return;
-
-        stopOwnerId = ownerId;
-        isFullyStopped = false;
-
-        currentStopDistance = Random.Range(minStopDistance, maxStopDistance);
-        stopTimer = 0f;
-        destinationLocked = false;
-        lastSetDestination = Vector3.positiveInfinity;
-
-        if(agent != null)
-        {
-            agent.acceleration = brakeAcceleration;
-
-            //No paramos al agente.
-            agent.isStopped = false;
-        }
+        stopStartDistance = startDist;
+        stopHardDistance = hardDist;
     }
 
-    //Actualiza la fase de frenado. Devuelve true si todavía está en fase de frenado
-    public bool UpdateStopping(string ownerId, Vector3 targetPosition, float chaseSpeed, float stopTransitionTime)
+    public void EnableStopLogic(bool enabled)
     {
-        //Si no eres el propietario activo, no haces nada
-        if(stopOwnerId == null || stopOwnerId != ownerId) return false;
-        if(agent == null) return false;
-
-        float distance = Vector3.Distance(transform.position, targetPosition);
-
-        //Frenado progresivo
-        if(distance < currentStopDistance)
-        {
-            stopTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(stopTimer / stopTransitionTime);
-
-            //Frenado progresivo
-            agent.speed = Mathf.Lerp(chaseSpeed, 0f, t);
-
-            //Actualizar destino miientras se reduce velocidad
-            if (t < 1f)
-            {
-                //Actualizamos destino mientras reducimos velocidad
-                if(lastSetDestination == Vector3.positiveInfinity || Vector3.SqrMagnitude(lastSetDestination - targetPosition) > DESTINATION_EPS)
-                {
-                    agent.SetDestination(targetPosition);
-                    lastSetDestination = targetPosition;
-                    destinationLocked = false;
-                }
-                isFullyStopped = true;
-            }
-            else
-            {
-                //Al llegar a velocidad 0 fijamos la meta en la posición acual una única vez
-                if(!destinationLocked || Vector3.SqrMagnitude(lastSetDestination - transform.position) > Mathf.Epsilon)
-                {
-                    agent.SetDestination(transform.position);
-                    lastSetDestination = transform.position;
-                    destinationLocked = true;
-                }
-
-                //Marcamos parada completa internamente y aplicamos agent.isStopped true
-                if (!isFullyStopped)
-                {
-                    agent.isStopped = true;
-                    isFullyStopped = true;
-                }
-            }
-            return true; //aún frenado
-        }
-
-        //Fuera del radio de parada: terminamos la fase de freando
-        //Liberamos propietario para que otros estados puedan tomar control si procede
-        stopOwnerId = null;
-        isFullyStopped = false;
-        return false; //fuera del radio de parada, no paramos
+        stopLogicEnabled = enabled;
     }
 
-    //Reanuda la persecución: reestablece aceleración/velocidad y desbloquea destino para permitir SetDestination inmediato.
-    public void ResumeMovement(string ownerId, float targetSpeed, float normalAcceleration, bool force = false)
+    public void ApplyStopLogic(float distanceToTarget, float speed, float acceleration)
     {
-        //Sólo el propietario o u caller con force podrá reanudar
-        if (!force && stopOwnerId != null && stopOwnerId != ownerId) return;
+        if (!stopLogicEnabled || agent == null) return; 
 
-        //Liberamos control del stop
-        stopOwnerId = null;
-        isFullyStopped = false;
+        //HARD STOP
+        if(distanceToTarget <= stopHardDistance)
+        {
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+            return;
+        }
 
-        if (agent == null) return;
+        //SOFT STOP
+        if(distanceToTarget > stopStartDistance)
+        {
+            agent.speed = Mathf.Lerp(0f, speed, Mathf.InverseLerp(stopHardDistance, stopStartDistance, distanceToTarget));
 
-        //Restauramos parámetros 
-        agent.speed = targetSpeed;
-        agent.acceleration = normalAcceleration;
-        agent.isStopped = false;
+            agent.acceleration = acceleration * 0.5f;
+            return;
+        }
 
-        destinationLocked = false;
-        lastSetDestination = Vector3.positiveInfinity;
+        //FULL SPEED
+        agent.speed = speed;
+        agent.acceleration = acceleration;
     }
     #endregion
 
@@ -238,6 +171,39 @@ public class EnemyMovementCommands
     public void ResetAngularVelocity()
     {
         angularVelocity = Vector3.zero;
+    }
+    #endregion
+
+    #region Reset
+    //Resetea el destino del agente y desbloquea el control para permitir SetDestination inmediato.
+    public void ResetDestination()
+    {
+        lastSetDestination = Vector3.positiveInfinity;
+
+        if(agent !=  null && !agent.isStopped)
+        {
+            //Forzamos que NavMeshAgent acepte nuevo destino
+            agent.ResetPath();
+        }
+    }
+
+    //Reanuda el movimiento del agente, restaurando velocidad, aceleración y desbloqueando el destino
+    public void ResumeMovement(float targetSpeed, float normalAcceleration)
+    {
+
+        if(agent != null)
+        {
+            //Restauramos parámetros
+            agent.speed = targetSpeed;
+            agent.acceleration = normalAcceleration;
+            agent.isStopped = false;
+
+            //Reiniciamos destino para aceptar nuevo SetDestination
+            ResetDestination();
+        }
+
+        //Restauramos velocidad angular para rotación
+        ResetAngularVelocity();
     }
     #endregion
 }

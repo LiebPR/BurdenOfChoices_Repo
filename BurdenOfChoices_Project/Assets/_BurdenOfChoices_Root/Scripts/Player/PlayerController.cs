@@ -51,7 +51,6 @@ public class PlayerController : MonoBehaviour
 
     #region References
     Rigidbody rb;
-    Animator animator;
     #endregion
 
     private void Awake()
@@ -118,6 +117,7 @@ public class PlayerController : MonoBehaviour
 
         //Aplicamos velocidad final manteniendo Y
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
+
     }
     #endregion
 
