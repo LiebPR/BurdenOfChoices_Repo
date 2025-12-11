@@ -51,6 +51,13 @@ public class EnemyPerceptionHandler : MonoBehaviour
     {
         lastTarget = target;
         fsm.OnChase();
+        
+        // Informar al EnemyAttack del objetivo
+        EnemyAttack attack = GetComponent<EnemyAttack>();
+        if (attack != null)
+        {
+            attack.SetTarget(target);
+        }
     }
 
     void HandleLoseTarget(Transform target)
