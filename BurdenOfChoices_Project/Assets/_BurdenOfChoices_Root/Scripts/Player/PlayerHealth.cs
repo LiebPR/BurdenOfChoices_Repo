@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,7 +7,10 @@ public class PlayerHealth : MonoBehaviour
     #region Inspector Variables
     [Header("Health Config")]
     [SerializeField] float knockbackForce = 5f; //fuerza del impulso hacia atrás
+
+    [Header("Respawn System")]
     [SerializeField] Transform firstDeathRespawnPoint; //punto donde reaparece en la primera muerte
+    [SerializeField] float respawnDelay = 1.2f; //tiempo en pantalla negra
     #endregion
 
     #region Internal State
@@ -15,9 +19,18 @@ public class PlayerHealth : MonoBehaviour
     Rigidbody rb;
     #endregion
 
+    #region References
+    FadeController fadeController;
+    #endregion
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
+        if (fadeController == null)
+        {
+            fadeController = FindAnyObjectByType<FadeController>();
+        }
     }
 
     #region Public Methods
@@ -47,6 +60,16 @@ public class PlayerHealth : MonoBehaviour
         var controller = GetComponent<PlayerController>();
         if (controller != null) controller.enabled = false;
 
+        //Forzar a todos los enemigos a dejar dever al player
+        var vision = FindAnyObjectByType<VisionSystem>();
+        if(vision != null)
+            vision.ResetVisionToDefault();
+
+        //Forzamos a patrol al enemigo
+        var enemyFsm = FindAnyObjectByType<EnemyFSM>();
+        if(enemyFsm != null)
+            enemyFsm.ForceResetToPatrol();
+
         deathCount++;
 
         if(deathCount == 1)
@@ -54,7 +77,7 @@ public class PlayerHealth : MonoBehaviour
             // Primera muerte: reaparecer en un punto definido (si está asignado)
             if (firstDeathRespawnPoint != null)
             {
-                ReappearAtPoint(firstDeathRespawnPoint);
+                StartCoroutine(RespawnRoutine(firstDeathRespawnPoint)); //respawn con fade
             }
             else
             {
@@ -104,6 +127,23 @@ public class PlayerHealth : MonoBehaviour
         if(controller != null) controller.enabled = true;
 
         isAlive = true;
+    }
+    #endregion
+
+    #region Routine
+    IEnumerator RespawnRoutine(Transform respawnPoint)
+    {
+        //Fade-Out solo en spawn
+        if (fadeController != null)
+            yield return fadeController.FadeOut();
+
+        yield return new WaitForSeconds(respawnDelay);
+
+        ReappearAtPoint(respawnPoint);
+
+        //Fade-In solo en respawn
+        if(fadeController != null)
+            yield return fadeController.FadeIn();
     }
     #endregion
 }

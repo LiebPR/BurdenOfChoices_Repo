@@ -216,6 +216,20 @@ public class VisionSystem : MonoBehaviour
     }
     #endregion
 
+    #region Public API
+    public void ResetVisionToDefault()
+    {
+        canSeePlayer = false;
+        isPlayerInStopArea = false;
+
+        perceptionTimer = 0f;
+        visionTimer = 0f;
+        lostTimer = 0f;
+
+        LastKnownPosition = Vector3.zero;
+    }
+    #endregion
+
     #region Gizmos 
     private void OnDrawGizmosSelected()
     {
