@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 81f810129789d1a4db977a955a237017
+guid: 2271971ad710ea34fb54478fafdae1c2
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,9 +31,9 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: IdleRelaxBody
-      takeName: IdleRelaxBody
-      internalID: 8831040787511332183
+      name: AN_PlayerBodyIdleRelax
+      takeName: AN_PlayerBodyIdleRelax
+      internalID: -5070302502839900512
       firstFrame: 0
       lastFrame: 74
       wrapMode: 0
@@ -60,7 +60,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|CrouchWalkBody
+      name: AN_PlayerBodyCrouchWalk
       takeName: Armature|CrouchWalkBody
       internalID: -2543134799997213614
       firstFrame: 0
@@ -89,7 +89,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|CrouchWalkPickUp
+      name: AN_PlayerBodyPickUpCrouchWalk
       takeName: Armature|CrouchWalkPickUp
       internalID: 2418863048558622560
       firstFrame: 0
@@ -118,7 +118,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|DeathBody
+      name: AN_PlayerBodyDeath
       takeName: Armature|DeathBody
       internalID: 2212676901686102299
       firstFrame: 0
@@ -147,7 +147,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|IdleBody
+      name: AN_PlayerBodyIdleScared
       takeName: Armature|IdleBody
       internalID: -5288323064777774048
       firstFrame: 0
@@ -176,7 +176,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|IdleBodyPickUp
+      name: AN_PlayerBodyPickUpIdleScaredBody
       takeName: Armature|IdleBodyPickUp
       internalID: -5429247729557461925
       firstFrame: 0
@@ -205,7 +205,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|IdleCrouchBody
+      name: AN_PlayerBodyCrouchIdle
       takeName: Armature|IdleCrouchBody
       internalID: 6012322996572841594
       firstFrame: 0
@@ -234,7 +234,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|IdleCrouchBodyPickUp
+      name: AN_PlayerBodyPickUpCrouch
       takeName: Armature|IdleCrouchBodyPickUp
       internalID: 6687542333736617263
       firstFrame: 0
@@ -263,7 +263,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|IdleRelaxBody
+      name: AN_PlayerBodyIdleRelax (1)
       takeName: Armature|IdleRelaxBody
       internalID: -4634655436816572298
       firstFrame: 0
@@ -292,7 +292,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|IdleRelaxBodyPickUp
+      name: AN_PlayerBodyPickUpIdleRelax
       takeName: Armature|IdleRelaxBodyPickUp
       internalID: -2447092991364670385
       firstFrame: 0
@@ -321,7 +321,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Take
+      name: AN_PlayerBodyTake
       takeName: Armature|Take
       internalID: -1845800019681135682
       firstFrame: 0
@@ -350,7 +350,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|TakeCrouch
+      name: AN_PlayerBodyTakeCrouch
       takeName: Armature|TakeCrouch
       internalID: -3425684068903057401
       firstFrame: 0
@@ -379,7 +379,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|TakeCrouchWalk
+      name: AN_PlayerBodyTakeCrouchWalk
       takeName: Armature|TakeCrouchWalk
       internalID: -2495273748467105590
       firstFrame: 0
@@ -408,7 +408,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|TakeWalk
+      name: AN_PlayerBodyTakeWalk
       takeName: Armature|TakeWalk
       internalID: 9016911531656743577
       firstFrame: 0
@@ -437,7 +437,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Throw
+      name: AN_PlayerBodyThrow
       takeName: Armature|Throw
       internalID: 9083654474561383684
       firstFrame: 0
@@ -466,7 +466,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|ThrowCrouch
+      name: AN_PlayerBodyThrowCrouch
       takeName: Armature|ThrowCrouch
       internalID: 5538435390969163803
       firstFrame: 0
@@ -495,7 +495,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|ThrowCrouchWalk
+      name: AN_PlayerBodyThrowCrouchWalk
       takeName: Armature|ThrowCrouchWalk
       internalID: -8911012193861746613
       firstFrame: 0
@@ -524,7 +524,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|ThrowWalk
+      name: AN_PlayerBodyThrowWalk
       takeName: Armature|ThrowWalk
       internalID: 3719694687667512011
       firstFrame: 0
@@ -553,7 +553,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|WalkBody
+      name: AN_PlayerBodyWalk
       takeName: Armature|WalkBody
       internalID: 839596701367754788
       firstFrame: 0
@@ -582,7 +582,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|WalkBodyPickUp
+      name: AN_PlayerBodyPickUpWalk
       takeName: Armature|WalkBodyPickUp
       internalID: 810103736509955576
       firstFrame: 0

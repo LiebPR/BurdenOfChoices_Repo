@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f74fd9c9be1b9824dbfe388faa92a2f3
+guid: 941e9f807d54bd54c839d52ec2c7ca50
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -31,9 +31,9 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: IdleRelaxLegs
-      takeName: IdleRelaxLegs
-      internalID: -3599612009597416077
+      name: AN_PlayerLegsIdleRelax
+      takeName: AN_PlayerLegsIdleRelax
+      internalID: 8768501106229879059
       firstFrame: 0
       lastFrame: 74
       wrapMode: 0
@@ -42,8 +42,8 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
-      loopBlend: 0
+      loopTime: 1
+      loopBlend: 1
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -60,7 +60,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|CrouchWalkLegs
+      name: AN_PlayerLegsCrouchWalk
       takeName: Armature.001|CrouchWalkLegs
       internalID: 3781303113838980368
       firstFrame: 0
@@ -89,7 +89,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|DeathLegs
+      name: AN_PlayerLegsDeath
       takeName: Armature.001|DeathLegs
       internalID: 3078469834659892749
       firstFrame: 0
@@ -118,7 +118,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|IdleCrouchLegs
+      name: AN_PlayerLegsCrouchIdle
       takeName: Armature.001|IdleCrouchLegs
       internalID: 423699850444299695
       firstFrame: 0
@@ -147,7 +147,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|IdleLegs
+      name: AN_PlayerLegsIdleScared
       takeName: Armature.001|IdleLegs
       internalID: 4488031096615024651
       firstFrame: 0
@@ -176,7 +176,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|IdleRelaxLegs
+      name: AN_PlayerLegsIdleRelax (1)
       takeName: Armature.001|IdleRelaxLegs
       internalID: -3926173097649182319
       firstFrame: 0
@@ -187,8 +187,8 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
+      loopTime: 0
+      loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -205,7 +205,7 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|WalkLegs
+      name: AN_PlayerLegsWalk
       takeName: Armature.001|WalkLegs
       internalID: -7272032227338098778
       firstFrame: 0
