@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,16 +12,20 @@ public class PlayerHealth : MonoBehaviour
     [Header("Respawn System")]
     [SerializeField] Transform firstDeathRespawnPoint; //punto donde reaparece en la primera muerte
     [SerializeField] float respawnDelay = 1.2f; //tiempo en pantalla negra
+
+    [Header("Cinemachine Cameras")]
+    [SerializeField] CinemachineCamera deathCamera;
     #endregion
 
     #region Internal State
     bool isAlive = true;
     int deathCount = 0;
-    Rigidbody rb;
+    int cameraHighPriority = 20;
     #endregion
 
     #region References
     FadeController fadeController;
+    Rigidbody rb;
     #endregion
 
     private void Awake()
@@ -141,8 +146,13 @@ public class PlayerHealth : MonoBehaviour
 
         ReappearAtPoint(respawnPoint);
 
+
+        //Activar cámara de muerte 
+        if(deathCamera != null)
+            deathCamera.Priority = cameraHighPriority;
+
         //Fade-In solo en respawn
-        if(fadeController != null)
+        if (fadeController != null)
             yield return fadeController.FadeIn();
     }
     #endregion

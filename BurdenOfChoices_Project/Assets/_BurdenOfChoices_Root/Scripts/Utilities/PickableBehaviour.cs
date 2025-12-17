@@ -14,6 +14,10 @@ public class PickableBehaviour : MonoBehaviour
     [Header("Debug")]
     [SerializeField] bool debugDrawGroundRay = true;
     [SerializeField] Color debugRayColor = Color.red;
+
+    [Header("Restore")]
+    [SerializeField] bool isRestoreWithTime = true;
+    [SerializeField] float restoreDelay = 1.5f;
     #endregion
 
     #region Internal States
@@ -21,15 +25,19 @@ public class PickableBehaviour : MonoBehaviour
     
     bool isCatched;
     bool pendingDropRequest;
+    bool restoreRunning;
 
     //Original States:
     Vector3 originalPosition;
     Quaternion originalRotation;
     Vector3 originalScale;
+
+    float restoreTimer;
     #endregion
 
     #region Rferences
     public Rigidbody rb;
+    Collider coll;
     #endregion
 
     #region Getters
@@ -44,6 +52,7 @@ public class PickableBehaviour : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        coll = GetComponent<Collider>();
 
         //Guardamos el estado original del objeto
         originalPosition = transform.position;
@@ -75,6 +84,11 @@ public class PickableBehaviour : MonoBehaviour
     //Coloca el obejto en la mano del jugador. 
     public void OnEquip(ICatcher catcher)
     {
+        //CAncelar cualquier restore pendiente
+        CancelInvoke(nameof(RestoreInternal));
+        CancelInvoke(nameof(UpdateRestoreTimer));
+        restoreRunning = false;
+
         if(catcher == null)
         {
             Debug.LogWarning("No se proporcionó un ICatcher válido");
@@ -90,6 +104,7 @@ public class PickableBehaviour : MonoBehaviour
             //Desactivar la física completamente
             rb.isKinematic = true;
             rb.useGravity = false;
+            coll.isTrigger = true;
         }
 
         //Parent al catchPoint
@@ -124,6 +139,7 @@ public class PickableBehaviour : MonoBehaviour
             {
                 rb.isKinematic = true;
                 rb.useGravity = false;
+                coll.isTrigger = true;
             }
 
             //No pocedemos al drop
@@ -142,12 +158,23 @@ public class PickableBehaviour : MonoBehaviour
         {
             rb.isKinematic = false;
             rb.useGravity = true;
+            coll.isTrigger = false;
         }
 
         //Restauramos el tamaño si se a alterado
         transform.localScale = originalScale;
 
         OnDropped?.Invoke(this); //notifica que se soltó
+
+        //Restore condicional
+        if (isRestoreWithTime)
+        {
+            restoreTimer = restoreDelay;
+            restoreRunning = true;
+
+            InvokeRepeating(nameof(UpdateRestoreTimer), 0f, Time.deltaTime);
+            Invoke(nameof(RestoreInternal), restoreDelay);
+        }
     }
     #endregion
 
@@ -204,6 +231,29 @@ public class PickableBehaviour : MonoBehaviour
 
         //Raycast hacia abajo buscando la layer configurada como suelo
         return Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
+    }
+    #endregion
+
+    #region Timer Visuals
+    void UpdateRestoreTimer()
+    {
+        restoreTimer -= Time.deltaTime;
+
+        if (restoreTimer <= 0f)
+        {
+            restoreTimer = 0f;
+            CancelInvoke(nameof(UpdateRestoreTimer));
+        }
+    }
+
+    public float GetRestoreRmainingTime()
+    {
+        return restoreRunning ? restoreTimer : 0f;
+    }
+
+    public float GetRestoreTotalTime()
+    {
+        return restoreDelay;
     }
     #endregion
 }
