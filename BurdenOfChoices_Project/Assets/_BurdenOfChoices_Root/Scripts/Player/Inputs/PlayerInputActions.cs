@@ -137,9 +137,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Gather"",
+                    ""name"": ""Catch"",
                     ""type"": ""Button"",
                     ""id"": ""813b618c-4240-4c50-b5ee-23219fee3fe0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Gather"",
+                    ""type"": ""Button"",
+                    ""id"": ""2557b93b-e4a4-4625-9d20-2f25a38f3e08"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -308,7 +317,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Gather"",
+                    ""action"": ""Catch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -319,7 +328,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Gather"",
+                    ""action"": ""Catch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -366,6 +375,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Atacar"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bad8d538-5f9c-44db-b423-76e87ec35a76"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gather"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -379,6 +399,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_GamePlay_Crouch = m_GamePlay.FindAction("Crouch", throwIfNotFound: true);
         m_GamePlay_Throw = m_GamePlay.FindAction("Throw", throwIfNotFound: true);
         m_GamePlay_Atacar = m_GamePlay.FindAction("Atacar", throwIfNotFound: true);
+        m_GamePlay_Catch = m_GamePlay.FindAction("Catch", throwIfNotFound: true);
         m_GamePlay_Gather = m_GamePlay.FindAction("Gather", throwIfNotFound: true);
     }
 
@@ -465,6 +486,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_Crouch;
     private readonly InputAction m_GamePlay_Throw;
     private readonly InputAction m_GamePlay_Atacar;
+    private readonly InputAction m_GamePlay_Catch;
     private readonly InputAction m_GamePlay_Gather;
     /// <summary>
     /// Provides access to input actions defined in input action map "GamePlay".
@@ -497,6 +519,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "GamePlay/Atacar".
         /// </summary>
         public InputAction @Atacar => m_Wrapper.m_GamePlay_Atacar;
+        /// <summary>
+        /// Provides access to the underlying input action "GamePlay/Catch".
+        /// </summary>
+        public InputAction @Catch => m_Wrapper.m_GamePlay_Catch;
         /// <summary>
         /// Provides access to the underlying input action "GamePlay/Gather".
         /// </summary>
@@ -542,6 +568,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Atacar.started += instance.OnAtacar;
             @Atacar.performed += instance.OnAtacar;
             @Atacar.canceled += instance.OnAtacar;
+            @Catch.started += instance.OnCatch;
+            @Catch.performed += instance.OnCatch;
+            @Catch.canceled += instance.OnCatch;
             @Gather.started += instance.OnGather;
             @Gather.performed += instance.OnGather;
             @Gather.canceled += instance.OnGather;
@@ -571,6 +600,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Atacar.started -= instance.OnAtacar;
             @Atacar.performed -= instance.OnAtacar;
             @Atacar.canceled -= instance.OnAtacar;
+            @Catch.started -= instance.OnCatch;
+            @Catch.performed -= instance.OnCatch;
+            @Catch.canceled -= instance.OnCatch;
             @Gather.started -= instance.OnGather;
             @Gather.performed -= instance.OnGather;
             @Gather.canceled -= instance.OnGather;
@@ -649,6 +681,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAtacar(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Catch" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCatch(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Gather" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

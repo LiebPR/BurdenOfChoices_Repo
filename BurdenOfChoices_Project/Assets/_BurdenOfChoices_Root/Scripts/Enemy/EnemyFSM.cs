@@ -165,4 +165,26 @@ public class EnemyFSM : MonoBehaviour
         ChangeState(EnemyState.TurnToTarget);
     }
     #endregion
+
+    #region Public API
+    public void ForceResetToPatrol()
+    {
+        // Limpiar estado interno
+        isChangingState = false;
+        hasPendingStateRequest = false;
+
+        // Forzar estado PATROL
+        CurrentState = EnemyState.Patrol;
+
+        // Obtener la instancia del estado
+        if (stateInstances.TryGetValue(EnemyState.Patrol, out IEnemyState patrolState))
+        {
+            currentStateInstance = patrolState;
+            currentStateInstance.Enter(); // Reiniciamos su lógica
+        }
+
+        // Avisamos a quien esté escuchando
+        OnStateChanged?.Invoke(CurrentState);
+    }
+    #endregion
 }

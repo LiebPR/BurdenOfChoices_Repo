@@ -24,6 +24,8 @@ public class InputManager : MonoBehaviour
     public static event Action OnThrowReleased;  // cuando suelta
     public static event Action OnGather;
     public static event Action OnGatherCanceled;
+    public static event Action OnCatch;
+    public static event Action OnCatchCanceled;
     #endregion
 
     private void Awake()
@@ -54,6 +56,8 @@ public class InputManager : MonoBehaviour
         inputA.GamePlay.Atacar.performed += OnAttackPerformed;
         inputA.GamePlay.Gather.performed += OnGatherPerformed;
         inputA.GamePlay.Gather.canceled += OnGatherCanceledPerformed;
+        inputA.GamePlay.Catch.started += ctx => OnCatch?.Invoke();
+        inputA.GamePlay.Catch.canceled += ctx => OnCatchCanceled?.Invoke();
 
         //LANZAR
         inputA.GamePlay.Throw.started += OnThrowStarted;
@@ -112,6 +116,10 @@ public class InputManager : MonoBehaviour
         inputA.GamePlay.Atacar.performed -= OnAttackPerformed;
         
         inputA.GamePlay.Gather.performed -= OnGatherPerformed;
+        inputA.GamePlay.Gather.canceled -= ctx => OnGatherCanceled?.Invoke();
+
+        inputA.GamePlay.Catch.started -= ctx => OnCatch?.Invoke();
+        inputA.GamePlay.Catch.canceled -= ctx => OnCatchCanceled?.Invoke();
 
         //LANZAR
         inputA.GamePlay.Throw.started -= OnThrowStarted;
