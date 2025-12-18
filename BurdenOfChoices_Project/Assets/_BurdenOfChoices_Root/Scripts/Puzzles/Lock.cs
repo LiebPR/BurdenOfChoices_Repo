@@ -5,6 +5,10 @@ public class Lock : MonoBehaviour
 {
     #region Inspector States
     [SerializeField] Cell ownerCell;
+
+    [Header("Consume Point")]
+    [Tooltip("Punto al que acudiara la llave cuando impacte con el candado")]
+    [SerializeField] Transform keyConsumePoint; 
     #endregion
 
     #region Internal States
@@ -13,6 +17,7 @@ public class Lock : MonoBehaviour
 
     #region Getters
     public bool IsLocked => isLocked;
+    public Transform KeyConsumePoint => keyConsumePoint; 
     #endregion
 
     //Public API

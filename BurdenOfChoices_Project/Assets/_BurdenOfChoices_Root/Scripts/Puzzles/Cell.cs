@@ -13,6 +13,10 @@ public class Cell : MonoBehaviour
     int lockedCount;
     #endregion
 
+    #region Getters
+    public bool AreAllLocksUnlocked => lockedCount <= 0;
+    #endregion
+
     private void Awake()
     {
         lockedCount = locks.Count;
@@ -21,16 +25,7 @@ public class Cell : MonoBehaviour
     #region Public API
     public void NotifyLockOpened(Lock onpenLock)
     {
-        lockedCount--;
-        if(lockedCount <= 0)
-        {
-            Win();
-        }
+        lockedCount = Mathf.Max(lockedCount - 1, 0);
     }
     #endregion
-
-    void Win()
-    {
-        SceneManager.LoadScene(winScene);
-    }
 }

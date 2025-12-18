@@ -2,11 +2,22 @@ using UnityEngine;
 
 public class Key : MonoBehaviour, IInteractable
 {
+    #region Inspector States
+    [Header("Consume Behaviour")]
+    [Tooltip("Punto de consumo para la llave")]
+    [SerializeField] float destroyDelay = 1f; //Delay antes de desaparecer
+    #endregion
+
+    //Internal State
+    Lock targetLock;
+
     #region References
     PickableBehaviour pickable;
     PlayerHand playerHand;
     Renderer meshRenderer;
     DataProvider dataProvider;
+    Rigidbody rb;
+    Collider col;
     #endregion
 
     #region Getters
@@ -18,6 +29,8 @@ public class Key : MonoBehaviour, IInteractable
         pickable = GetComponent<PickableBehaviour>();
         dataProvider = GetComponent<DataProvider>();
         meshRenderer = GetComponentInChildren<Renderer>();
+        rb = GetComponent<Rigidbody>();
+        col = GetComponentInChildren<Collider>();
 
         playerHand = FindAnyObjectByType<PlayerHand>();
         if(playerHand == null)
@@ -29,17 +42,10 @@ public class Key : MonoBehaviour, IInteractable
     #region IInteractable
     public void OnPress()
     {
-        if (playerHand == null || pickable == null) return;
-
-        ICatcher carcher = playerHand.GetComponent<ICatcher>();
-        pickable.OnEquip(carcher);
     }
 
     public void OnRelease()
     {
-        if(pickable == null) return;
-
-        pickable.RequestDrop();
     }
 
     public void OnHighlight()
@@ -67,8 +73,47 @@ public class Key : MonoBehaviour, IInteractable
 
         if (!lockComponent.IsLocked) return;
 
-        lockComponent.UnLock(); // Desbloquea y apaga el candado
-        Destroy(gameObject);    // Consume la llave
+        ConsumeKey(lockComponent);
+    }
+    #endregion
+
+    #region Private API
+    void ConsumeKey(Lock lockComponent)
+    {
+        targetLock = lockComponent;
+        // Soltar forzado
+        pickable.OnDrop(true);
+
+        // Apagar físicas
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
+
+        if (col != null)
+            col.isTrigger = true;
+
+        // Mover al punto del candado
+        Transform consumePoint = lockComponent.KeyConsumePoint;
+        if (consumePoint != null)
+        {
+            transform.SetParent(null);
+            transform.position = consumePoint.position;
+            transform.rotation = consumePoint.rotation;
+        }
+
+        Invoke(nameof(FinishConsume), destroyDelay);
+    }
+
+    void FinishConsume()
+    {
+        if(targetLock != null && targetLock.IsLocked)
+        {
+            targetLock.UnLock();
+        }
+
+        Destroy(gameObject);
     }
     #endregion
 }

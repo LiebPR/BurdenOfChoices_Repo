@@ -65,7 +65,7 @@ public class PickSystem : MonoBehaviour
     {
         if(currentPickable == null) return;
 
-        currentPickable.OnDrop(true);
+        currentPickable.RequestDrop();
         currentPickable = null;
     }
     #endregion
