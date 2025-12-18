@@ -1,8 +1,11 @@
 using UnityEngine;
 
-public class Key : MonoBehaviour, IInteractable
+public class Key : MonoBehaviour, IInteractable, IPickListener
 {
     #region Inspector States
+    [Header("References")]
+    [SerializeField] Animator anim;
+
     [Header("Consume Behaviour")]
     [Tooltip("Punto de consumo para la llave")]
     [SerializeField] float destroyDelay = 1f; //Delay antes de desaparecer
@@ -10,27 +13,27 @@ public class Key : MonoBehaviour, IInteractable
 
     //Internal State
     Lock targetLock;
+    bool isConsuming;
 
     #region References
     PickableBehaviour pickable;
     PlayerHand playerHand;
-    Renderer meshRenderer;
     DataProvider dataProvider;
-    Rigidbody rb;
-    Collider col;
     #endregion
 
     #region Getters
     EquipableData Data => dataProvider != null ? dataProvider.GetData<EquipableData>() : null;
     #endregion
 
+    #region Animator Params
+    static readonly int IsCatchHash = Animator.StringToHash("IsCatch");
+    static readonly int IsConsumeHash = Animator.StringToHash("IsConsume");
+    #endregion
+
     private void Awake()
     {
         pickable = GetComponent<PickableBehaviour>();
         dataProvider = GetComponent<DataProvider>();
-        meshRenderer = GetComponentInChildren<Renderer>();
-        rb = GetComponent<Rigidbody>();
-        col = GetComponentInChildren<Collider>();
 
         playerHand = FindAnyObjectByType<PlayerHand>();
         if(playerHand == null)
@@ -46,20 +49,33 @@ public class Key : MonoBehaviour, IInteractable
 
     public void OnRelease()
     {
+
     }
 
     public void OnHighlight()
     {
-        if (meshRenderer == null || Data == null) return;
-
-        meshRenderer.material = Data.highlightMaterial;
+        
     }
 
     public void OnRemoveHighlight()
     {
-        if (meshRenderer == null || Data == null) return;
+        
+    }
+    #endregion
 
-        meshRenderer.material = Data.originalMaterial;
+    #region IPickableListener
+    public void OnPick(ICatcher catcher)
+    {
+        if(anim != null)
+        {
+            anim.SetBool(IsCatchHash, true);
+        }
+    }
+
+    public void OnDrop()
+    {
+        if (anim != null && !isConsuming)
+            anim.SetBool(IsCatchHash, false);
     }
     #endregion
 
@@ -80,24 +96,21 @@ public class Key : MonoBehaviour, IInteractable
     #region Private API
     void ConsumeKey(Lock lockComponent)
     {
+        isConsuming = true;
         targetLock = lockComponent;
+
         // Soltar forzado
-        pickable.OnDrop(true);
-
-        // Apagar físicas
-        if (rb != null)
-        {
-            rb.isKinematic = true;
-            rb.useGravity = false;
-        }
-
-        if (col != null)
-            col.isTrigger = true;
+        pickable.BlockDrop();
+        pickable.OnDropWithoutPhysics();
 
         // Mover al punto del candado
         Transform consumePoint = lockComponent.KeyConsumePoint;
         if (consumePoint != null)
         {
+            //Animator 
+            if (anim != null)
+                anim.SetBool(IsConsumeHash, true);
+
             transform.SetParent(null);
             transform.position = consumePoint.position;
             transform.rotation = consumePoint.rotation;

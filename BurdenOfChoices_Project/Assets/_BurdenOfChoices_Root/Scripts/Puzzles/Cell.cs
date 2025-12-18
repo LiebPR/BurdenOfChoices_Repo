@@ -6,7 +6,6 @@ public class Cell : MonoBehaviour
 {
     #region Inspector States
     [SerializeField] List<Lock> locks = new List<Lock>();
-    [SerializeField] string winScene = "SCN:WinMenu";
     #endregion
 
     #region Internal States

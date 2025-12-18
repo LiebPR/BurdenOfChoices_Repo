@@ -26,6 +26,7 @@ public class PickableBehaviour : MonoBehaviour
     bool isCatched;
     bool pendingDropRequest;
     bool restoreRunning;
+    bool blockDrop;
 
     //Original States:
     Vector3 originalPosition;
@@ -113,6 +114,14 @@ public class PickableBehaviour : MonoBehaviour
         transform.localRotation = Quaternion.identity;
 
         OnEquipped?.Invoke(this); //notifica que se equipó
+        NotifyEquipListeners(catcher);
+    }
+
+    void NotifyEquipListeners(ICatcher catcher)
+    {
+        var listeners = GetComponents<IPickListener>();
+        for (int i = 0; i < listeners.Length; i++)
+            listeners[i].OnPick(catcher);
     }
     #endregion
 
@@ -165,6 +174,7 @@ public class PickableBehaviour : MonoBehaviour
         transform.localScale = originalScale;
 
         OnDropped?.Invoke(this); //notifica que se soltó
+        NotifyDropListeners();
 
         //Restore condicional
         if (isRestoreWithTime)
@@ -175,6 +185,37 @@ public class PickableBehaviour : MonoBehaviour
             InvokeRepeating(nameof(UpdateRestoreTimer), 0f, Time.deltaTime);
             Invoke(nameof(RestoreInternal), restoreDelay);
         }
+    }
+
+    public void OnDropWithoutPhysics()
+    {
+        pendingDropRequest = false;
+        isCatched = false;
+
+        //Quitar parent
+        transform.SetParent(null);
+
+        //Restaurar escala si fue alterada
+        transform.localScale = originalScale;
+
+        //notificar eventos
+        OnDropped?.Invoke(this);
+        NotifyDropListeners();
+        restoreRunning = false;
+        CancelInvoke(nameof(UpdateRestoreTimer));
+        CancelInvoke(nameof(RestoreInternal));
+    }
+
+    public void BlockDrop()
+    {
+        blockDrop = true;
+    }
+
+    void NotifyDropListeners()
+    {
+        var listeners = GetComponents<IPickListener>();
+        for (int i = 0; i < listeners.Length; i++)
+            listeners[i].OnDrop();
     }
     #endregion
 
@@ -206,6 +247,8 @@ public class PickableBehaviour : MonoBehaviour
     #region Public API
     public void RequestDrop()
     {
+        if (blockDrop)
+            return;
         //Llamamos a OnDrop sin forzar: se encargará de encolar si no hay suelo
         OnDrop(false);
     }

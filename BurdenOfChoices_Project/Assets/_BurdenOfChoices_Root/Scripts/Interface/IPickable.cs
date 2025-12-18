@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public class IPickable
+public interface IPickListener
 {
-    void Pick(ICatcher catcher) { }
-    void Drop() { }
-    bool IsPicked { get; }
+    void OnPick(ICatcher catcher);
+    void OnDrop();
 }
