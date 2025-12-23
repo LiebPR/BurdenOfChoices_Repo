@@ -57,7 +57,6 @@ public class EnemyAttack : MonoBehaviour
         if (playerHealth != null)
         {
             playerHealth.TakeHit(hitDirection);
-            Debug.Log("Jugador golpeado por enemigo.");
         }
     }
     #endregion

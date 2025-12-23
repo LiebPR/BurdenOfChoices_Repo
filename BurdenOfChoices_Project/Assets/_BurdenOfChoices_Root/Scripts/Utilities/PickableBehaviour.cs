@@ -18,6 +18,9 @@ public class PickableBehaviour : MonoBehaviour
     [Header("Restore")]
     [SerializeField] bool isRestoreWithTime = true;
     [SerializeField] float restoreDelay = 1.5f;
+
+    [Header("Grab Point")]
+    [SerializeField] Transform grabPoint;
     #endregion
 
     #region Internal States
@@ -85,7 +88,7 @@ public class PickableBehaviour : MonoBehaviour
     //Coloca el obejto en la mano del jugador. 
     public void OnEquip(ICatcher catcher)
     {
-        //CAncelar cualquier restore pendiente
+        //Cancelar cualquier restore pendiente
         CancelInvoke(nameof(RestoreInternal));
         CancelInvoke(nameof(UpdateRestoreTimer));
         restoreRunning = false;
@@ -97,7 +100,6 @@ public class PickableBehaviour : MonoBehaviour
         }
 
         catchPoint = catcher.GetCatchPoint();
-
         isCatched = true;
 
         if(rb != null)
@@ -110,10 +112,23 @@ public class PickableBehaviour : MonoBehaviour
 
         //Parent al catchPoint
         transform.SetParent(catchPoint);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
+        
+        if(grabPoint != null)
+        {
+            Vector3 offsetPos = grabPoint.localPosition;
+            Quaternion offsetRot = grabPoint.localRotation;
 
-        OnEquipped?.Invoke(this); //notifica que se equipó
+            transform.localPosition = -offsetPos;
+            transform.localRotation = Quaternion.Inverse(offsetRot);
+        }
+        else
+        {
+            //Fallback segura si no hay grabPoint
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+
+            OnEquipped?.Invoke(this); //notifica que se equipó
         NotifyEquipListeners(catcher);
     }
 

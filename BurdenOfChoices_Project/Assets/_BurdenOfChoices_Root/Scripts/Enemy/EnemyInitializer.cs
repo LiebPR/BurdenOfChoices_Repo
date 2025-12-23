@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyInitializer : MonoBehaviour
 {
@@ -8,11 +9,16 @@ public class EnemyInitializer : MonoBehaviour
     ChaseState chase;
     TurnToTargetState turnState;
     AlertState alert;
+    DeathState death;
+    StunState stun;
     
     EnemyFSM fsm;
     EnemyMovementCommands commands;
     VisionSystem vision;
     EnemyMoveController moveController;
+    EnemyHealth health;
+    Rigidbody rb;
+    NavMeshAgent agent;
     #endregion
 
     private void Start()
@@ -22,11 +28,16 @@ public class EnemyInitializer : MonoBehaviour
         chase = GetComponent<ChaseState>();
         turnState = GetComponent<TurnToTargetState>();
         alert = GetComponent<AlertState>();
+        death = GetComponent<DeathState>();
+        stun = GetComponent<StunState>();
 
         fsm = GetComponent<EnemyFSM>();
         vision = GetComponent<VisionSystem>();
         commands = GetComponent<EnemyMoveController>().Commands;
         moveController = GetComponent<EnemyMoveController>();
+        health = GetComponent<EnemyHealth>();
+        rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();   
 
 
         // Inicializamos cada estado
@@ -35,12 +46,16 @@ public class EnemyInitializer : MonoBehaviour
         chase.Initialize(fsm, commands, vision);
         turnState.Initialize(fsm, commands);
         alert.Initialize(fsm, commands);
+        death.Initialize(fsm, commands);
+        stun.Initialize(fsm, commands, health, rb, agent);
 
         // Registramos estados en la FSM
         fsm.RegisterState(EnemyState.Patrol, patrol);
         fsm.RegisterState(EnemyState.Idle, idle);
         fsm.RegisterState(EnemyState.Chase, chase);
         fsm.RegisterState(EnemyState.TurnToTarget, turnState);
+        fsm.RegisterState(EnemyState.Death, death);
+        fsm.RegisterState(EnemyState.Stun, stun);
 
         // Activamos el primer estado
         fsm.ResetState(); // Esto llamará a ChangeState(EnemyState.Patrol) y ejecutará Enter()

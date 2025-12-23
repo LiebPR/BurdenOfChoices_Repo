@@ -23,7 +23,7 @@ public class HealthSystem : MonoBehaviour
 
     #region Getters
     public int CurrentHealth => currentHealth;
-    public int MaxHEalth => maxHealth;
+    public int MaxHealth => maxHealth;
     public bool IsAlive => currentHealth > 0;
     #endregion
 
@@ -40,6 +40,7 @@ public class HealthSystem : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0);
 
+        OnHit?.Invoke(damage);
         if(currentHealth <= 0)
         {
             OnDeath?.Invoke();
