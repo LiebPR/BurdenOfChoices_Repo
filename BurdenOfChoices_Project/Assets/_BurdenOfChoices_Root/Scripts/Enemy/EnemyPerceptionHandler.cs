@@ -14,6 +14,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
     EnemyFSM fsm;
     VisionSystem visionSystem;
     TurnToTargetState turnToTargetState;
+    StunState stunState;
     #endregion
 
     void Awake()
@@ -21,6 +22,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
         fsm = GetComponent<EnemyFSM>();
         visionSystem = GetComponent<VisionSystem>();
         turnToTargetState = GetComponent<TurnToTargetState>();
+        stunState = GetComponent<StunState>();
     }
 
     #region Subscription Events
@@ -42,6 +44,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
     #region Handlers
     void HandleEnterPerception(Transform target)
     {
+        if (stunState.IsStunned) return;
         if (fsm.CurrentState == EnemyState.Chase) return;
         lastTarget = target;
         fsm.OnTurnTuTarget(target);
@@ -49,6 +52,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
 
     void HandleSeeTarget(Transform target)
     {
+        if (stunState.IsStunned) return;
         lastTarget = target;
         fsm.OnChase();
         
@@ -62,6 +66,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
 
     void HandleLoseTarget(Transform target)
     {
+        if (stunState.IsStunned) return;
         fsm.OnPatrol();
     }
     #endregion

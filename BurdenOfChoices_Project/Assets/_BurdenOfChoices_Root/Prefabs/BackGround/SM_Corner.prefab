@@ -55,5 +55,58 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4250372935941778005, guid: 06d1058e473224c4c8ff9efef593588c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1679729440719616353}
+    - targetCorrespondingSourceObject: {fileID: 4250372935941778005, guid: 06d1058e473224c4c8ff9efef593588c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8568706641113929679}
   m_SourcePrefab: {fileID: 100100000, guid: 06d1058e473224c4c8ff9efef593588c, type: 3}
+--- !u!1 &8206915076168968089 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4250372935941778005, guid: 06d1058e473224c4c8ff9efef593588c, type: 3}
+  m_PrefabInstance: {fileID: 5411227156957564364}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1679729440719616353
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8206915076168968089}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.6075709, y: 1.70824, z: 3.000001}
+  m_Center: {x: -0.30378592, y: 0.85412073, z: -1.500001}
+--- !u!65 &8568706641113929679
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8206915076168968089}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.3935766, y: 1.70824, z: 0.6149721}
+  m_Center: {x: -1.8032107, y: 0.85412073, z: -0.30748653}

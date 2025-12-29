@@ -28,11 +28,12 @@ public class AlertState : MonoBehaviour, IEnemyState
         movementCommands = movement;
     }
 
+    #region State Flow
     public void Enter()
     {
         // Se detiene al entrar en el estado de alerta
         movementCommands.ResumeMovement(0f, enemyData.breackAcceleration);
-        movementCommands.ResetAngularVelocity();
+        movementCommands.ResetRotation();
 
         waitTimer = 0f;
         waitingPhase = true;
@@ -82,14 +83,14 @@ public class AlertState : MonoBehaviour, IEnemyState
                 movingPhase = true;
 
                 movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.normalAcceleration);
-                movementCommands.MoveTo(alertPoint, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
+                movementCommands.SetMoveTarget(alertPoint, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
             }
         }
 
         // Fase de movimiento
         if (movingPhase)
         {
-            movementCommands.MoveTo(alertPoint, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
+            movementCommands.SetMoveTarget(alertPoint, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
 
             float dist = Vector3.Distance(movementCommands.Transform.position, alertPoint);
 
@@ -111,8 +112,9 @@ public class AlertState : MonoBehaviour, IEnemyState
 
     public void Exit()
     {
-        movementCommands.ResetAngularVelocity();
+        movementCommands.ResetRotation();
     }
+    #endregion
 
     #region External API
     // Asigna el último punto escuchado

@@ -2,7 +2,8 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// HealthSystem: Componente general para gestionar vida y golpes.
+/// Sistema genérico de vida.
+/// No decide comportamiento, solo emite eventos.
 /// </summary>
 public class HealthSystem : MonoBehaviour
 {
@@ -12,27 +13,31 @@ public class HealthSystem : MonoBehaviour
     #endregion
 
     #region Internal State
-    int currentHealth;
+    int currentHealth; //vida actual
     #endregion
 
     #region Events
-    public event Action<int> OnHit; //se disapra cuando el objeto recibe un golpe
-    public event Action<int> OnHealthChanged; //se dispara cuando la vida cambia
-    public event Action OnDeath; //se dispara cuando llega a 0
+    public event Action<int> OnHit; //golpe recibido
+    public event Action<int> OnHealthChanged; //cambio de vida
+    public event Action OnDeath; //vida llegada a 0
     #endregion
 
     #region Getters
     public int CurrentHealth => currentHealth;
-    public int MaxHEalth => maxHealth;
+    public int MaxHealth => maxHealth;
     public bool IsAlive => currentHealth > 0;
     #endregion
 
     private void Awake()
     {
+        //Inicialización base
         currentHealth = maxHealth;
     }
 
     #region Health Logic 
+    /// <summary>
+    /// Aplica daño directo.
+    /// </summary>
     public void TakeHit(int damage = 1)
     {
         if (!IsAlive) return;
@@ -40,13 +45,16 @@ public class HealthSystem : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0);
 
+        OnHit?.Invoke(damage);
         if(currentHealth <= 0)
         {
             OnDeath?.Invoke();
         }
     }
 
-    //Restauramos la vida a la máxima
+    /// <summary>
+    /// Restaura la vida al máximo.
+    /// </summary>
     public void HealFull()
     {
         currentHealth = maxHealth;

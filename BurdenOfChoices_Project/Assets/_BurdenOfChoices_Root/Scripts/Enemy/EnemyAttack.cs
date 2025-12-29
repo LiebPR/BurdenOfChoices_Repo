@@ -6,7 +6,6 @@ public class EnemyAttack : MonoBehaviour
     #region Inspector Variables
     [SerializeField] float attackRange = 2f; //distancia máxima para golpear
     [SerializeField] float attackCooldown = 1f; //tiempo entre ataques
-    [SerializeField] int damage = 1; //daño que inflinge al jugador 
     [SerializeField] Transform attackPoint; //Punto desde donde se mide el rango de ataque
     #endregion
 
@@ -58,7 +57,6 @@ public class EnemyAttack : MonoBehaviour
         if (playerHealth != null)
         {
             playerHealth.TakeHit(hitDirection);
-            Debug.Log("Jugador golpeado por enemigo.");
         }
     }
     #endregion
