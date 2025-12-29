@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyMoveController : MonoBehaviour
+public class EnemyMotionContext : MonoBehaviour
 {
     #region Getters
     public EnemyMovementCommands Commands { get; private set; }

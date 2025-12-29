@@ -19,27 +19,31 @@ public class PatrolState : MonoBehaviour, IEnemyState
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
     TurnToTargetState turnState;
-    EnemyMoveController moveController;
+    EnemyMotionContext moveContext;
     #endregion
 
-    public void Initialize(EnemyFSM enemyfsm, EnemyMovementCommands command, TurnToTargetState turn, EnemyMoveController move)
+    public void Initialize(EnemyFSM enemyfsm, EnemyMovementCommands command, TurnToTargetState turn, EnemyMotionContext move)
     {
         fsm = enemyfsm;
         movementCommands = command;
         turnState = turn;
-        moveController = move;
+        moveContext = move;
     }
 
+    #region State Flow
     public void Enter()
     {
         idleInProgress = false;
 
 
-        movementCommands.ResetDestination();
+        //Reanudamos movimiento con parámetros de patrulla
         movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.normalAcceleration);
 
-        //Reasigna destino al punto actual
-        movementCommands.MoveTo(patrolPoints[currentIndex].position, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
+        //Asignamos objetivo inicial
+        if(patrolPoints.Length > 0)
+        {
+            movementCommands.SetMoveTarget(patrolPoints[currentIndex].position, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
+        }
     }
 
     public void Handle()
@@ -50,14 +54,19 @@ public class PatrolState : MonoBehaviour, IEnemyState
 
         if (!idleInProgress)
         {
-            movementCommands.MoveTo(target.position, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
+            //Movimiento hacia el punto de patrulla
+            movementCommands.SetMoveTarget(target.position, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
+
+            //Rotación manual suavizada
             movementCommands.RotateTowards(target.position, enemyData.rotationStiffness, enemyData.rotationDamping);
 
-            //Llegada al punto
-            if (!moveController.Agent.pathPending && moveController.Agent.remainingDistance <= moveController.Agent.stoppingDistance + 0.1f)
+            //Comporbación de llegada al punto
+            if (!moveContext.Agent.pathPending && moveContext.Agent.remainingDistance <= moveContext.Agent.stoppingDistance + 0.1f)
             {
                 idleInProgress = true;
                 idleTimer = enemyData.idleTime;
+
+                //transición al estado de idle -> si llego al punto de patrulla
                 fsm.OnIdle();
             }
         }
@@ -67,7 +76,7 @@ public class PatrolState : MonoBehaviour, IEnemyState
             if(idleTimer <= 0)
             {
                 idleInProgress = false;
-                currentIndex = (currentIndex + 1) % patrolPoints.Length;
+                AdvanceIndex();
             }
         }
 
@@ -75,11 +84,13 @@ public class PatrolState : MonoBehaviour, IEnemyState
 
     public void Exit()
     {
-        idleInProgress = false;    
+        idleInProgress = false; 
+        
+        movementCommands.ResetRotation();
     }
+    #endregion
 
     #region Utilities
-
     public void AdvanceIndex()
     {
         currentIndex = (currentIndex + 1) % patrolPoints.Length;

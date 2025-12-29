@@ -7,49 +7,87 @@ using UnityEngine.Rendering;
 public class EnemyData : ScriptableObject
 {
 
-    //Perception
+    #region Vision
     [Header("Vision Settings")]
-    public float visionRadius = 6f; //radio de visión del enemigo
-    public float visionAngle = 45f; //ángulo de visión del enemigo
+    [Tooltip("Radio maximo de detección visual frontal.")]
+    public float visionRadius = 6f;
+    [Tooltip("Ángulo del cono de visión en grados.")]
+    public float visionAngle = 45f;
+    [Tooltip("Radio mínimo de detección inmediata alrededor del enemigo.")]
     public float perceptionRadius = 1f;
+    [Tooltip("Capas consideradas como obstáculos visuales")]
     public LayerMask obstacleMask;
 
     [Header("Vision Delays")]
-    public float perceptionDelay = 0.5f; //tiempo de retraso para detectar el área
+    [Tooltip("Tiempo necesario para confirmar detección por proximidad.")]
+    public float perceptionDelay = 0.5f;
+    [Tooltip("Tiempo necesario para confirmar detección visual.")]
     public float visionDelay = 0.2f;
-    public float lostDelay = 1f; //tiempo de retraso para perder al jugador
+    [Tooltip("Tiempo antes de perder completamente al objetivo.")]
+    public float lostDelay = 1f;
+    #endregion
 
+    #region Hearing
     [Header("Heraing Settings")]
+    [Tooltip("Radio máximo de destección auditiva.")]
     public float maxHearingRadius = 5f;
+    [Tooltip("Tiempo durante el cual el enemigo recuerda un sonido")]
     public float noiseMemoryTime = 1f;
 
     [Header("Heraing Delys")]
+    [Tooltip("Retraso para reaccionar a sonidos de caminar.")]
     public float hearingDelayWalk = 1.5f;
+    [Tooltip("Retraso para reaccionar a sonidos de carrera.")]
     public float hearingDelayRun = 0.8f;
+    #endregion
 
-    //States 
+    #region Movement
     [Header("Movement Settings")]
-    public float patrolSpeed = 3f; //velocidad de patrulla del enemigo
-    public float chaseSpeed = 5f; //velocidad de persecución del enemigo
-    public float rotationSpeed = 8f; //velocidad de rotación del enemigo
+    [Tooltip("Velocidad base durate la patrulla.")]
+    public float patrolSpeed = 3f;
+    [Tooltip("Velocidad durante la persecución.")]
+    public float chaseSpeed = 5f;
+    [Tooltip("Velocidad de rotación simple(estados no críticos).")]
+    public float rotationSpeed = 8f;
+    [Tooltip("Distacia mínima para actualizar el destino del NavMeshAgent.")]
     public float destinationUpdateThreshold = 0.2f;
+    #endregion
 
+    #region Chasing Rotation
     [Header("Chasing Setting")]
+    [Tooltip("Fuerza del resorte para rotación suave")]
     public float rotationChaseStiffness = 12f;
+    [Tooltip("Fricción angular aplicado a la rotación")]
     public float rotationChaseDamping = 20f;
+    #endregion
 
+    #region Rotation Damping
     [Header("Rotation Damp Settings")]
-    public float rotationStiffness = 6f; //fuerza del resorte
-    public float rotationDamping = 10f; //fricción angular
+    [Tooltip("Fuerza del resorte para rotación suave.")]
+    public float rotationStiffness = 6f;
+    [Tooltip("Nivel de fricción angular aplicada a la rotación.")]
+    public float rotationDamping = 10f;
+    #endregion
 
+    #region Stop Area
     [Header("Stop Area Settings")]
-    public float stopStartDistance = 6f; //comienza a frenar a esta distancia
-    public float stopHardDistance = 3f; //se detiene totalmente a esta distancia
+    [Tooltip("Distancia a la que comienzza el frenado progresivo.")]
+    public float stopStartDistance = 6f;
+    [Tooltip("Distancia a la que el enemigo se detiene completamente.")]
+    public float stopHardDistance = 3f;
+    #endregion
 
+    #region Acceleration
     [Header("Acceleration Settings")]
+    [Tooltip("Aceleración normal durante movimiento estándar.")]
     public float normalAcceleration = 8f;
+    [Tooltip("Aceleración usada para frenadas bruscas.")]
     public float breackAcceleration = 25f;
+    #endregion
 
+    #region Idle
     [Header("Idle Settings")]
-    public float idleTime = 2f; //tiempo que el enemigo permanece inactivo en un punto de patrulla
+    [Tooltip("Tiempo que el enemigo permanece inactivo en un punto.")]
+    public float idleTime = 2f;
+    #endregion
 }

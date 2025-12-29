@@ -1,50 +1,36 @@
 using UnityEngine;
 
 /// <summary>
-/// AnimatorManager: Se encaarga de gestionar todas la animaciones del jagaador.
-/// Escucha los eventos del InputManager y actualiza el Animator según ele stado.
+/// AnimatorManager
+/// Gestiona los estados de animación compartidos
+/// entre piernas y torso.
 /// </summary>
 public class AnimatorManager : MonoBehaviour
 {
-    #region References
-    Animator animator;
-    PlayerController playerController;
+    #region Inspector Variables
+    [Header("Animators")]
+    [SerializeField] Animator legsAnimator;
+    [SerializeField] Animator torsoAnimator;
     #endregion
 
     #region Internal States
-    bool lastCrouchState;
-    int hashIsCrouching;
+    bool isRelaxed;
     #endregion
 
-    private void Awake()
+    #region Public API
+    public void SetRelaxed(bool value)
     {
-        animator = GetComponent<Animator>();
-        playerController = GetComponent<PlayerController>();
-        hashIsCrouching = Animator.StringToHash("isCrouching");
-        lastCrouchState = false;
+        isRelaxed = value;
+        ApplyState();
     }
+    #endregion
 
-    private void OnEnable()
+    #region Core
+    void ApplyState()
     {
-        animator.SetBool(hashIsCrouching, false);
-    }
-    private void OnDisable()
-    {
-    }
+        legsAnimator.SetBool("IsRelaxed", isRelaxed);
 
-    private void Update()
-    {
-        UpdateCrouchAnimation();
-    }
-
-    #region Crouch Animation Logic
-    void UpdateCrouchAnimation()
-    {
-        if (animator == null) return;
-        if (lastCrouchState == playerController.IsCrouching) return;
-
-        animator.SetBool(hashIsCrouching, playerController.IsCrouching);
-        lastCrouchState = playerController.IsCrouching;
+        torsoAnimator.SetBool("IsRelaxed", isRelaxed);
     }
     #endregion
 }

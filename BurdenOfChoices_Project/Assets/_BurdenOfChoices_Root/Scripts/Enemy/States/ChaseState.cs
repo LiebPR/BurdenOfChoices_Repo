@@ -18,12 +18,14 @@ public class ChaseState : MonoBehaviour, IEnemyState
         visionSystem = vision;
     }
 
+    #region State Flow
     public void Enter() 
     {
-        // Reseteamos todo para empezar a perseguir limpio
+        //Reanudamos movimiento limpio con parámetros de persecución
         movementCommands.ResumeMovement(enemyData.chaseSpeed, enemyData.normalAcceleration);
-        movementCommands.ResetAngularVelocity();
-        movementCommands.ResetDestination();
+
+        //Resetea rotación acumulada y destino anterior
+        movementCommands.ResetRotation();
 
         // Activamos la lógica de frenado progresivo
         movementCommands.EnableStopLogic(true);
@@ -38,11 +40,7 @@ public class ChaseState : MonoBehaviour, IEnemyState
         float distance = Vector3.Distance(transform.position, targetPos);
 
         // Movimiento hacia el jugador
-        movementCommands.MoveTo(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold,
-                                enemyData.rotationChaseStiffness, enemyData.rotationChaseDamping);
-
-        // Aplicamos frenado progresivo si estamos en área de parada
-        movementCommands.ApplyStopLogic(distance, enemyData.chaseSpeed, enemyData.breackAcceleration);
+        movementCommands.SetMoveTarget(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold);
 
         // Rotación hacia el objetivo
         movementCommands.RotateTowards(targetPos, enemyData.rotationChaseStiffness, enemyData.rotationChaseDamping);
@@ -57,4 +55,5 @@ public class ChaseState : MonoBehaviour, IEnemyState
         // Aseguramos que el agente quede listo para el siguiente estado
         movementCommands.ResumeMovement(enemyData.chaseSpeed, enemyData.normalAcceleration);
     }
+    #endregion
 }

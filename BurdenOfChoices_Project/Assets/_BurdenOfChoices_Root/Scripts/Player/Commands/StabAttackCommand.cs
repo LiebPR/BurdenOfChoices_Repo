@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//Comando de ataque lineal (raycast desde el origen hacía adelante)
 public class StabAttackCommand : AttackCommand
 {
     public StabAttackCommand(WeaponData data, Transform origin) : base(data, origin) { }

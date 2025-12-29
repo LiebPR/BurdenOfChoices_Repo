@@ -21,9 +21,10 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
         movementCommands = movement;
     }
 
+    #region State Flow
     public void Enter()
     {
-        //Aseguramos que no se congele el movimiento
+        //Reanuda movimeinto para no bloquear NavMeshAgent
         movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.breackAcceleration);
     }
 
@@ -57,8 +58,9 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
 
     public void Exit()
     {
-        movementCommands.ResetAngularVelocity();
+        movementCommands.ResetRotation();
     }
+    #endregion
 
     #region Utilities
     public void SetTarget(Transform t)

@@ -1,14 +1,19 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// AttackSystem
+/// Gestiona la ejecución de ataques según el arma equipada.
+/// Controla cooldown y creación de comandos de ataque.
+/// </summary>
 public class AttackSystem : MonoBehaviour
 {
     #region References
-    PickSystem pickSystem;
+    PickSystem pickSystem; //Para obtener el arma actualmente equipada
     #endregion
 
     #region Internal States
-    bool onCooldown;
+    bool onCooldown; //Bloqueo temporal entre ataques
     #endregion
 
     private void Awake()
@@ -27,6 +32,10 @@ public class AttackSystem : MonoBehaviour
         InputManager.OnAttack -= HandleAttack;
     }
 
+    #region Handles
+    /// <summary>
+    /// Evento de ataque, crea y ejecuta comando según el arma.
+    /// </summary>
     void HandleAttack()
     {
         if(onCooldown) return;
@@ -46,19 +55,22 @@ public class AttackSystem : MonoBehaviour
 
         StartCoroutine(AttackRoutine(weapon, data));
     }
+    #endregion
 
-    
-    
+
     #region Routine
     IEnumerator AttackRoutine(IWeapon weapon, WeaponData data)
     {
         onCooldown = true; 
 
-        yield return new WaitForSeconds(data.cooldown);
+        yield return new WaitForSeconds(data.cooldown); //espera el tiempo de cooldown
         onCooldown = false;
     }
     #endregion
 
+    /// <summary>
+    /// Fabrica el comando correspondiente a Slash o Stab.
+    /// </summary>
     AttackCommand CreateCommand(IWeapon weapon, WeaponData data)
     {
         switch (data.attackType)

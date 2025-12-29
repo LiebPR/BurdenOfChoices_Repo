@@ -15,13 +15,13 @@ public class EnemyInitializer : MonoBehaviour
     EnemyFSM fsm;
     EnemyMovementCommands commands;
     VisionSystem vision;
-    EnemyMoveController moveController;
+    EnemyMotionContext moveContext;
     EnemyHealth health;
     Rigidbody rb;
     NavMeshAgent agent;
     #endregion
 
-    private void Start()
+    private void Awake()
     {
         patrol = GetComponent<PatrolState>();
         idle = GetComponent<IdleState>();
@@ -33,15 +33,15 @@ public class EnemyInitializer : MonoBehaviour
 
         fsm = GetComponent<EnemyFSM>();
         vision = GetComponent<VisionSystem>();
-        commands = GetComponent<EnemyMoveController>().Commands;
-        moveController = GetComponent<EnemyMoveController>();
+        commands = GetComponent<EnemyMotionContext>().Commands;
+        moveContext = GetComponent<EnemyMotionContext>();
         health = GetComponent<EnemyHealth>();
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();   
 
 
         // Inicializamos cada estado
-        patrol.Initialize(fsm, commands, turnState, moveController);
+        patrol.Initialize(fsm, commands, turnState, moveContext);
         idle.Initialize(fsm, commands, patrol, turnState);
         chase.Initialize(fsm, commands, vision);
         turnState.Initialize(fsm, commands);
