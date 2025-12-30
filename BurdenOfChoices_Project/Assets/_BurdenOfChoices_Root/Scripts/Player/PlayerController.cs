@@ -26,9 +26,6 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Internal States
-    //RUIDO:
-    //bool ruido; //Estado interno que indica que el player hace ruido
-
     //MOVIMIENTO:
     Vector2 inputMovement; //entrada de movimiento
     Vector3 currentVelocitySmooth; //usado para SmoothDamp
@@ -51,12 +48,14 @@ public class PlayerController : MonoBehaviour
 
     #region References
     Rigidbody rb;
+    AnimatorManager animatorManager;
     #endregion
 
     private void Awake()
     {
         //REFERENCES:
         rb = GetComponent<Rigidbody>();
+        animatorManager = GetComponent<AnimatorManager>();
     }
 
     private void Update()
@@ -92,6 +91,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         HandleMovementSpeed();
+        UpdateAnimatorVelocity();
     }
 
     #region Movement Logic
@@ -178,7 +178,13 @@ public class PlayerController : MonoBehaviour
     #region Ipunts Callbacks
     void OnMoveChanged(Vector2 input) => inputMovement = input;
     void OnRunChanged(bool runState) => isRuning = runState;
-    void OnCrouchChanged(bool crouchState) => isCrouching = crouchState;
+    void OnCrouchChanged(bool crouchState)
+    {
+        isCrouching = crouchState;
+
+        if (animatorManager != null)
+            animatorManager.SetCrouching(isCrouching);
+    }
     #endregion
 
     #region Weight (Handler)
@@ -218,6 +224,24 @@ public class PlayerController : MonoBehaviour
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         float multiplier = 1f - penalty;
         currentWeightSpeedMultiplier = Mathf.Clamp(multiplier, weightAccelerationSensitivity, 1f);
+    }
+    #endregion
+
+    #region Animations
+    void UpdateAnimatorVelocity()
+    {
+        if (animatorManager == null) return;
+
+        // Velocidad planar
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speed = planarVelocity.magnitude;
+
+        // Enviar velocidad real para transiciones Walk/Idle
+        animatorManager.SetVelocity(speed);
+
+        // Calcular ratio normalizado para ajustar velocidad de animación
+        float ratio = speed / walkSpeed;
+        animatorManager.SetMovementRatio(ratio);
     }
     #endregion
 }

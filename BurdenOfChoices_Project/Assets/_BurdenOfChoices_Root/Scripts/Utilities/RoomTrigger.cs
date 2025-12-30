@@ -39,7 +39,7 @@ public class RoomTrigger : MonoBehaviour
     void ApplyRoomState()
     {
         //Sala hostil => jugador tenso
-        animatorManager.SetRelaxed(false);
+        animatorManager.SetRelaxed(!hasEnemies);
     }
     #endregion
 }
