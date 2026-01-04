@@ -22,7 +22,10 @@ public class EnemyAttack : MonoBehaviour
 
     private void Update()
     {
-        if(player == null) return;
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return; // El enemigo no ejecuta lógica mientras el juego está pausado
+
+        if (player == null) return;
 
         //Solo atacar si estamos persiguiendo
         if(fsm.CurrentState != EnemyState.Chase) return;

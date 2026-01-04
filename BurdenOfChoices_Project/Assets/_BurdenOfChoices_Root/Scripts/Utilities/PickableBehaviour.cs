@@ -55,7 +55,9 @@ public class PickableBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        if(rb == null)
+            rb = GetComponent<Rigidbody>();
+
         coll = GetComponent<Collider>();
 
         //Guardamos el estado original del objeto

@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     Vector2 inputMovement; //entrada de movimiento
     Vector3 currentVelocitySmooth; //usado para SmoothDamp
     bool isRuning; //estado interno que indica que el player esta corriendo.
+    bool movementLocked; //bloquea el movimiento del jugador
     
     //AGACHARSE:
     bool isCrouching; //estado interno que indica que el player esta agachado.
@@ -60,6 +61,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return;
+
         HandleRotation();
     }
 
@@ -90,6 +94,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return;
+
         HandleMovementSpeed();
         UpdateAnimatorVelocity();
     }
@@ -97,6 +104,11 @@ public class PlayerController : MonoBehaviour
     #region Movement Logic
     void HandleMovementSpeed()
     {
+        if (movementLocked)
+        {
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+        }
+
         //Determina velocidad objetivo según estado
         float targetSpeed = walkSpeed;
         if (isCrouching) targetSpeed = crouchSpeed;
@@ -118,6 +130,22 @@ public class PlayerController : MonoBehaviour
         //Aplicamos velocidad final manteniendo Y
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
 
+    }
+    void LockMovement(bool value)
+    {
+        movementLocked = value;
+
+        if (value)
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+    }
+    public void PausePlayer()
+    {
+        LockMovement(true);  // bloquea la velocidad y entradas
+    }
+
+    public void ResumePlayer()
+    {
+        LockMovement(false); // permite mover al jugador
     }
     #endregion
 

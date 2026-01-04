@@ -37,7 +37,13 @@ public class PlayerThrowController : MonoBehaviour
     #region References
     PickableBehaviour pickable;
     ThrowableBehaviour throwable;
+    AnimatorManager animatorManager;
     #endregion
+
+    private void Awake()
+    {
+        animatorManager = GetComponent<AnimatorManager>();
+    }
 
     private void Start()
     {
@@ -126,6 +132,8 @@ public class PlayerThrowController : MonoBehaviour
     {
         if (pickable == null || !pickable.IsCatched) return;
 
+        animatorManager.SetThrowing(true);
+
         isHolding = true;
         holdTime = 0f;
 
@@ -147,6 +155,7 @@ public class PlayerThrowController : MonoBehaviour
         if (!isHolding) return;
 
         isHolding = false;
+        animatorManager.SetThrowing(false);
         if(throwPreview != null)
             throwPreview.gameObject.SetActive(false);
 

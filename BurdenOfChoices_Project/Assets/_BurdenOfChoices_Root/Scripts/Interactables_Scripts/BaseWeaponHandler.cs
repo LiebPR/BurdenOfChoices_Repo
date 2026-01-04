@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BaseWeaponHandler : MonoBehaviour, IPickListener, IWeapon
+public class Knife : MonoBehaviour, IPickListener, IWeapon
 {
     #region Inspector States
     [Header("References")]

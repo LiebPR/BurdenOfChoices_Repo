@@ -10,6 +10,8 @@ public class AttackSystem : MonoBehaviour
 {
     #region References
     PickSystem pickSystem; //Para obtener el arma actualmente equipada
+    AnimatorManager animatorManager;
+    PlayerController playerController;
     #endregion
 
     #region Internal States
@@ -18,8 +20,9 @@ public class AttackSystem : MonoBehaviour
 
     private void Awake()
     {
-        if(pickSystem == null)
-            pickSystem = GetComponent<PickSystem>();
+        pickSystem = GetComponent<PickSystem>();
+        animatorManager = GetComponent<AnimatorManager>();
+        playerController = GetComponent<PlayerController>();
     }
 
     private void OnEnable()
@@ -51,12 +54,15 @@ public class AttackSystem : MonoBehaviour
         // Crear y ejecutar comando según el tipo de ataque
         AttackCommand command = CreateCommand(weapon, data);
         if (command != null)
+        {
+            animatorManager.PlayAttack(data.attackType);
             command.Execute();
+        }
+            
 
         StartCoroutine(AttackRoutine(weapon, data));
     }
     #endregion
-
 
     #region Routine
     IEnumerator AttackRoutine(IWeapon weapon, WeaponData data)
