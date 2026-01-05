@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
         targetSpeed *= currentWeightSpeedMultiplier;
 
         //Dirección de movimiento
-        Vector3 inputDir = new Vector3(inputMovement.x, 0, inputMovement.y).normalized;
+        Vector3 inputDir = new Vector3(inputMovement.x, 0, inputMovement.y);
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
         //Selecciona el tiempo de suavizado según si aceleramos o desaceleramos
