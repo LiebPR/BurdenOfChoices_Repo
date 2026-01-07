@@ -8,11 +8,22 @@ public class PuzzleThrowItem : MonoBehaviour, IInteractable
 
     #region Internal States
     Rigidbody rb;
+    DataProvider dataProvider;
+    #endregion
+
+    #region Getter
+    EquipableData Data => dataProvider.GetData<EquipableData>();
     #endregion
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        dataProvider = GetComponent<DataProvider>();
+
+        if(rb != null && Data != null)
+        {
+            rb.mass = Data.weight; //aquí se aplica el peso
+        }
     }
 
     #region Accessors

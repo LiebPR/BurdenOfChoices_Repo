@@ -18,21 +18,20 @@ public class AnimatorManager : MonoBehaviour
     static readonly int VelocityHash = Animator.StringToHash("Velocity");
     static readonly int IsRelaxedHash = Animator.StringToHash("IsRelaxed");
     static readonly int IsCrouchingHash = Animator.StringToHash("IsCrouching");
-
     static readonly int IsAttackHash = Animator.StringToHash("IsAttack");
     static readonly int IsSlashingHash = Animator.StringToHash("IsSlashing");
-
     static readonly int IsPickingHash = Animator.StringToHash("IsPicking");
     static readonly int IsThrowingHash = Animator.StringToHash("IsThrowing");
+    static readonly int IsDeadHash = Animator.StringToHash("IsDead");
     #endregion
 
     #region State
     float velocity;
     bool isCrouching;
     float isRelaxed;
-
-    float currentWalkFrameRate; //frame rate actual suavizado
-    float walkFrameRateVelocity; //helper para smoothDamp
+    float currentWalkFrameRate; // frame rate actual suavizado
+    float walkFrameRateVelocity; // helper para smoothDamp
+    bool isDead;
     #endregion
 
     #region Reference
