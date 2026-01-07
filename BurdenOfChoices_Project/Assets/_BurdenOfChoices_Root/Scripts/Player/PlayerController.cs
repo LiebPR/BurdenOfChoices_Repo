@@ -106,46 +106,55 @@ public class PlayerController : MonoBehaviour
     {
         if (movementLocked)
         {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            // Mientras está pausado: velocidad planar a 0, pero inputMovement se sigue actualizando
+            currentVelocitySmooth = Vector3.zero;
+            return;
         }
 
-        //Determina velocidad objetivo según estado
+        // Determinar velocidad objetivo
         float targetSpeed = walkSpeed;
         if (isCrouching) targetSpeed = crouchSpeed;
-        else if(isRuning) targetSpeed = runSpeed;
+        else if (isRuning) targetSpeed = runSpeed;
 
-        //Aplicamos penalización por peso (si currentEquipWeight > 1)
         targetSpeed *= currentWeightSpeedMultiplier;
 
-        //Dirección de movimiento
-        Vector3 inputDir = new Vector3(inputMovement.x, 0, inputMovement.y);
+        // Solo usamos inputMovement si su magnitud > 0
+        Vector3 inputDir = new Vector3(inputMovement.x, 0f, inputMovement.y);
+        if (inputDir.sqrMagnitude < 0.01f)
+        {
+            // Si no hay input real, no nos movemos
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            currentVelocitySmooth = Vector3.zero;
+            return;
+        }
+
+        inputDir.Normalize();
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
-        //Selecciona el tiempo de suavizado según si aceleramos o desaceleramos
+        // Suavizado
         float smoothTime = (desiredVelocity.magnitude > new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude) ? accelerationTime : decelerationTime;
-
-        //Suavizado de velocidad
         Vector3 smoothVelocity = Vector3.SmoothDamp(new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z), desiredVelocity, ref currentVelocitySmooth, smoothTime);
 
-        //Aplicamos velocidad final manteniendo Y
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
-
-    }
-    void LockMovement(bool value)
-    {
-        movementLocked = value;
-
-        if (value)
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
     }
     public void PausePlayer()
     {
-        LockMovement(true);  // bloquea la velocidad y entradas
+        movementLocked = true;
+        rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+        // Bloquear Rigidbody completamente
+        rb.isKinematic = true;
+
+        // Reset SmoothDamp
+        currentVelocitySmooth = Vector3.zero;
+        inputMovement = Vector2.zero;
     }
 
     public void ResumePlayer()
     {
-        LockMovement(false); // permite mover al jugador
+        movementLocked = false; // permite mover al jugador
+
+        // Desbloquear Rigidbody
+        rb.isKinematic = false;
     }
     #endregion
 
@@ -204,7 +213,10 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Ipunts Callbacks
-    void OnMoveChanged(Vector2 input) => inputMovement = input;
+    void OnMoveChanged(Vector2 input)
+    {
+        inputMovement = input;
+    }
     void OnRunChanged(bool runState) => isRuning = runState;
     void OnCrouchChanged(bool crouchState)
     {

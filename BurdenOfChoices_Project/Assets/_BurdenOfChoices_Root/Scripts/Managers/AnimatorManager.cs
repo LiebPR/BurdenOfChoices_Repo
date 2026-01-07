@@ -80,9 +80,9 @@ public class AnimatorManager : MonoBehaviour
         animator.SetFloat(IsRelaxedHash, isRelaxed);
     }
 
-    public void PlayAttack(WeaponAttackType type)
+    public void PlayAttack(float slashingValue)
     {
-        animator.SetBool(IsSlashingHash, type == WeaponAttackType.Slash);
+        animator.SetFloat(IsSlashingHash, Mathf.Clamp01(slashingValue));
         animator.SetTrigger(IsAttackHash);
     }
 
@@ -118,18 +118,6 @@ public class AnimatorManager : MonoBehaviour
 
         // Aplicamos solo a Walk
         animator.speed = currentWalkFrameRate / walkBaseFrameRate;
-    }
-    #endregion
-
-    #region Animation Events
-    public void OnAttackStart()
-    {
-        playerController.PausePlayer();
-    }
-
-    public void OnAttackEnd()
-    {
-        playerController.ResumePlayer();
     }
     #endregion
 

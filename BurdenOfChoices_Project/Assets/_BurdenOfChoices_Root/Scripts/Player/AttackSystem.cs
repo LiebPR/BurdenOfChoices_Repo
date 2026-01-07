@@ -51,11 +51,14 @@ public class AttackSystem : MonoBehaviour
         WeaponData data = weapon.GetWeaponData();
         if(data == null) return;
 
+        //Ejecuta animación según tipo de ataque
+        float slashingValue = (data.attackType == WeaponAttackType.Slash) ? 1f : 0f;
+        animatorManager.PlayAttack(slashingValue);
+
         // Crear y ejecutar comando según el tipo de ataque
         AttackCommand command = CreateCommand(weapon, data);
         if (command != null)
         {
-            animatorManager.PlayAttack(data.attackType);
             command.Execute();
         }
             
