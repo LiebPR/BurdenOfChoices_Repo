@@ -22,7 +22,7 @@ public class AnimatorManager : MonoBehaviour
     static readonly int IsSlashingHash = Animator.StringToHash("IsSlashing");
     static readonly int IsPickingHash = Animator.StringToHash("IsPicking");
     static readonly int IsThrowingHash = Animator.StringToHash("IsThrowing");
-    static readonly int IsDeadHash = Animator.StringToHash("IsDead");
+    static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
     #endregion
 
     #region State
@@ -36,11 +36,20 @@ public class AnimatorManager : MonoBehaviour
 
     #region Reference
     PlayerController playerController;
+    PlayerHealth health;
     #endregion
 
     void Awake()
     {
         playerController = GetComponent<PlayerController>();
+        health = GetComponent<PlayerHealth>();
+    }
+
+    private void Update()
+    {
+        if(health == null) return;
+
+        animator.SetBool(IsDeathHash, !health.IsAlive);
     }
 
     void OnEnable()

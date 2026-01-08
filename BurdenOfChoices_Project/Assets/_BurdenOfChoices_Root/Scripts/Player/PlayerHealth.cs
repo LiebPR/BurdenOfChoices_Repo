@@ -23,6 +23,10 @@ public class PlayerHealth : MonoBehaviour
     int cameraHighPriority = 20;
     #endregion
 
+    #region Getters
+    public bool IsAlive => isAlive;
+    #endregion
+
     #region References
     FadeController fadeController;
     Rigidbody rb;

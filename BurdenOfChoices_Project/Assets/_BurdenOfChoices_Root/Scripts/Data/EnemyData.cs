@@ -59,6 +59,7 @@ public class EnemyData : ScriptableObject
     public float rotationChaseStiffness = 12f;
     [Tooltip("Fricción angular aplicado a la rotación")]
     public float rotationChaseDamping = 20f;
+    public float chaseAlignmentAngle = 60f;
     #endregion
 
     #region Rotation Damping

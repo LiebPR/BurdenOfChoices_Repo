@@ -26,11 +26,12 @@ MonoBehaviour:
   hearingDelayWalk: 1
   hearingDelayRun: 0.5
   patrolSpeed: 1
-  chaseSpeed: 2.5
-  rotationSpeed: 8
+  chaseSpeed: 3
+  rotationSpeed: 360
   destinationUpdateThreshold: 0.2
-  rotationChaseStiffness: 8
-  rotationChaseDamping: 4
+  rotationChaseStiffness: 45
+  rotationChaseDamping: 15
+  chaseAlignmentAngle: 80
   rotationStiffness: 25
   rotationDamping: 15
   stopStartDistance: 2

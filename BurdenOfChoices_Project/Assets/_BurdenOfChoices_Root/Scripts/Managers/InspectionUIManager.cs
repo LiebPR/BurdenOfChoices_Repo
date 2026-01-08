@@ -8,6 +8,7 @@ public class InspectionUIManager : MonoBehaviour
 
     [SerializeField] GameObject inspectionUI;
     [SerializeField] Button exitButton;
+    [SerializeField] GameObject inspectionPanel;
 
     InspectableObject currentInspectable;
 
@@ -25,6 +26,7 @@ public class InspectionUIManager : MonoBehaviour
 
         if(inspectionUI != null)
             inspectionUI.SetActive(false);
+        inspectionPanel.SetActive(false);
 
         if (exitButton != null)
             exitButton.onClick.AddListener(OnExitButtonClicked);
@@ -43,12 +45,14 @@ public class InspectionUIManager : MonoBehaviour
     {
         if (inspectionUI != null)
             inspectionUI.SetActive(true);
+        inspectionPanel.SetActive(true);
     }
 
     public void Hide()
     {
         if (inspectionUI != null)
             inspectionUI.SetActive(false);
+        inspectionPanel.SetActive(false);
     }
 
     //Se llama al pulsar ESC o el botón

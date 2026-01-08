@@ -82,16 +82,36 @@ public class EnemyMovementCommands
     }
     #endregion
 
-    #region Speed Modifier
+    #region Aligment
     /// <summary>
-    /// Factor de velocidad basado en alineación frontal.
+    /// Devuelve el ángulo plano (en grados) entre el forward actual y el objetivo.
     /// </summary>
-    public float GetAligmentSpeedFactor(Vector3 targetPosition, float minFactor)
+    public float GetFlatAngleToTarget(Vector3 targetPosition)
     {
         Vector3 dir = targetPosition - transform.position;
         dir.y = 0f;
 
-        if(dir.sqrMagnitude < 0.0001f) return 1f;
+        if(dir.sqrMagnitude < 0.0001f) return 0f;
+
+        return Vector3.Angle(transform.forward, dir.normalized);
+    }
+
+    /// <summary>
+    /// Penalización de velocidad basada en velocidad angular actual.
+    /// </summary>
+    public bool IsAlignedTo(Vector3 targetPosition, float maxAngle)
+    {
+        return GetFlatAngleToTarget(targetPosition) <= maxAngle;
+    }
+    #endregion
+
+    #region Speed Modifiers
+    public float GetAlignmentSpeedFactor(Vector3 targetPosition, float minFactor)
+    {
+        Vector3 dir = targetPosition - transform.position;
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude < 0.0001f) return 1f;
 
         float dot = Vector3.Dot(transform.forward, dir.normalized);
         float normalized = (dot + 1f) * 0.5f;
@@ -99,12 +119,9 @@ public class EnemyMovementCommands
         return Mathf.Lerp(minFactor, 1f, normalized);
     }
 
-    /// <summary>
-    /// Penalización de velocidad basada en velocidad angular actual.
-    /// </summary>
-    public float GetangularVelocityPenalty(float stregth)
+    public float GetAngularVelocityPenalty(float strength)
     {
-        float penalty = Mathf.Clamp01(angularVelocity.magnitude * stregth);
+        float penalty = Mathf.Clamp01(angularVelocity.magnitude * strength);
         return 1f - penalty;
     }
     #endregion
