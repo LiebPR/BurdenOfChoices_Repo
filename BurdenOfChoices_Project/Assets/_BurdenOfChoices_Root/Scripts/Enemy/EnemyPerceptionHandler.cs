@@ -52,7 +52,9 @@ public class EnemyPerceptionHandler : MonoBehaviour
     void HandleEnterPerception(Transform target)
     {
         if (stunState.IsStunned) return;
+        if (target != null && IsPlayerDead(target)) return;
         if (fsm.CurrentState == EnemyState.Chase) return;
+
         lastTarget = target;
         fsm.OnTurnTuTarget(target);
     }
@@ -60,6 +62,8 @@ public class EnemyPerceptionHandler : MonoBehaviour
     void HandleSeeTarget(Transform target)
     {
         if (stunState.IsStunned) return;
+        if (target != null && IsPlayerDead(target)) return;
+
         lastTarget = target;
         fsm.OnChase();
         
@@ -83,10 +87,19 @@ public class EnemyPerceptionHandler : MonoBehaviour
     {
         if(stunState.IsStunned) return;
         if (visionSystem.CanSeeTarget()) return;
+        if (lastTarget != null && IsPlayerDead(lastTarget)) return;
 
         lastTargetPosition = soundPosition;
         fsm.OnTurnTuTarget(null);
         fsm.ChangeState(EnemyState.Alert);
+    }
+    #endregion
+
+    #region Utilities
+    bool IsPlayerDead(Transform target)
+    {
+        PlayerHealth playerHealth = target.GetComponent<PlayerHealth>();
+        return playerHealth != null && !playerHealth.IsAlive;
     }
     #endregion
 }

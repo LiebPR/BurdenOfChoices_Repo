@@ -6,7 +6,8 @@ using UnityEngine;
 public enum WeaponAttackType
 {
     Slash, //ataque radial
-    Stab  //raycast recto
+    Stab,  //raycast recto
+    Empty
 }
 
 /// <summary>

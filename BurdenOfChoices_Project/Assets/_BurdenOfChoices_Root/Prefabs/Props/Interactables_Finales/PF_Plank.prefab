@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 8371233933572695395}
   - component: {fileID: 889520850101382520}
   - component: {fileID: 208181648426144217}
-  - component: {fileID: 9084830312566312158}
+  - component: {fileID: 5731309641744915046}
   - component: {fileID: 4011034528896613714}
   m_Layer: 0
   m_Name: PF_Plank
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 6ecfcf1bf33385d4ba8046a968909f8d, type: 2}
---- !u!114 &9084830312566312158
+--- !u!114 &5731309641744915046
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -191,7 +191,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3335363119273737271}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ecbfdff508ac464dbb0f4eaac4eff1d, type: 3}
+  m_Script: {fileID: 11500000, guid: 48a36024924b0754ab42f430452d07b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   anim: {fileID: 4544227721188582350}
@@ -223,7 +223,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!1 &5549611431774185293
 GameObject:
   m_ObjectHideFlags: 0

@@ -31,7 +31,6 @@ public class AnimatorManager : MonoBehaviour
     float isRelaxed;
     float currentWalkFrameRate; // frame rate actual suavizado
     float walkFrameRateVelocity; // helper para smoothDamp
-    bool isDead;
     #endregion
 
     #region Reference
@@ -43,13 +42,6 @@ public class AnimatorManager : MonoBehaviour
     {
         playerController = GetComponent<PlayerController>();
         health = GetComponent<PlayerHealth>();
-    }
-
-    private void Update()
-    {
-        if(health == null) return;
-
-        animator.SetBool(IsDeathHash, !health.IsAlive);
     }
 
     void OnEnable()
@@ -102,6 +94,11 @@ public class AnimatorManager : MonoBehaviour
     public void SetThrowing(bool value)
     {
         animator.SetBool(IsThrowingHash, value);
+    }
+
+    public void DeathAnim()
+    {
+        animator.SetTrigger(IsDeathHash);
     }
     #endregion
 

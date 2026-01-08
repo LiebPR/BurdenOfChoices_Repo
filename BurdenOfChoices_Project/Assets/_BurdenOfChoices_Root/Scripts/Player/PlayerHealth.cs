@@ -21,6 +21,7 @@ public class PlayerHealth : MonoBehaviour
     bool isAlive = true;
     int deathCount = 0;
     int cameraHighPriority = 20;
+    Vector3 lastHitDirection;
     #endregion
 
     #region Getters
@@ -30,6 +31,7 @@ public class PlayerHealth : MonoBehaviour
     #region References
     FadeController fadeController;
     Rigidbody rb;
+    AnimatorManager animatorManager;
     #endregion
 
     private void Awake()
@@ -39,6 +41,8 @@ public class PlayerHealth : MonoBehaviour
         {
             fadeController = FindAnyObjectByType<FadeController>();
         }
+
+        animatorManager = GetComponent<AnimatorManager>();
     }
 
     #region Public Methods
@@ -47,8 +51,28 @@ public class PlayerHealth : MonoBehaviour
         if (!isAlive) return;
 
         isAlive = false; // jugador muere al primer golpe
+        lastHitDirection = hitDirection;
         ApplyKnockback(hitDirection);
         HandleDeath();
+    }
+
+    /// <summary>
+    /// Llamado exclusivamente desde un ANimation Event al finalizar la animación de muerte. 
+    /// </summary>
+    public void OnDeathAnimationFinished()
+    {
+        if(deathCount == 1)
+        {
+            if(firstDeathRespawnPoint != null)
+                StartCoroutine(RespawnRoutine(firstDeathRespawnPoint));
+            else
+                ResetPlayerState();
+        }
+        else
+        {
+            if (SceneController.Instance != null)
+                SceneController.Instance.LoadScene("SCN_LoseMenu");
+        }
     }
     #endregion
 
@@ -61,6 +85,15 @@ public class PlayerHealth : MonoBehaviour
 
     void HandleDeath()
     {
+        //Girar al jugador hacia la dirección contraria del golpe
+        RotateAwayFromHit();
+
+        animatorManager.DeathAnim();
+
+        //Deshabilitar el controlador para que no se mueva más 
+        var controller = GetComponent<PlayerController>();
+        if (controller != null) controller.enabled = false;
+
         var vision = FindAnyObjectByType<VisionSystem>();
         if (vision != null) vision.ResetVisionToDefault();
 
@@ -68,22 +101,6 @@ public class PlayerHealth : MonoBehaviour
         if (enemyFsm != null) enemyFsm.ForceResetToPatrol();
 
         deathCount++;
-
-        if (deathCount == 1)
-        {
-            if (firstDeathRespawnPoint != null)
-                StartCoroutine(RespawnRoutine(firstDeathRespawnPoint));
-            else
-            {
-                Debug.LogWarning("PlayerHealth: firstDeathRespawnPoint no está asignado. No se puede reaparecer.");
-                ResetPlayerState();
-            }
-        }
-        else
-        {
-            if (SceneController.Instance != null)
-                SceneController.Instance.LoadScene("SCN_LoseMenu");
-        }
     }
 
     void ReappearAtPoint(Transform respawnPoint)
@@ -115,6 +132,22 @@ public class PlayerHealth : MonoBehaviour
         if (controller != null) controller.enabled = true;
 
         isAlive = true;
+    }
+
+    void RotateAwayFromHit()
+    {
+        // El vector del golpe ya se planea en el plano XZ
+        Vector3 hitDir = new Vector3(lastHitDirection.x, 0f, lastHitDirection.z);
+        hitDir.y = 0f;
+
+        if (hitDir.sqrMagnitude < 0.01f) return; // evitar NaN
+
+        // Rotación hacia el opuesto del golpe
+        Vector3 oppositeDir = -hitDir.normalized;
+        Quaternion targetRot = Quaternion.LookRotation(oppositeDir, Vector3.up);
+
+        // Aplicar la rotación instantánea
+        transform.rotation = targetRot;
     }
     #endregion
 

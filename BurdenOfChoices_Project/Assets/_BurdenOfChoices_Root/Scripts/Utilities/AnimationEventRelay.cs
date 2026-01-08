@@ -6,6 +6,7 @@ public class AnimationEventRelay : MonoBehaviour
     [Header("Target References")]
     [SerializeField] AnimatorManager animatorManager;
     [SerializeField] PlayerController playerController;
+    [SerializeField] PlayerHealth health;
 
     #region Animation Events
     public void OnAttackStart()
@@ -30,6 +31,14 @@ public class AnimationEventRelay : MonoBehaviour
     {
         if (animatorManager != null)
             animatorManager.SetPicking(true);
+    }
+    #endregion
+
+    #region Death
+    public void OnDeathAnimationEnd()
+    {
+        if (health != null)
+            health.OnDeathAnimationFinished();
     }
     #endregion
 }
