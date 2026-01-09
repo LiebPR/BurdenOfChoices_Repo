@@ -34,6 +34,7 @@ public class ThrowImpactDamage : MonoBehaviour
         {
             hasCollided = true;
             ApplyDamage(enemy, collision);
+            Break(collision);
             return;
         }
 
@@ -41,8 +42,7 @@ public class ThrowImpactDamage : MonoBehaviour
         if (IsBreakLayer(collision.gameObject.layer))
         {
             hasCollided = true;
-            SpawnImpact(collision.contacts[0].point);
-            Destroy(gameObject);
+            Break(collision);
         }
     }
 
@@ -83,6 +83,11 @@ public class ThrowImpactDamage : MonoBehaviour
     #endregion
 
     #region Break Logic
+    void Break(Collision collision)
+    {
+        SpawnImpact(collision.contacts[0].point);
+        Destroy(gameObject);
+    }
     bool IsBreakLayer(int layer)
     {
         return (breakLayer.value & (1 << layer)) != 0;
