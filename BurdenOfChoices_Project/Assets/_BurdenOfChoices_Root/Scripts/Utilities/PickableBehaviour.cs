@@ -21,6 +21,9 @@ public class PickableBehaviour : MonoBehaviour
 
     [Header("Grab Point")]
     [SerializeField] Transform grabPoint;
+
+    [Header("Collider")]
+    [SerializeField] Collider coll;
     #endregion
 
     #region Internal States
@@ -41,7 +44,6 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Rferences
     public Rigidbody rb;
-    Collider coll;
     #endregion
 
     #region Getters
@@ -55,8 +57,11 @@ public class PickableBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        coll = GetComponent<Collider>();
+        if(rb == null)
+            rb = GetComponent<Rigidbody>();
+
+        if(coll == null)
+            coll = GetComponent<Collider>();
 
         //Guardamos el estado original del objeto
         originalPosition = transform.position;

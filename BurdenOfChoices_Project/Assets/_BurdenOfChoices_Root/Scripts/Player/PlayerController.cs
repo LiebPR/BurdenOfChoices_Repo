@@ -26,13 +26,11 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Internal States
-    //RUIDO:
-    //bool ruido; //Estado interno que indica que el player hace ruido
-
     //MOVIMIENTO:
     Vector2 inputMovement; //entrada de movimiento
     Vector3 currentVelocitySmooth; //usado para SmoothDamp
     bool isRuning; //estado interno que indica que el player esta corriendo.
+    bool movementLocked; //bloquea el movimiento del jugador
     
     //AGACHARSE:
     bool isCrouching; //estado interno que indica que el player esta agachado.
@@ -51,16 +49,21 @@ public class PlayerController : MonoBehaviour
 
     #region References
     Rigidbody rb;
+    AnimatorManager animatorManager;
     #endregion
 
     private void Awake()
     {
         //REFERENCES:
         rb = GetComponent<Rigidbody>();
+        animatorManager = GetComponent<AnimatorManager>();
     }
 
     private void Update()
     {
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return;
+
         HandleRotation();
     }
 
@@ -91,33 +94,67 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return;
+
         HandleMovementSpeed();
+        UpdateAnimatorVelocity();
     }
 
     #region Movement Logic
     void HandleMovementSpeed()
     {
-        //Determina velocidad objetivo según estado
+        if (movementLocked)
+        {
+            // Mientras está pausado: velocidad planar a 0, pero inputMovement se sigue actualizando
+            currentVelocitySmooth = Vector3.zero;
+            return;
+        }
+
+        // Determinar velocidad objetivo
         float targetSpeed = walkSpeed;
         if (isCrouching) targetSpeed = crouchSpeed;
-        else if(isRuning) targetSpeed = runSpeed;
+        else if (isRuning) targetSpeed = runSpeed;
 
-        //Aplicamos penalización por peso (si currentEquipWeight > 1)
         targetSpeed *= currentWeightSpeedMultiplier;
 
-        //Dirección de movimiento
-        Vector3 inputDir = new Vector3(inputMovement.x, 0, inputMovement.y).normalized;
+        // Solo usamos inputMovement si su magnitud > 0
+        Vector3 inputDir = new Vector3(inputMovement.x, 0f, inputMovement.y);
+        if (inputDir.sqrMagnitude < 0.01f)
+        {
+            // Si no hay input real, no nos movemos
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            currentVelocitySmooth = Vector3.zero;
+            return;
+        }
+
+        inputDir.Normalize();
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
-        //Selecciona el tiempo de suavizado según si aceleramos o desaceleramos
+        // Suavizado
         float smoothTime = (desiredVelocity.magnitude > new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude) ? accelerationTime : decelerationTime;
-
-        //Suavizado de velocidad
         Vector3 smoothVelocity = Vector3.SmoothDamp(new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z), desiredVelocity, ref currentVelocitySmooth, smoothTime);
 
-        //Aplicamos velocidad final manteniendo Y
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
+    }
+    public void PausePlayer()
+    {
+        movementLocked = true;
+        rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+        // Bloquear Rigidbody completamente
+        rb.isKinematic = true;
 
+        // Reset SmoothDamp
+        currentVelocitySmooth = Vector3.zero;
+        inputMovement = Vector2.zero;
+    }
+
+    public void ResumePlayer()
+    {
+        movementLocked = false; // permite mover al jugador
+
+        // Desbloquear Rigidbody
+        rb.isKinematic = false;
     }
     #endregion
 
@@ -176,9 +213,18 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Ipunts Callbacks
-    void OnMoveChanged(Vector2 input) => inputMovement = input;
+    void OnMoveChanged(Vector2 input)
+    {
+        inputMovement = input;
+    }
     void OnRunChanged(bool runState) => isRuning = runState;
-    void OnCrouchChanged(bool crouchState) => isCrouching = crouchState;
+    void OnCrouchChanged(bool crouchState)
+    {
+        isCrouching = crouchState;
+
+        if (animatorManager != null)
+            animatorManager.SetCrouching(isCrouching);
+    }
     #endregion
 
     #region Weight (Handler)
@@ -218,6 +264,24 @@ public class PlayerController : MonoBehaviour
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         float multiplier = 1f - penalty;
         currentWeightSpeedMultiplier = Mathf.Clamp(multiplier, weightAccelerationSensitivity, 1f);
+    }
+    #endregion
+
+    #region Animations
+    void UpdateAnimatorVelocity()
+    {
+        if (animatorManager == null) return;
+
+        // Velocidad planar
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speed = planarVelocity.magnitude;
+
+        // Enviar velocidad real para transiciones Walk/Idle
+        animatorManager.SetVelocity(speed);
+
+        // Calcular ratio normalizado para ajustar velocidad de animación
+        float ratio = speed / walkSpeed;
+        animatorManager.SetMovementRatio(ratio);
     }
     #endregion
 }

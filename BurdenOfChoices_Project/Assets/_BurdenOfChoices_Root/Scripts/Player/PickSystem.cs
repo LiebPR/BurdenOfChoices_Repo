@@ -5,7 +5,7 @@ public class PickSystem : MonoBehaviour
     #region Inspector States
     [Header("Pick Config")]
     [Tooltip("Distancia a la que el jugador puede coger un objeto")]
-    [SerializeField] float pickRange = 2f;
+    [SerializeField] float pickRange = 1f; //radio de la esfera de recogida
 
     [Header("References")]
     [SerializeField] PlayerHand playerHand; //mano del jugador
@@ -70,16 +70,22 @@ public class PickSystem : MonoBehaviour
     }
     #endregion
 
-    #region Raycast
+    #region OverlapShere Detection
     bool TryGetPickable(out PickableBehaviour pickable)
     {
         pickable = null;
 
-        Ray ray = new Ray(pickOrigin.position, pickOrigin.forward);
-        if(Physics.Raycast(ray, out RaycastHit hit, pickRange))
+        //Detecta todos los colliders dentro del radio
+        Collider[] hits = Physics.OverlapSphere(pickOrigin.position, pickRange);
+
+        for(int i = 0; i < hits.Length; i++)
         {
-            pickable = hit.collider.GetComponent<PickableBehaviour>();
-            return pickable != null;
+            PickableBehaviour p = hits[i].GetComponentInParent<PickableBehaviour>();
+            if (p != null)
+            {
+                pickable = p;
+                return true;
+            }
         }
 
         return false;
@@ -89,4 +95,14 @@ public class PickSystem : MonoBehaviour
     #region Public API
     public PickableBehaviour GetCurrentPickable() => currentPickable;
     #endregion
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        if (pickOrigin == null) return;
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(pickOrigin.position, pickRange);
+    }
+#endif
 }

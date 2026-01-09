@@ -37,14 +37,21 @@ public class ChaseState : MonoBehaviour, IEnemyState
         if (visionSystem == null || visionSystem.Target == null) return;
 
         Vector3 targetPos = visionSystem.Target.position;
-        float distance = Vector3.Distance(transform.position, targetPos);
 
-        // Movimiento hacia el jugador
-        movementCommands.SetMoveTarget(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold);
-
-        // Rotación hacia el objetivo
+        //Siempre rotamos hacie el objetivo
         movementCommands.RotateTowards(targetPos, enemyData.rotationChaseStiffness, enemyData.rotationChaseDamping);
 
+        //Comprobamos alineación
+        bool isAligned = movementCommands.IsAlignedTo(targetPos, enemyData.chaseAlignmentAngle);
+
+        //Si no está alineado, nos recolocamos sin avanzar.
+        if (!isAligned)
+        {
+            movementCommands.PauseMovement();
+            return;
+        }
+
+        movementCommands.SetMoveTarget(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold);
     }
 
     public void Exit() 

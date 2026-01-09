@@ -6,6 +6,7 @@ public class Door : MonoBehaviour, IInteractable
 {
     #region Inspector States
     [Header("Door Settings")]
+    [SerializeField] bool isSecondaryDoor;
     [SerializeField] Animator exitDoorAnimator; //Animator de la puerta de salida
     [SerializeField] string openExitTrigger = "Open";
     [SerializeField] float exitDoorAnimatorDuration = 1f;
@@ -21,6 +22,11 @@ public class Door : MonoBehaviour, IInteractable
     [SerializeField] CinemachineCamera entryCamera;
     #endregion
 
+    #region Internal States
+    bool isInteracting;
+    bool locked;
+    #endregion
+
     #region References
     FadeController fadeController;
     #endregion
@@ -31,9 +37,10 @@ public class Door : MonoBehaviour, IInteractable
         {
             fadeController = FindAnyObjectByType<FadeController>();
         }
-    }
 
-    bool isInteracting = false;
+        if (isSecondaryDoor)
+            locked = true;
+    }
 
     public void OnHighlight(){}
     public void OnRemoveHighlight(){}
@@ -42,8 +49,24 @@ public class Door : MonoBehaviour, IInteractable
     public void OnPress()
     {
         if (isInteracting) return;
+        if(locked) return;
         StartCoroutine(HandleDoorRoutine());
     }
+
+    #region Block System (Public API)
+    public void Lock()
+    {
+        locked = true;
+    }
+    public void Unlock()
+    {
+        locked = false;
+    }
+    public bool IsLocked()
+    {
+        return locked;
+    }
+    #endregion
 
     #region Routine
     IEnumerator HandleDoorRoutine()

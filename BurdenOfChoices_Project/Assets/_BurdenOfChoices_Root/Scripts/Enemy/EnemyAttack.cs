@@ -22,7 +22,10 @@ public class EnemyAttack : MonoBehaviour
 
     private void Update()
     {
-        if(player == null) return;
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return; // El enemigo no ejecuta lógica mientras el juego está pausado
+
+        if (player == null) return;
 
         //Solo atacar si estamos persiguiendo
         if(fsm.CurrentState != EnemyState.Chase) return;
@@ -49,15 +52,11 @@ public class EnemyAttack : MonoBehaviour
     {
         if (player == null) return;
 
-        // Calculamos dirección hacia el jugador para el knockback
-        Vector3 hitDirection = (player.position - transform.position).normalized;
-
         // Llamamos al PlayerHealth
         PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
-        {
-            playerHealth.TakeHit(hitDirection);
-        }
+        if(playerHealth == null || !playerHealth.IsAlive) return;
+        Vector3 hitDirection = (player.position - transform.position).normalized;
+        playerHealth.TakeHit(hitDirection);
     }
     #endregion
 

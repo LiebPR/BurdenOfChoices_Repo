@@ -86,6 +86,21 @@ public class VisionSystem : MonoBehaviour
 
     void UpdateVisionState(bool inCone, bool inPerception, bool obstacleRay)
     {
+        //Ignorar jugador si está muerto
+        PlayerHealth playerHealth = Target.GetComponent<PlayerHealth>();
+        if(playerHealth != null && !playerHealth.IsAlive)
+        {
+            if (canSeePlayer)
+            {
+                OnLoseTarget?.Invoke(Target);
+            }
+
+            canSeePlayer = false;
+            perceptionTimer = 0f;
+            visionTimer = 0f;
+            lostTimer = 0f;
+            return;
+        }
         bool previousSee = canSeePlayer;
 
         // Visión directa

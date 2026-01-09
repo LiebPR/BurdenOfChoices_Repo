@@ -8,7 +8,6 @@ public class EnemyInitializer : MonoBehaviour
     IdleState idle;
     ChaseState chase;
     TurnToTargetState turnState;
-    AlertState alert;
     DeathState death;
     StunState stun;
     
@@ -27,7 +26,6 @@ public class EnemyInitializer : MonoBehaviour
         idle = GetComponent<IdleState>();
         chase = GetComponent<ChaseState>();
         turnState = GetComponent<TurnToTargetState>();
-        alert = GetComponent<AlertState>();
         death = GetComponent<DeathState>();
         stun = GetComponent<StunState>();
 
@@ -45,7 +43,6 @@ public class EnemyInitializer : MonoBehaviour
         idle.Initialize(fsm, commands, patrol, turnState);
         chase.Initialize(fsm, commands, vision);
         turnState.Initialize(fsm, commands);
-        alert.Initialize(fsm, commands);
         death.Initialize(fsm, commands);
         stun.Initialize(fsm, commands, health, rb, agent);
 

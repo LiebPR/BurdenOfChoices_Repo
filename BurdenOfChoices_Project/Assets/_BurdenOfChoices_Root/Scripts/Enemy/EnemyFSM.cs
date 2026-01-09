@@ -46,6 +46,9 @@ public class EnemyFSM : MonoBehaviour
 
     private void Update()
     {
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+            return; // El enemigo no ejecuta lógica mientras el juego está pausado
+
         // Ejecutar la lógica del estado actual
         currentStateInstance?.Handle();
 

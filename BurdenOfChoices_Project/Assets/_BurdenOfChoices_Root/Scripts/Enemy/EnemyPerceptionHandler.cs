@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyPerceptionHandler : MonoBehaviour
@@ -13,6 +14,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
     #region References
     EnemyFSM fsm;
     VisionSystem visionSystem;
+    HearingSystem hearingSystem;
     TurnToTargetState turnToTargetState;
     StunState stunState;
     #endregion
@@ -21,6 +23,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
     {
         fsm = GetComponent<EnemyFSM>();
         visionSystem = GetComponent<VisionSystem>();
+        hearingSystem = GetComponent<HearingSystem>();
         turnToTargetState = GetComponent<TurnToTargetState>();
         stunState = GetComponent<StunState>();
     }
@@ -31,6 +34,8 @@ public class EnemyPerceptionHandler : MonoBehaviour
         visionSystem.OnSeeTarget += HandleSeeTarget;
         visionSystem.OnLoseTarget += HandleLoseTarget;
         visionSystem.OnEnterPerception += HandleEnterPerception;
+
+        hearingSystem.OnHearSound += HandleHearSound;
     }
 
     void OnDisable()
@@ -38,14 +43,18 @@ public class EnemyPerceptionHandler : MonoBehaviour
         visionSystem.OnSeeTarget -= HandleSeeTarget;
         visionSystem.OnLoseTarget -= HandleLoseTarget;
         visionSystem.OnEnterPerception -= HandleEnterPerception;
+
+        hearingSystem.OnHearSound -= HandleHearSound;
     }
     #endregion
 
-    #region Handlers
+    #region Handlers Vision & Perception
     void HandleEnterPerception(Transform target)
     {
         if (stunState.IsStunned) return;
+        if (target != null && IsPlayerDead(target)) return;
         if (fsm.CurrentState == EnemyState.Chase) return;
+
         lastTarget = target;
         fsm.OnTurnTuTarget(target);
     }
@@ -53,6 +62,8 @@ public class EnemyPerceptionHandler : MonoBehaviour
     void HandleSeeTarget(Transform target)
     {
         if (stunState.IsStunned) return;
+        if (target != null && IsPlayerDead(target)) return;
+
         lastTarget = target;
         fsm.OnChase();
         
@@ -68,6 +79,27 @@ public class EnemyPerceptionHandler : MonoBehaviour
     {
         if (stunState.IsStunned) return;
         fsm.OnPatrol();
+    }
+    #endregion
+
+    #region Handlers Noise
+    void HandleHearSound(Vector3 soundPosition)
+    {
+        if(stunState.IsStunned) return;
+        if (visionSystem.CanSeeTarget()) return;
+        if (lastTarget != null && IsPlayerDead(lastTarget)) return;
+
+        lastTargetPosition = soundPosition;
+        fsm.OnTurnTuTarget(null);
+        fsm.ChangeState(EnemyState.Alert);
+    }
+    #endregion
+
+    #region Utilities
+    bool IsPlayerDead(Transform target)
+    {
+        PlayerHealth playerHealth = target.GetComponent<PlayerHealth>();
+        return playerHealth != null && !playerHealth.IsAlive;
     }
     #endregion
 }

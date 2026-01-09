@@ -2,35 +2,139 @@ using UnityEngine;
 
 /// <summary>
 /// AnimatorManager
-/// Gestiona los estados de animación compartidos
-/// entre piernas y torso.
+/// Gestiona todos los estados de animación
+/// usando un único Animator con capas.
 /// </summary>
 public class AnimatorManager : MonoBehaviour
 {
-    #region Inspector Variables
-    [Header("Animators")]
-    [SerializeField] Animator legsAnimator;
-    [SerializeField] Animator torsoAnimator;
+    #region Inspector
+    [SerializeField] Animator animator;
+
+    [Header("Animations Speed")]
+    [SerializeField] float walkBaseFrameRate = 35f;
     #endregion
 
-    #region Internal States
-    bool isRelaxed;
+    #region Animator Hashes
+    static readonly int VelocityHash = Animator.StringToHash("Velocity");
+    static readonly int IsRelaxedHash = Animator.StringToHash("IsRelaxed");
+    static readonly int IsCrouchingHash = Animator.StringToHash("IsCrouching");
+    static readonly int IsAttackHash = Animator.StringToHash("IsAttack");
+    static readonly int IsSlashingHash = Animator.StringToHash("IsSlashing");
+    static readonly int IsPickingHash = Animator.StringToHash("IsPicking");
+    static readonly int IsThrowingHash = Animator.StringToHash("IsThrowing");
+    static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
     #endregion
+
+    #region State
+    float velocity;
+    bool isCrouching;
+    float isRelaxed;
+    float currentWalkFrameRate; // frame rate actual suavizado
+    float walkFrameRateVelocity; // helper para smoothDamp
+    #endregion
+
+    #region Reference
+    PlayerController playerController;
+    PlayerHealth health;
+    #endregion
+
+    void Awake()
+    {
+        playerController = GetComponent<PlayerController>();
+        health = GetComponent<PlayerHealth>();
+    }
+
+    void OnEnable()
+    {
+        PickableBehaviour.OnEquipped += HandlePick;
+        PickableBehaviour.OnDropped += HandleDrop;
+    }
+
+    void OnDisable()
+    {
+        PickableBehaviour.OnEquipped -= HandlePick;
+        PickableBehaviour.OnDropped -= HandleDrop;
+    }
 
     #region Public API
-    public void SetRelaxed(bool value)
+    public void SetVelocity(float value)
     {
-        isRelaxed = value;
-        ApplyState();
+        velocity = value;
+        animator.SetFloat(VelocityHash, velocity, 0.05f, Time.deltaTime);
+    }
+
+    public void SetMovementRatio(float ratio)
+    {
+        UpdateAnimSpeed(ratio);
+    }
+
+    public void SetCrouching(bool value)
+    {
+        isCrouching = value;
+        animator.SetBool(IsCrouchingHash, value);
+    }
+
+    public void SetRelaxed(float value)
+    {
+        isRelaxed = Mathf.Clamp01(value);
+        animator.SetFloat(IsRelaxedHash, isRelaxed);
+    }
+
+    public void PlayAttack(float slashingValue)
+    {
+        animator.SetFloat(IsSlashingHash, Mathf.Clamp01(slashingValue));
+        animator.SetTrigger(IsAttackHash);
+    }
+
+    public void SetPicking(bool value)
+    {
+        animator.SetBool(IsPickingHash, value);
+    }
+
+    public void SetThrowing(bool value)
+    {
+        animator.SetBool(IsThrowingHash, value);
+    }
+
+    public void DeathAnim()
+    {
+        animator.SetTrigger(IsDeathHash);
     }
     #endregion
 
     #region Core
-    void ApplyState()
+    void UpdateAnimSpeed(float ratio)
     {
-        legsAnimator.SetBool("IsRelaxed", isRelaxed);
+        // Solo aplicamos frame rate variable si estamos caminando
+        if (velocity < 0.1f)
+        {
+            // Idle o detenido ? animación normal
+            animator.speed = 1f;
+            currentWalkFrameRate = walkBaseFrameRate;
+            return;
+        }
 
-        torsoAnimator.SetBool("IsRelaxed", isRelaxed);
+        // Determinar frame rate objetivo según velocidad y si corre o está agachado
+        float maxMultiplier = isCrouching ? 1.2f : 1.5f;
+        float targetFrameRate = Mathf.Clamp(ratio * walkBaseFrameRate, walkBaseFrameRate * 0.8f, walkBaseFrameRate * maxMultiplier);
+
+        // Suavizado para transición fluida
+        currentWalkFrameRate = Mathf.SmoothDamp(currentWalkFrameRate, targetFrameRate, ref walkFrameRateVelocity, 0.1f);
+
+        // Aplicamos solo a Walk
+        animator.speed = currentWalkFrameRate / walkBaseFrameRate;
+    }
+    #endregion
+
+    #region Handles
+    void HandlePick(PickableBehaviour p)
+    {
+        SetPicking(true);
+    }
+
+    void HandleDrop(PickableBehaviour p)
+    {
+        SetPicking(false);
     }
     #endregion
 }

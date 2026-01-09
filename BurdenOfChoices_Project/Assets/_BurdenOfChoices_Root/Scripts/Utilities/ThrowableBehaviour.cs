@@ -6,12 +6,14 @@ using UnityEngine;
 public class ThrowableBehaviour : MonoBehaviour
 {
     PickableBehaviour pickable;
+    ThrowImpactDamage impactDamage;
 
     private void Awake()
     {
         pickable = GetComponent<PickableBehaviour>();
         if (pickable == null)
             Debug.LogWarning("TrowableBehaviour requiere un PickableBehaviour en el mismo objeto.");
+        impactDamage = GetComponent<ThrowImpactDamage>();
     }
 
     #region Throw
@@ -27,6 +29,8 @@ public class ThrowableBehaviour : MonoBehaviour
 
         //Aplicamos fuerza limpia
         pickable.rb.AddForce(appliedForce, ForceMode.Impulse);
+
+        impactDamage.Arm();
     }
     #endregion
 }

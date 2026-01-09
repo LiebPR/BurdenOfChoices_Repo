@@ -30,7 +30,7 @@ public class RoomTrigger : MonoBehaviour
         if(!other.CompareTag("Player")) return;
 
         if (animatorManager != null)
-            animatorManager.SetRelaxed(true);
+            animatorManager.SetRelaxed(1f);
 
         animatorManager = null;
     }
@@ -38,8 +38,9 @@ public class RoomTrigger : MonoBehaviour
     #region Core
     void ApplyRoomState()
     {
-        //Sala hostil => jugador tenso
-        animatorManager.SetRelaxed(false);
+        //Sala hostil => jugador tenso (0 = tenso, 1 = relajado)
+        float relaxedValue = hasEnemies ? 0f : 1f;
+        animatorManager.SetRelaxed(relaxedValue);
     }
     #endregion
 }
