@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8692897537774436851, guid: a53cf879a175d4042ba8144619c11e6b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ef698286795a61f4699d5e2a565c86c4, type: 2}
     - target: {fileID: -8679921383154817045, guid: a53cf879a175d4042ba8144619c11e6b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -48,10 +52,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -2733714279514646990, guid: a53cf879a175d4042ba8144619c11e6b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ef698286795a61f4699d5e2a565c86c4, type: 2}
     - target: {fileID: 919132149155446097, guid: a53cf879a175d4042ba8144619c11e6b, type: 3}
       propertyPath: m_Name
-      value: SM_Cuberteria
+      value: PF_Cuberteria
       objectReference: {fileID: 0}
+    - target: {fileID: 8779229144771987272, guid: a53cf879a175d4042ba8144619c11e6b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ef698286795a61f4699d5e2a565c86c4, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
