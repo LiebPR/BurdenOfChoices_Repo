@@ -204,12 +204,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9505291e07adc40b15302568a973f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isSecondaryDoor: 0
   exitDoorAnimator: {fileID: 0}
   openExitTrigger: Open
-  exitDoorAnimatorDuration: 1
+  exitDoorAnimatorDuration: 1.2
   entryDoorAnimator: {fileID: 0}
   closeEntryTrigger: Close
-  entryDoorAnimDuration: 1
+  entryDoorAnimDuration: 0
   idleTrigger: Idle
   playerSpawnPoint: {fileID: 0}
   exitCamera: {fileID: 0}
