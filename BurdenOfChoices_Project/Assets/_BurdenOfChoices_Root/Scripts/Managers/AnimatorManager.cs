@@ -86,7 +86,7 @@ public class AnimatorManager : MonoBehaviour
         animator.SetTrigger(IsAttackHash);
     }
 
-    public void SetPicking(bool value)
+    public void SetGrabbing(bool value)
     {
         animator.SetBool(IsPickingHash, value);
     }
@@ -129,12 +129,12 @@ public class AnimatorManager : MonoBehaviour
     #region Handles
     void HandlePick(PickableBehaviour p)
     {
-        SetPicking(true);
+        SetGrabbing(true);
     }
 
     void HandleDrop(PickableBehaviour p)
     {
-        SetPicking(false);
+        SetGrabbing(false);
     }
     #endregion
 }

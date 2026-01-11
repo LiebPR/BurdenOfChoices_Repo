@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     Vector3 currentVelocitySmooth; //usado para SmoothDamp
     bool isRuning; //estado interno que indica que el player esta corriendo.
     bool movementLocked; //bloquea el movimiento del jugador
+
+    public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     
     //AGACHARSE:
     bool isCrouching; //estado interno que indica que el player esta agachado.
@@ -41,6 +43,11 @@ public class PlayerController : MonoBehaviour
     //PESO: 
     float currentEquipWeight = 1f; //peso actual del equipamiento
     float currentWeightSpeedMultiplier = 1f; //multiplicador de velocidad por peso
+
+    bool rotationLocked;
+
+    //DRAG
+    Vector3 dragAxisLocked = Vector3.zero; //eje que se bloquea durante drag
     #endregion
 
     #region Getters
@@ -48,7 +55,7 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region References
-    Rigidbody rb;
+    public Rigidbody rb;
     AnimatorManager animatorManager;
     #endregion
 
@@ -131,6 +138,13 @@ public class PlayerController : MonoBehaviour
         inputDir.Normalize();
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
+        // Bloqueo de ejes
+        if (dragAxisLocked != Vector3.zero)
+        {
+            if (Mathf.Abs(dragAxisLocked.x) > 0f) desiredVelocity.x = 0f;
+            if (Mathf.Abs(dragAxisLocked.z) > 0f) desiredVelocity.z = 0f;
+        }
+
         // Suavizado
         float smoothTime = (desiredVelocity.magnitude > new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude) ? accelerationTime : decelerationTime;
         Vector3 smoothVelocity = Vector3.SmoothDamp(new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z), desiredVelocity, ref currentVelocitySmooth, smoothTime);
@@ -158,9 +172,23 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region Drag Movement Lock
+    public void LockMovementAxis(Vector3 axis)
+    {
+        dragAxisLocked = axis;
+    }
+
+    public void UnlockMovementAxis()
+    {
+        dragAxisLocked = Vector3.zero;
+    }
+    #endregion
+
     #region Rotation Logic
     void HandleRotation()
     {
+        if(rotationLocked) return;
+
         // Velocidad planar y magnitud
         Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speed = planarVelocity.magnitude;
@@ -209,6 +237,16 @@ public class PlayerController : MonoBehaviour
         // Aplicar rotación suave hacia la dirección resultante
         Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+    }
+
+    public void LockRotation()
+    {
+        rotationLocked = true;
+    }
+
+    public void UnlockRotation()
+    {
+        rotationLocked = false;
     }
     #endregion
 
@@ -264,6 +302,12 @@ public class PlayerController : MonoBehaviour
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         float multiplier = 1f - penalty;
         currentWeightSpeedMultiplier = Mathf.Clamp(multiplier, weightAccelerationSensitivity, 1f);
+    }
+
+    public void SetDraggedWeight(float weight)
+    {
+        currentEquipWeight = weight;
+        RecalculateWeightMultiplier();
     }
     #endregion
 

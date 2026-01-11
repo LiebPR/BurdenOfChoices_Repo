@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 696851203066131740}
   - component: {fileID: 2458121485343374787}
   - component: {fileID: 5253959463380057055}
+  - component: {fileID: 1485971493066991267}
   - component: {fileID: 6720865921545517628}
   m_Layer: 0
   m_Name: PF_BrokenBottle
@@ -119,6 +120,24 @@ MonoBehaviour:
   anim: {fileID: 5998399671135059195}
   data: {fileID: 11400000, guid: 364b4f650bcad0f47b2cc1bb6511f694, type: 2}
   attackOrigin: {fileID: 2345195983873510236}
+--- !u!114 &1485971493066991267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569143904732285720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93263a9ed1ac117439cfa052b9334f2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  breakLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  hitsToBreak: 2
+  breakDelay: 0.05
+  breakVFX: {fileID: 0}
 --- !u!54 &6720865921545517628
 Rigidbody:
   m_ObjectHideFlags: 0

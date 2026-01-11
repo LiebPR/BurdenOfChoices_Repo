@@ -13,8 +13,8 @@ public class SimpleThrowableItem : MonoBehaviour
         pickable = GetComponent<PickableBehaviour>();
         dataProvider = GetComponent<DataProvider>();
 
-        playerHand = GetComponent<PlayerHand>();
-        if(playerHand == null)
+        playerHand = FindAnyObjectByType<PlayerHand>();
+        if (playerHand == null)
         {
             Debug.LogWarning("No se encontró PlayerHand en la escena.");
         }

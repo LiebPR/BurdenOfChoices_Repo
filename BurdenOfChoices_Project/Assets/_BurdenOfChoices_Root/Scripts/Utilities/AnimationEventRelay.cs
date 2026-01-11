@@ -30,7 +30,7 @@ public class AnimationEventRelay : MonoBehaviour
     public void OnPickStart()
     {
         if (animatorManager != null)
-            animatorManager.SetPicking(true);
+            animatorManager.SetGrabbing(true);
     }
     #endregion
 

@@ -7,6 +7,8 @@ using System;
 public class PickableBehaviour : MonoBehaviour
 {
     #region Inspector Variables
+    [Tooltip("Si es falso, el objeto no se equipa y solo se usa para interacción/drag.")]
+    public bool AllowEquip = true;
     [Header("Drop / GroundCheck")]
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckDistance = 0.25f;
@@ -104,6 +106,14 @@ public class PickableBehaviour : MonoBehaviour
             return;
         }
 
+        if (!AllowEquip)
+        {
+            //Solo notifica que fue pickeado, sin equipar
+            NotifyEquipListeners(catcher);
+            return;
+        }
+
+
         catchPoint = catcher.GetCatchPoint();
         isCatched = true;
 
@@ -133,7 +143,33 @@ public class PickableBehaviour : MonoBehaviour
             transform.localRotation = Quaternion.identity;
         }
 
-            OnEquipped?.Invoke(this); //notifica que se equipó
+        OnEquipped?.Invoke(this); //notifica que se equipó
+        NotifyEquipListeners(catcher);
+        NotifyEquipListeners(catcher);
+    }
+
+    /// <summary>
+    /// Marca el objeto como cogido pero sin equiparlo en la mano
+    /// Pensado para objetos arrastrables.
+    /// </summary>
+    public void OnDragEquip(ICatcher catcher)
+    {
+        CancelInvoke(nameof(RestoreInternal));
+        CancelInvoke(nameof(UpdateRestoreTimer));
+        restoreRunning = false;
+
+        isCatched = true;
+        catchPoint = null;
+
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = false;
+        }
+
+        Debug.Log("OnDragEquip -> Disparando OnEquipped para: " + gameObject.name);
+        OnEquipped?.Invoke(this);
         NotifyEquipListeners(catcher);
     }
 
@@ -182,12 +218,27 @@ public class PickableBehaviour : MonoBehaviour
         //Quita el parent
         transform.SetParent(null);
 
-        //Activa la física
-        if (rb != null)
+        // Revisar si es arrastrable
+        var draggable = GetComponent<DraggableBehaviour>();
+        if (draggable != null)
         {
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            coll.isTrigger = false;
+            // Siempre kinematic si es arrastrable
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                coll.isTrigger = false;
+            }
+        }
+        else
+        {
+            // Física normal para objetos normales
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.useGravity = true;
+                coll.isTrigger = false;
+            }
         }
 
         //Restauramos el tamaño si se a alterado

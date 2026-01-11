@@ -47,6 +47,7 @@ public class AttackSystem : MonoBehaviour
         if (pickable == null) return;
 
         IWeapon weapon = pickable.GetComponent<IWeapon>();
+        if(weapon == null) return; //no es un arma, ignorar input
 
         WeaponData data = weapon.GetWeaponData();
         if(data == null) return;

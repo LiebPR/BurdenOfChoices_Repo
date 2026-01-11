@@ -25,6 +25,12 @@ public class StabAttackCommand : AttackCommand
                 //Aplicamos el daño definido en el WeaponData
                 enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
             }
+
+            BrokenGlass brokenGlass = tOrigin.GetComponentInParent<BrokenGlass>();
+            if (brokenGlass != null)
+            {
+                brokenGlass.BreakImmediate(hit.point);
+            }
         }
     }
 }
