@@ -1,15 +1,22 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 
 public class Cell : MonoBehaviour
 {
     #region Inspector States
     [SerializeField] List<Lock> locks = new List<Lock>();
+    [SerializeField] Animator doorAnimator;
+    [SerializeField] float openDelay = 0.5f;
     #endregion
 
     #region Internal States
     int lockedCount;
+    #endregion
+
+    #region Animator
+    static readonly int IsCellOpenHash = Animator.StringToHash("IsCellOpen");
     #endregion
 
     #region Getters
@@ -25,6 +32,17 @@ public class Cell : MonoBehaviour
     public void NotifyLockOpened(Lock onpenLock)
     {
         lockedCount = Mathf.Max(lockedCount - 1, 0);
+        if (AreAllLocksUnlocked)
+            StartCoroutine(OpenDoorWithDelay());
     }
     #endregion
+
+    private IEnumerator OpenDoorWithDelay()
+    {
+        if (openDelay > 0f)
+            yield return new WaitForSeconds(openDelay);
+
+        if (doorAnimator != null)
+            doorAnimator.SetBool(IsCellOpenHash, true);
+    }
 }
