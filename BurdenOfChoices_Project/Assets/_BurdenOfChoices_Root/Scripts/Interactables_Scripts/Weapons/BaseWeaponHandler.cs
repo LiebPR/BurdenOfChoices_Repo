@@ -17,6 +17,7 @@ public class BaseWeaponHandler : MonoBehaviour, IPickListener, IWeapon
 
     #region Animator Params
     static readonly int IsCatchHash = Animator.StringToHash("IsCatch");
+    static readonly int IsAttackHash = Animator.StringToHash("IsAttack");
     #endregion
 
     private void Awake()
@@ -49,4 +50,12 @@ public class BaseWeaponHandler : MonoBehaviour, IPickListener, IWeapon
             anim.SetBool(IsCatchHash, false);
     }
     #endregion
+
+    public void PlayWeaponAttack()
+    {
+        if(anim != null)
+        {
+            anim.SetTrigger(IsAttackHash);
+        }
+    }
 }

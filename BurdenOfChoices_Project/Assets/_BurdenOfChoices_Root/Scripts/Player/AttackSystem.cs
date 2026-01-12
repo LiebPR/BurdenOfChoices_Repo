@@ -41,30 +41,37 @@ public class AttackSystem : MonoBehaviour
     /// </summary>
     void HandleAttack()
     {
-        if(onCooldown) return;
+        if (onCooldown) return;
 
         PickableBehaviour pickable = pickSystem.GetCurrentPickable();
         if (pickable == null) return;
 
         IWeapon weapon = pickable.GetComponent<IWeapon>();
-        if(weapon == null) return; //no es un arma, ignorar input
 
-        WeaponData data = weapon.GetWeaponData();
-        if(data == null) return;
+        WeaponData data = weapon != null ? weapon.GetWeaponData() : null;
 
-        //Ejecuta animación según tipo de ataque
-        float slashingValue = (data.attackType == WeaponAttackType.Slash) ? 1f : 0f;
+        // ---- Animación del jugador ----
+        // Mantener exactamente como estaba
+        float slashingValue = (data != null && data.attackType == WeaponAttackType.Slash) ? 1f : 0f;
         animatorManager.PlayAttack(slashingValue);
 
-        // Crear y ejecutar comando según el tipo de ataque
-        AttackCommand command = CreateCommand(weapon, data);
-        if (command != null)
+        if (weapon != null && data != null)
         {
-            command.Execute();
-        }
-            
+            // Ejecutar comando de ataque (daño, área, etc.)
+            AttackCommand command = CreateCommand(weapon, data);
+            command?.Execute();
 
-        StartCoroutine(AttackRoutine(weapon, data));
+            // ---- Animación del arma ----
+            BaseWeaponHandler weaponHandler = weapon as BaseWeaponHandler;
+            weaponHandler?.PlayWeaponAttack();
+
+            StartCoroutine(AttackRoutine(weapon, data));
+        }
+        else
+        {
+            // Si no hay arma, aún aplicamos cooldown
+            StartCoroutine(AttackRoutine(null, null));
+        }
     }
     #endregion
 
