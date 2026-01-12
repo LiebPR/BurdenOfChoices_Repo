@@ -111,6 +111,7 @@ public class EnemyHealth : MonoBehaviour
         {
             firstLifeBroken = true;
             movementCommands.EnterPhysicalMode();
+            RotateOppositeToHit(LastHitDirection);
             StartCoroutine(KnockbackRoutine(LastHitDirection, LastKncokBack));
 
             EnterStun();
@@ -193,6 +194,19 @@ public class EnemyHealth : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+    }
+    #endregion
+
+    #region Utilitis
+    void RotateOppositeToHit(Vector3 hitDirection)
+    {
+        Vector3 planarDir = new Vector3(hitDirection.x, 0f, hitDirection.z);
+
+        if (planarDir.sqrMagnitude < 0.0001f) return;
+
+        // Mirar en dirección contraria al golpe
+        Quaternion targetRotation = Quaternion.LookRotation(-planarDir.normalized);
+        transform.rotation = targetRotation;
     }
     #endregion
 }
