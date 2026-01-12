@@ -416,6 +416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3259c8c4d3914d341ae0d1bab216e55b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowEquip: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1605,7 +1606,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &314954978
 Transform:
   m_ObjectHideFlags: 0
@@ -2478,6 +2479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3259c8c4d3914d341ae0d1bab216e55b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowEquip: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -6988,6 +6990,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3259c8c4d3914d341ae0d1bab216e55b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowEquip: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -7252,7 +7255,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerCell: {fileID: 2026844605}
+  anim: {fileID: 0}
   keyConsumePoint: {fileID: 1181376143}
+  lockDisableDelay: 1
+  chainFadeDelay: 0.3
+  chain: {fileID: 0}
 --- !u!1001 &1055476164
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9881,6 +9888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3259c8c4d3914d341ae0d1bab216e55b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowEquip: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -11405,6 +11413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3259c8c4d3914d341ae0d1bab216e55b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowEquip: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -13991,10 +14000,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faabb0c92278a3246bb204e03a894100, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statues:
+  orderedStatues:
   - {fileID: 477475561}
   - {fileID: 742829886}
   - {fileID: 579650811}
+  pillars:
+  - {fileID: 896006273}
+  - {fileID: 1747871540}
+  - {fileID: 750894520}
   puzzleRoom: {fileID: 1639529745}
   lifeSystemPuzzle: {fileID: 1219143354}
 --- !u!4 &2015504167
@@ -14310,6 +14323,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   locks:
   - {fileID: 1053377970}
+  doorAnimator: {fileID: 0}
+  openDelay: 0.5
 --- !u!1 &2039033867
 GameObject:
   m_ObjectHideFlags: 0
@@ -14344,7 +14359,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &2039033868
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -15290,6 +15305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3259c8c4d3914d341ae0d1bab216e55b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowEquip: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8

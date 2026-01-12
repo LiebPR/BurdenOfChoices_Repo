@@ -29,8 +29,10 @@ public class ThrowableBehaviour : MonoBehaviour
 
         //Aplicamos fuerza limpia
         pickable.rb.AddForce(appliedForce, ForceMode.Impulse);
-
-        impactDamage.Arm();
+        if(impactDamage != null)
+        {
+            impactDamage.Arm();
+        }
     }
     #endregion
 }
