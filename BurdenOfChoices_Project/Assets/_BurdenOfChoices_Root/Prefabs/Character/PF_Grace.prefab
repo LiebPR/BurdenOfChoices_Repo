@@ -1769,16 +1769,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   throwDirectionSource: {fileID: 7294122243911310253}
   throwPreview: {fileID: 0}
+  throwCooldown: 1
   holdSpeed: 1.5
   verticalThrowForce: 1
   minThrowDistance: 2
   maxThrowDistance: 10
   simulationAirResistance: 0.1
   previewHeightOffset: 0
-  throwFollowSpeed: 8
-  throwLine: {fileID: 6310927900572377224}
-  trajectoryPoints: 30
-  trajectoryPointSpacing: 0.1
+  throwFollowSpeed: 7
 --- !u!114 &6196688805697900210
 MonoBehaviour:
   m_ObjectHideFlags: 0

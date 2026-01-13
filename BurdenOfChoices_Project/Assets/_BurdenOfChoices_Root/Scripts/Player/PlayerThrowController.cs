@@ -10,6 +10,9 @@ public class PlayerThrowController : MonoBehaviour
     [SerializeField] Transform throwDirectionSource; //transform que indica la dirección de lanzamiento
     [SerializeField] Transform throwPreview; //imagen que indica el punto final del lanzamiento
 
+    [Header("Cooldown")]
+    [SerializeField] float throwCooldown = 1.0f; //segundos entre lanzamientos
+
     [Header("Hold Settings")]
     [SerializeField] float holdSpeed = 0.5f; //velocidad de carga
     [SerializeField] float verticalThrowForce = 0.25f; //fuerza vertical aplicada al lanzar
@@ -25,6 +28,9 @@ public class PlayerThrowController : MonoBehaviour
     #region Internal States
     float holdTime;
     bool isHolding;
+
+    //Cooldown
+    float cooldownEndTime;
 
     //Valores ajustados en tiempo de ejecución
     float currentWeight = 1f; 
@@ -81,6 +87,11 @@ public class PlayerThrowController : MonoBehaviour
     {
         if(isHolding && pickable != null)
         {
+            if (IsInCooldown())
+            {
+                CancelHold();
+                return;
+            }
             holdTime += Time.deltaTime * effectiveHoldSpeed;
             holdTime = Mathf.Clamp01(holdTime); //siempre entre 0 y 1
 
@@ -148,6 +159,7 @@ public class PlayerThrowController : MonoBehaviour
 
     void StartHold()
     {
+        if(IsInCooldown()) return;
         if (pickable == null || !pickable.IsCatched) return;
 
         animatorManager.StartHold();
@@ -175,9 +187,34 @@ public class PlayerThrowController : MonoBehaviour
         }
     }
 
+    void CancelHold()
+    {
+        isHolding = false;
+        holdTime = 0f;
+
+        if(throwPreview != null)
+            throwPreview.gameObject.SetActive(false);
+
+        animatorManager.EndHold();
+
+        var playerController = GetComponent<PlayerController>();
+        if(playerController != null)
+        {
+            playerController.ResumePlayer();
+            playerController.LockCrouch();
+            playerController.EnableFreeRotation(false);
+        }
+    }
+
     void ReleaseThrow()
     {
         if (!isHolding) return;
+
+        if (IsInCooldown())
+        {
+            CancelHold();
+            return;
+        }
 
         isHolding = false;
         animatorManager.TriggerThrow();
@@ -206,8 +243,21 @@ public class PlayerThrowController : MonoBehaviour
         // Usamos la dirección suavizada en lugar de la dirección directa
         throwable.OnThrow(throwDirectionSmoothed, throwDistance, effectiveVerticalThrowForce);
 
+        StartCooldown();
         holdTime = 0f;
     }
+
+    #region Cooldown Logic
+    bool IsInCooldown()
+    {
+        return Time.time < cooldownEndTime;
+    }
+
+    void StartCooldown()
+    {
+        cooldownEndTime = Time.time + throwCooldown;
+    }
+    #endregion
 
     #region Preview Hold Methods
     void UpdateThrowPreview()
