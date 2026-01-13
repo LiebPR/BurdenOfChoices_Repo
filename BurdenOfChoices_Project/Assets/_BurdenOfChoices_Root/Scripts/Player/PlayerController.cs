@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float inertiaFactor = 0.15f; //amortiguación del cambio de dirección
     [SerializeField] float rotationNoise = 0.02f; //variación humana sutil
 
+    [Header("FreeRotation")]
+    [SerializeField] float freeRotationSensitivity = 3f;
+    [SerializeField] float freeRotationDamping = 15f; //damping al usar mouse
+
     [Header("Weight Factor")]
     [SerializeField] float weightSpeedSensitivity = 0.25f; //sensibilidad con la que el peso afecta a la velocidad
     [SerializeField] float weightAccelerationSensitivity = 0.1f; //miltiplicador mínimo de velocidad por peso
@@ -36,15 +40,16 @@ public class PlayerController : MonoBehaviour
     
     //AGACHARSE:
     bool isCrouching; //estado interno que indica que el player esta agachado.
+    bool crouchLocked; 
 
     //ROTACIÓN:
     Vector3 lastMoveDirection; //ultima dirección válida de movimiento
+    bool rotationLocked;
+    bool freeRotation;
 
     //PESO: 
     float currentEquipWeight = 1f; //peso actual del equipamiento
     float currentWeightSpeedMultiplier = 1f; //multiplicador de velocidad por peso
-
-    bool rotationLocked;
 
     //DRAG
     Vector3 dragAxisLocked = Vector3.zero; //eje que se bloquea durante drag
@@ -71,7 +76,31 @@ public class PlayerController : MonoBehaviour
         if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
             return;
 
-        HandleRotation();
+        if (freeRotation)
+        {
+            Vector2 lookInput = InputManager.LookInput;
+
+            if (lookInput.sqrMagnitude > 0.001f)
+            {
+                // Convertimos input a dirección en el plano XZ
+                Vector3 inputDir = new Vector3(lookInput.x, 0f, lookInput.y).normalized;
+
+                // Guardamos como última dirección
+                lastMoveDirection = inputDir;
+
+                // Rotación suave y natural usando RotateTowards
+                Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRot,
+                    freeRotationSensitivity * Time.deltaTime // multiplicador para ajustar velocidad
+                );
+            }
+        }
+        else
+        {
+            HandleRotation();
+        }
     }
 
     #region Input Event Subscriptions
@@ -184,6 +213,11 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region Crouch Locks
+    public void LockCrouch() => crouchLocked = true;
+    public void UnlockCrouch() => crouchLocked = false;
+    #endregion
+
     #region Rotation Logic
     void HandleRotation()
     {
@@ -239,6 +273,11 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
     }
 
+    public void EnableFreeRotation(bool value)
+    {
+        freeRotation = value;
+    }
+
     public void LockRotation()
     {
         rotationLocked = true;
@@ -258,6 +297,8 @@ public class PlayerController : MonoBehaviour
     void OnRunChanged(bool runState) => isRuning = runState;
     void OnCrouchChanged(bool crouchState)
     {
+        if (crouchLocked) return;
+
         isCrouching = crouchState;
 
         if (animatorManager != null)

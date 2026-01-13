@@ -24,6 +24,7 @@ public class AnimatorManager : MonoBehaviour
     static readonly int IsSlashingHash = Animator.StringToHash("IsSlashing");
     static readonly int IsPickingHash = Animator.StringToHash("IsPicking");
     static readonly int IsThrowingHash = Animator.StringToHash("IsThrowing");
+    static readonly int ThrowHash = Animator.StringToHash("Throw");
     static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
     #endregion
 
@@ -95,9 +96,19 @@ public class AnimatorManager : MonoBehaviour
         smAnimator.SetBool(IsPickingHash, value);
     }
 
-    public void SetThrowing(bool value)
+    public void StartHold()
     {
-        smAnimator.SetBool(IsThrowingHash, value);
+        smAnimator.SetBool(IsThrowingHash, true);
+    }
+
+    public void EndHold()
+    {
+        smAnimator.SetBool(IsThrowingHash, false);
+    }
+
+    public void TriggerThrow()
+    {
+        smAnimator.SetTrigger(ThrowHash);
     }
 
     public void DeathAnim()
