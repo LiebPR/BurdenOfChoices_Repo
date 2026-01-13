@@ -507,6 +507,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.05
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
@@ -3108,6 +3109,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.05
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
@@ -6253,6 +6255,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1222904707}
     m_Modifications:
+    - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
+      propertyPath: m_Size.z
+      value: 3.4595213
+      objectReference: {fileID: 0}
+    - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
+      propertyPath: m_Center.z
+      value: -2.2702403
+      objectReference: {fileID: 0}
     - target: {fileID: 5878954513801967377, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Name
       value: SM_Suelo (10)
@@ -7527,6 +7537,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.1
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
@@ -8045,11 +8056,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Size.x
-      value: 2.5786018
+      value: 2.4119692
+      objectReference: {fileID: 0}
+    - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
+      propertyPath: m_Size.z
+      value: 2.4443436
       objectReference: {fileID: 0}
     - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Center.x
-      value: -1.2893009
+      value: -1.2059846
+      objectReference: {fileID: 0}
+    - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
+      propertyPath: m_Center.z
+      value: -1.2221718
       objectReference: {fileID: 0}
     - target: {fileID: 2596782954992008297, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Name
@@ -8929,19 +8948,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Size.x
-      value: 2.5839615
+      value: 2.4517527
       objectReference: {fileID: 0}
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Size.z
-      value: 3.596438
+      value: 3.4594316
       objectReference: {fileID: 0}
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Center.x
-      value: -1.2919807
+      value: -1.2258763
       objectReference: {fileID: 0}
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Center.z
-      value: -2.2017806
+      value: -2.2702837
       objectReference: {fileID: 0}
     - target: {fileID: 5878954513801967377, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Name
@@ -10425,6 +10444,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.1
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
@@ -10634,11 +10654,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Size.x
-      value: 2.6454656
+      value: 2.4469604
+      objectReference: {fileID: 0}
+    - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
+      propertyPath: m_Size.z
+      value: 2.4390173
       objectReference: {fileID: 0}
     - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Center.x
-      value: -1.6772672
+      value: -1.7765198
+      objectReference: {fileID: 0}
+    - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
+      propertyPath: m_Center.z
+      value: -1.2195086
       objectReference: {fileID: 0}
     - target: {fileID: 2596782954992008297, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Name
@@ -11974,6 +12002,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.05
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
@@ -13886,6 +13915,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1222904707}
     m_Modifications:
+    - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
+      propertyPath: m_Size.z
+      value: 2.4442496
+      objectReference: {fileID: 0}
+    - target: {fileID: 619479238219766791, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
+      propertyPath: m_Center.z
+      value: -1.2221248
+      objectReference: {fileID: 0}
     - target: {fileID: 2596782954992008297, guid: a39b566518e30c4408f1a9a195c2b5fa, type: 3}
       propertyPath: m_Name
       value: SM_Suelo3 (2)
@@ -14171,19 +14208,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Size.x
-      value: 2.6440532
+      value: 2.443721
       objectReference: {fileID: 0}
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Size.z
-      value: 3.5918007
+      value: 3.457517
       objectReference: {fileID: 0}
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Center.x
-      value: -1.6779734
+      value: -1.7781395
       objectReference: {fileID: 0}
     - target: {fileID: 1576842550534569505, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Center.z
-      value: -2.2040992
+      value: -2.2712412
       objectReference: {fileID: 0}
     - target: {fileID: 5878954513801967377, guid: e0a1625c775dfbc46b91b0df2158cce9, type: 3}
       propertyPath: m_Name
@@ -15828,6 +15865,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.1
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
@@ -16189,9 +16227,9 @@ SceneRoots:
   - {fileID: 41210705}
   - {fileID: 579206397}
   - {fileID: 478216084}
-  - {fileID: 2023458064}
   - {fileID: 17501552}
-  - {fileID: 830396726}
   - {fileID: 314954978}
   - {fileID: 1581624364}
+  - {fileID: 830396726}
+  - {fileID: 2023458064}
   - {fileID: 28049084}

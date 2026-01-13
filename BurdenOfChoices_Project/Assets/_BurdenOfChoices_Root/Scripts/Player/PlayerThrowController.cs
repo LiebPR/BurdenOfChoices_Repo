@@ -85,15 +85,25 @@ public class PlayerThrowController : MonoBehaviour
 
     private void Update()
     {
-        if(isHolding && pickable != null)
+        if (isHolding)
         {
+            // Si ya no hay throwable, cancelamos Hold
+            if (throwable == null || pickable == null || !pickable.IsCatched)
+            {
+                CancelHold();
+                return;
+            }
+
+            // Chequeo de cooldown
             if (IsInCooldown())
             {
                 CancelHold();
                 return;
             }
+
+            // Aumentar holdTime
             holdTime += Time.deltaTime * effectiveHoldSpeed;
-            holdTime = Mathf.Clamp01(holdTime); //siempre entre 0 y 1
+            holdTime = Mathf.Clamp01(holdTime);
 
             UpdateThrowPreview();
         }
@@ -151,7 +161,7 @@ public class PlayerThrowController : MonoBehaviour
             if (playerController != null)
             {
                 playerController.ResumePlayer();//desbloqueamos movimiento
-                playerController.LockCrouch(); //desbloqueamos agachar
+                playerController.UnlockCrouch(); //desbloqueamos agachar
                 playerController.EnableFreeRotation(false); //vuelvea rotación normal en movimiento 
             }
         }
@@ -159,14 +169,27 @@ public class PlayerThrowController : MonoBehaviour
 
     void StartHold()
     {
-        if(IsInCooldown()) return;
+        var playerController = GetComponent<PlayerController>();
+
+        //No lanzar agachado
+        if (playerController != null && playerController.IsCrouching)
+            return;
+
+        //No lanzar si está en cooldown
+        if (IsInCooldown()) return;
+
+        //No lanzar si no hay objeto agarrado
         if (pickable == null || !pickable.IsCatched) return;
 
+        //No lanzar si no tiene ThrowableBehaviour
+        if (throwable == null) return;
+
+        //Solo si es lanzable activamos Hold
         animatorManager.StartHold();
         isHolding = true;
         holdTime = 0f;
 
-        var playerController = GetComponent<PlayerController>();
+        // Bloqueo de movimiento y crouch
         if (playerController != null)
         {
             playerController.PausePlayer();
@@ -174,7 +197,7 @@ public class PlayerThrowController : MonoBehaviour
             playerController.EnableFreeRotation(true);
         }
 
-        // Inicializamos la dirección suavizada al inicio del hold
+        // Inicializamos dirección suavizada para la preview
         throwDirectionSmoothed = throwDirectionSource.forward;
 
         if (throwPreview != null && throwDirectionSource != null)
@@ -182,7 +205,12 @@ public class PlayerThrowController : MonoBehaviour
             throwPreview.gameObject.SetActive(true);
 
             float previewForce = effectiveMinThrowDistance;
-            Vector3 predicted = PredictLandingPoint(throwDirectionSource.position, throwDirectionSmoothed, previewForce, effectiveVerticalThrowForce);
+            Vector3 predicted = PredictLandingPoint(
+                throwDirectionSource.position,
+                throwDirectionSmoothed,
+                previewForce,
+                effectiveVerticalThrowForce
+            );
             throwPreview.position = predicted;
         }
     }
@@ -201,16 +229,15 @@ public class PlayerThrowController : MonoBehaviour
         if(playerController != null)
         {
             playerController.ResumePlayer();
-            playerController.LockCrouch();
+            playerController.UnlockCrouch();
             playerController.EnableFreeRotation(false);
         }
     }
 
     void ReleaseThrow()
     {
-        if (!isHolding) return;
-
-        if (IsInCooldown())
+        //Si no hay throwable, cancelamos animación
+        if(!isHolding || throwable == null)
         {
             CancelHold();
             return;
@@ -227,7 +254,7 @@ public class PlayerThrowController : MonoBehaviour
         if(playerController != null)
         {
             playerController.ResumePlayer();//desbloqueamos movimiento
-            playerController.LockCrouch(); //desbloqueamos agachar
+            playerController.UnlockCrouch(); //desbloqueamos agachar
             playerController.EnableFreeRotation(false); //vuelvea rotación normal en movimiento 
         }
         //Guardamos la fuerza final, pero NO lanzamos aquí
@@ -236,6 +263,7 @@ public class PlayerThrowController : MonoBehaviour
 
     public void ExecuteThrow()
     {
+        //Solo lanzar si hay objeto y es lanzable
         if (pickable == null || throwable == null) return;
 
         float throwDistance = Mathf.Lerp(effectiveMinThrowDistance, effectiveMaxThrowDistance, holdTime);

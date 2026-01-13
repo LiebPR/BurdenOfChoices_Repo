@@ -12,6 +12,7 @@ public class PickableBehaviour : MonoBehaviour
     [Header("Drop / GroundCheck")]
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckDistance = 0.25f;
+    [SerializeField] float groundStickTime = 0.05f; //tiempo de pegado al suelo
 
     [Header("Debug")]
     [SerializeField] bool debugDrawGroundRay = true;
@@ -42,6 +43,7 @@ public class PickableBehaviour : MonoBehaviour
     Vector3 originalScale;
 
     float restoreTimer;
+    float lastGroundedTime;
     #endregion
 
     #region Rferences
@@ -84,10 +86,13 @@ public class PickableBehaviour : MonoBehaviour
 #endif
 
         //Si hay una petición pediente de soltado y ahora está en suelo, ejecutarla
-        if(pendingDropRequest && isCatched && IsGrounded())
+        if(pendingDropRequest && isCatched)
         {
-            pendingDropRequest = false;
-            OnDrop();
+            if (IsGrounded())
+            {
+                pendingDropRequest = false;
+                OnDrop();
+            }
         }
     }
 
@@ -126,22 +131,7 @@ public class PickableBehaviour : MonoBehaviour
         }
 
         //Parent al catchPoint
-        transform.SetParent(catchPoint);
-        
-        if(grabPoint != null)
-        {
-            Vector3 offsetPos = grabPoint.localPosition;
-            Quaternion offsetRot = grabPoint.localRotation;
-
-            transform.localPosition = -offsetPos;
-            transform.localRotation = Quaternion.Inverse(offsetRot);
-        }
-        else
-        {
-            //Fallback segura si no hay grabPoint
-            transform.localPosition = Vector3.zero;
-            transform.localRotation = Quaternion.identity;
-        }
+        SnapTopGrabPoint();
 
         OnEquipped?.Invoke(this); //notifica que se equipó
         NotifyEquipListeners(catcher);
@@ -194,20 +184,13 @@ public class PickableBehaviour : MonoBehaviour
 
             //Asegurar que el estado permanece como 'cogido' y que siga parentado al cathPoint
             isCatched = true;
-            if(catchPoint != null)
-            {
-                transform.SetParent(catchPoint);
-                transform.localPosition = Vector3.zero;
-                transform.localRotation = Quaternion.identity;
-            }
+            SnapTopGrabPoint();
             if(rb != null)
             {
                 rb.isKinematic = true;
                 rb.useGravity = false;
                 coll.isTrigger = true;
             }
-
-            //No pocedemos al drop
             return;
         }
 
@@ -343,10 +326,43 @@ public class PickableBehaviour : MonoBehaviour
         Vector3 origin = transform.position + Vector3.up * 0.1f;
         float maxDistance = groundCheckDistance + 0.1f;
 
-        //Raycast hacia abajo buscando la layer configurada como suelo
-        return Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
+        bool hitGround = Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
+
+        if (hitGround)
+        {
+            lastGroundedTime = 0f; //guardamos el último momento de contacto con el suelo
+            return true;
+        }
+        
+        lastGroundedTime += Time.deltaTime;
+
+        //Mientras no supere el buffer, seguimos considerándolo grounded
+        return lastGroundedTime < groundStickTime;
     }
     #endregion
+
+    void SnapTopGrabPoint()
+    {
+        if (catchPoint == null) return;
+
+        transform.SetParent(catchPoint);
+
+        if(grabPoint != null)
+        {
+            transform.localPosition = -grabPoint.localPosition;
+            transform.localRotation = Quaternion.Inverse(grabPoint.localRotation);
+        }
+        else
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+        if(rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
 
     #region Timer Visuals
     void UpdateRestoreTimer()
