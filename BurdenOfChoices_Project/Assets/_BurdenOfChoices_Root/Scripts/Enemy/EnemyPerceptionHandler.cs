@@ -121,5 +121,11 @@ public class EnemyPerceptionHandler : MonoBehaviour
     {
         return Time.time - lastHeardTime <= data.noiseMemoryTime;
     }
+
+    public void ForgetSound()
+    {
+        IsHearingNoise = false;
+    }
+
     #endregion
 }

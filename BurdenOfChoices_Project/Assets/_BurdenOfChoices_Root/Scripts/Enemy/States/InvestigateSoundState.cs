@@ -8,11 +8,15 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
     #region Internal States
     float reactionTimer;
     float inspectTimer;
-
-    bool isTurning;
-    bool isInvestigating;
+    float soundMemoryTimer;
 
     bool hasLockedPoint;
+
+    bool isReacting;
+    bool isRotating;
+    bool isWaitingAlignment;
+    bool isMoving;
+
     Vector3 lockedInvestigatePoint;
     #endregion
 
@@ -37,20 +41,22 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
     {
         reactionTimer = enemyData.soundReactionDelay;
         inspectTimer = enemyData.soundInspectTime;
+        soundMemoryTimer = enemyData.noiseMemoryTime;
 
         hasLockedPoint = false;
+
+        isReacting = true;
+        isRotating = false;
+        isWaitingAlignment = false;
+        isMoving = false;   
 
         movementCommands.PauseMovement();
     }
 
     public void Handle()
     {
-        Vector3 targetPoint = perception.HasValidSound()
-                              ? perception.LastTargetPosition
-                              : lockedInvestigatePoint;
-
-        // FASE 1 — REACCIÓN / DUDA
-        if (reactionTimer > 0f)
+        //Reacción / Duda
+        if (isReacting)
         {
             reactionTimer -= Time.deltaTime;
 
@@ -63,23 +69,75 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 );
             }
 
+            if (reactionTimer <= 0f)
+            {
+                isReacting = false;
+                isRotating = true;
+            }
+
             return;
         }
 
-        // FASE 2 — FIJAR PUNTO DE INVESTIGACIÓN UNA SOLA VEZ
-        if (!hasLockedPoint && perception.LastTargetPosition != Vector3.zero)
+        //Rotación + Memoria
+        if (isRotating)
         {
-            lockedInvestigatePoint = perception.LastTargetPosition;
-            hasLockedPoint = true;
+            if (perception.IsHearingNoise)
+            {
+                soundMemoryTimer = enemyData.noiseMemoryTime;
 
+                movementCommands.RotateTowards(
+                    perception.LastTargetPosition,
+                    enemyData.rotationSoundStiffness,
+                    enemyData.rotationSoundDamping
+                );
+            }
+            else
+            {
+                soundMemoryTimer -= Time.deltaTime;
+            }
+
+            if (soundMemoryTimer <= 0f && !hasLockedPoint)
+            {
+                lockedInvestigatePoint = perception.LastTargetPosition;
+                hasLockedPoint = true;
+
+                // ?? IMPORTANTE
+                perception.ForgetSound();
+
+                isRotating = false;
+                isWaitingAlignment = true;
+            }
+
+            return;
+        }
+
+        //Espera alineación
+        if (isWaitingAlignment)
+        {
+            if (!movementCommands.IsAlignedTo(
+                    lockedInvestigatePoint,
+                    enemyData.soundTurnAlignmentAngle))
+            {
+                movementCommands.RotateTowards(
+                    lockedInvestigatePoint,
+                    enemyData.rotationSoundStiffness,
+                    enemyData.rotationSoundDamping
+                );
+                return;
+            }
+
+            // Ya está alineado ? ahora sí puede moverse
             movementCommands.ResumeMovement(
                 enemyData.investigateSpeed,
                 enemyData.normalAcceleration
             );
+
+            isWaitingAlignment = false;
+            isMoving = true;
         }
 
-        // FASE 3 — DESPLAZAMIENTO HACIA EL PUNTO FIJADO
-        if (hasLockedPoint)
+        //Movimiento (Sin Rotar)
+        if (isMoving)
         {
             movementCommands.SetMoveTarget(
                 lockedInvestigatePoint,
@@ -88,7 +146,8 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             );
 
             if (!moveContext.Agent.pathPending &&
-                moveContext.Agent.remainingDistance <= moveContext.Agent.stoppingDistance + 0.1f)
+                moveContext.Agent.remainingDistance <=
+                moveContext.Agent.stoppingDistance + 0.1f)
             {
                 inspectTimer -= Time.deltaTime;
 
@@ -97,16 +156,6 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                     fsm.OnPatrol();
                 }
             }
-        }
-
-        // FASE 4 — GIRAR HACIA SONIDO SI SIGUE ESTANDO ACTIVO
-        if (perception.IsHearingNoise)
-        {
-            movementCommands.RotateTowards(
-                perception.LastTargetPosition,
-                enemyData.rotationSoundStiffness,
-                enemyData.rotationSoundDamping
-            );
         }
     }
 

@@ -133,7 +133,7 @@ public class EnemyMovementCommands
     public void RotateTowards(Vector3 targetPosition, float stiffness, float damping)
     {
         //Cancelación de rotación en estados inválidos
-        if (agent == null || !agent.enabled || agent.isStopped)
+        if (agent == null || !agent.enabled)
         {
             angularVelocity = Vector3.zero;
             return;
