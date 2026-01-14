@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3868504545302698305
 Transform:
@@ -61,6 +61,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8938757199331756022, guid: e7581e490474c7448808167ee501940f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e7581e490474c7448808167ee501940f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -101,9 +105,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -6335137425615992343, guid: e7581e490474c7448808167ee501940f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -6301639454980675290, guid: e7581e490474c7448808167ee501940f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -734938396680093130, guid: e7581e490474c7448808167ee501940f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e7581e490474c7448808167ee501940f, type: 3}
       propertyPath: m_Name
       value: PF_BigDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e7581e490474c7448808167ee501940f, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -112,12 +132,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3868504545302698305}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7431478967194133461, guid: e7581e490474c7448808167ee501940f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5317552963095641113}
-    - targetCorrespondingSourceObject: {fileID: 7431478967194133461, guid: e7581e490474c7448808167ee501940f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2144243395464299967}
     - targetCorrespondingSourceObject: {fileID: -6335137425615992343, guid: e7581e490474c7448808167ee501940f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3828544973639037269}
@@ -182,50 +196,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e7581e490474c7448808167ee501940f, type: 3}
   m_PrefabInstance: {fileID: 3744244319266871917}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6113584687744661944 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7431478967194133461, guid: e7581e490474c7448808167ee501940f, type: 3}
-  m_PrefabInstance: {fileID: 3744244319266871917}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &5317552963095641113
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6113584687744661944}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.5632406, y: 1.70824, z: 0.7925384}
-  m_Center: {x: -0.28162083, y: 0.85412073, z: -2.6037316}
---- !u!65 &2144243395464299967
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6113584687744661944}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.5632406, y: 1.70824, z: 0.7984182}
-  m_Center: {x: -0.28162083, y: 0.85412073, z: -0.39921007}
