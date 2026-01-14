@@ -20,6 +20,7 @@ public class EnemyInitializer : MonoBehaviour
     Rigidbody rb;
     NavMeshAgent agent;
     EnemyPerceptionHandler perceptionHandler;
+    EnemyAnimationHandler animatorHandler;
     #endregion
 
     private void Awake()
@@ -40,11 +41,11 @@ public class EnemyInitializer : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
         perceptionHandler = GetComponent<EnemyPerceptionHandler>();
-
+        animatorHandler = GetComponent<EnemyAnimationHandler>();
 
         // Inicializamos cada estado
         patrol.Initialize(fsm, commands, turnState, moveContext);
-        idle.Initialize(fsm, commands, patrol, turnState);
+        idle.Initialize(fsm, commands, patrol, turnState, animatorHandler);
         chase.Initialize(fsm, commands, vision);
         turnState.Initialize(fsm, commands);
         death.Initialize(fsm, commands);

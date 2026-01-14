@@ -1,4 +1,4 @@
-using Mono.Cecil.Cil;
+ï»¿using Mono.Cecil.Cil;
 using UnityEngine;
 
 public class InvestigateSoundState : MonoBehaviour, IEnemyState
@@ -55,7 +55,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
 
     public void Handle()
     {
-        //Reacción / Duda
+        //ReacciÃ³n / Duda
         if (isReacting)
         {
             reactionTimer -= Time.deltaTime;
@@ -78,7 +78,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             return;
         }
 
-        //Rotación + Memoria
+        //RotaciÃ³n + Memoria
         if (isRotating)
         {
             if (perception.IsHearingNoise)
@@ -101,7 +101,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 lockedInvestigatePoint = perception.LastTargetPosition;
                 hasLockedPoint = true;
 
-                // ?? IMPORTANTE
+                //IMPORTANTE
                 perception.ForgetSound();
 
                 isRotating = false;
@@ -111,7 +111,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             return;
         }
 
-        //Espera alineación
+        //Espera alineaciÃ³n
         if (isWaitingAlignment)
         {
             if (!movementCommands.IsAlignedTo(
@@ -126,7 +126,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 return;
             }
 
-            // Ya está alineado ? ahora sí puede moverse
+            // Ya estÃ¡ alineado â†’ ahora sÃ­ puede moverse
             movementCommands.ResumeMovement(
                 enemyData.investigateSpeed,
                 enemyData.normalAcceleration
