@@ -41,6 +41,24 @@ public class EnemyData : ScriptableObject
     public float hearingDelayRun = 0.8f;
     #endregion
 
+    #region Sound Investigation
+    [Header("Sound Investigation Settings")]
+    [Tooltip("Tiempo de duda antes de reaccionar al sonido.")]
+    public float soundReactionDelay = 0.6f;
+    [Tooltip("Velocidad al investigar un sonido.")]
+    public float investigateSpeed = 2.5f;
+    [Tooltip("Tiempo que el enemigo inspecciona el punto del sonido.")]
+    public float soundInspectTime = 2.5f;
+    [Tooltip("Ángulo máximo para considerar alineado al sonido.")]
+    public float soundTurnAlignmentAngle = 8f;
+
+    [Header("Sound Rotation Settings")]
+    [Tooltip("Fuerza del resorte al girar hacia un sonido.")]
+    public float rotationSoundStiffness = 4f;
+    [Tooltip("Fricción angular al investigar un sonido.")]
+    public float rotationSoundDamping = 14f;
+    #endregion
+
     #region Movement
     [Header("Movement Settings")]
     [Tooltip("Velocidad base durate la patrulla.")]

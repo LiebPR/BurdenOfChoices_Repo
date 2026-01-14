@@ -22119,6 +22119,7 @@ GameObject:
   - component: {fileID: 2039033886}
   - component: {fileID: 2039033890}
   - component: {fileID: 2039033889}
+  - component: {fileID: 2039033891}
   m_Layer: 0
   m_Name: PF_Sectario
   m_TagString: Untagged
@@ -22462,6 +22463,19 @@ MonoBehaviour:
   suspiciousImage: {fileID: 1156594452}
   alertImage: {fileID: 697558647}
   stunImage: {fileID: 1784550148}
+--- !u!114 &2039033891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039033867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4707df12606cdf4486d9ae4e37c4ab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyData: {fileID: 11400000, guid: c319d7cc71a1b8d4eac0d1ee0f36a2e8, type: 2}
 --- !u!1001 &2039941919
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -43,7 +43,7 @@ public class PickableBehaviour : MonoBehaviour
     Vector3 originalScale;
 
     float restoreTimer;
-    float lastGroundedTime;
+    float groundedStableTimer;
     #endregion
 
     #region Rferences
@@ -328,16 +328,18 @@ public class PickableBehaviour : MonoBehaviour
 
         bool hitGround = Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
 
-        if (hitGround)
+        if (!hitGround)
         {
-            lastGroundedTime = 0f; //guardamos el último momento de contacto con el suelo
-            return true;
+            //si no hay suelo, reiniciamos el contador
+            groundedStableTimer = 0f;
+            return false;
         }
         
-        lastGroundedTime += Time.deltaTime;
+        //Hay suelo -> empezamos a contar estabilidad
+        groundedStableTimer += Time.deltaTime;
 
         //Mientras no supere el buffer, seguimos considerándolo grounded
-        return lastGroundedTime < groundStickTime;
+        return groundedStableTimer >= groundStickTime;
     }
     #endregion
 
