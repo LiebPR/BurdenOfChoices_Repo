@@ -7,9 +7,12 @@ using System;
 public class PickableBehaviour : MonoBehaviour
 {
     #region Inspector Variables
+    [Tooltip("Si es falso, el objeto no se equipa y solo se usa para interacción/drag.")]
+    public bool AllowEquip = true;
     [Header("Drop / GroundCheck")]
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckDistance = 0.25f;
+    [SerializeField] float groundStickTime = 0.05f; //tiempo de pegado al suelo
 
     [Header("Debug")]
     [SerializeField] bool debugDrawGroundRay = true;
@@ -40,6 +43,7 @@ public class PickableBehaviour : MonoBehaviour
     Vector3 originalScale;
 
     float restoreTimer;
+    float groundedStableTimer;
     #endregion
 
     #region Rferences
@@ -82,10 +86,13 @@ public class PickableBehaviour : MonoBehaviour
 #endif
 
         //Si hay una petición pediente de soltado y ahora está en suelo, ejecutarla
-        if(pendingDropRequest && isCatched && IsGrounded())
+        if(pendingDropRequest && isCatched)
         {
-            pendingDropRequest = false;
-            OnDrop();
+            if (IsGrounded())
+            {
+                pendingDropRequest = false;
+                OnDrop();
+            }
         }
     }
 
@@ -104,6 +111,14 @@ public class PickableBehaviour : MonoBehaviour
             return;
         }
 
+        if (!AllowEquip)
+        {
+            //Solo notifica que fue pickeado, sin equipar
+            NotifyEquipListeners(catcher);
+            return;
+        }
+
+
         catchPoint = catcher.GetCatchPoint();
         isCatched = true;
 
@@ -116,24 +131,35 @@ public class PickableBehaviour : MonoBehaviour
         }
 
         //Parent al catchPoint
-        transform.SetParent(catchPoint);
-        
-        if(grabPoint != null)
-        {
-            Vector3 offsetPos = grabPoint.localPosition;
-            Quaternion offsetRot = grabPoint.localRotation;
+        SnapTopGrabPoint();
 
-            transform.localPosition = -offsetPos;
-            transform.localRotation = Quaternion.Inverse(offsetRot);
-        }
-        else
+        OnEquipped?.Invoke(this); //notifica que se equipó
+        NotifyEquipListeners(catcher);
+        NotifyEquipListeners(catcher);
+    }
+
+    /// <summary>
+    /// Marca el objeto como cogido pero sin equiparlo en la mano
+    /// Pensado para objetos arrastrables.
+    /// </summary>
+    public void OnDragEquip(ICatcher catcher)
+    {
+        CancelInvoke(nameof(RestoreInternal));
+        CancelInvoke(nameof(UpdateRestoreTimer));
+        restoreRunning = false;
+
+        isCatched = true;
+        catchPoint = null;
+
+        if (rb != null)
         {
-            //Fallback segura si no hay grabPoint
-            transform.localPosition = Vector3.zero;
-            transform.localRotation = Quaternion.identity;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = false;
         }
 
-            OnEquipped?.Invoke(this); //notifica que se equipó
+        Debug.Log("OnDragEquip -> Disparando OnEquipped para: " + gameObject.name);
+        OnEquipped?.Invoke(this);
         NotifyEquipListeners(catcher);
     }
 
@@ -158,20 +184,13 @@ public class PickableBehaviour : MonoBehaviour
 
             //Asegurar que el estado permanece como 'cogido' y que siga parentado al cathPoint
             isCatched = true;
-            if(catchPoint != null)
-            {
-                transform.SetParent(catchPoint);
-                transform.localPosition = Vector3.zero;
-                transform.localRotation = Quaternion.identity;
-            }
+            SnapTopGrabPoint();
             if(rb != null)
             {
                 rb.isKinematic = true;
                 rb.useGravity = false;
                 coll.isTrigger = true;
             }
-
-            //No pocedemos al drop
             return;
         }
 
@@ -182,12 +201,27 @@ public class PickableBehaviour : MonoBehaviour
         //Quita el parent
         transform.SetParent(null);
 
-        //Activa la física
-        if (rb != null)
+        // Revisar si es arrastrable
+        var draggable = GetComponent<DraggableBehaviour>();
+        if (draggable != null)
         {
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            coll.isTrigger = false;
+            // Siempre kinematic si es arrastrable
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                coll.isTrigger = false;
+            }
+        }
+        else
+        {
+            // Física normal para objetos normales
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.useGravity = true;
+                coll.isTrigger = false;
+            }
         }
 
         //Restauramos el tamaño si se a alterado
@@ -292,10 +326,45 @@ public class PickableBehaviour : MonoBehaviour
         Vector3 origin = transform.position + Vector3.up * 0.1f;
         float maxDistance = groundCheckDistance + 0.1f;
 
-        //Raycast hacia abajo buscando la layer configurada como suelo
-        return Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
+        bool hitGround = Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
+
+        if (!hitGround)
+        {
+            //si no hay suelo, reiniciamos el contador
+            groundedStableTimer = 0f;
+            return false;
+        }
+        
+        //Hay suelo -> empezamos a contar estabilidad
+        groundedStableTimer += Time.deltaTime;
+
+        //Mientras no supere el buffer, seguimos considerándolo grounded
+        return groundedStableTimer >= groundStickTime;
     }
     #endregion
+
+    void SnapTopGrabPoint()
+    {
+        if (catchPoint == null) return;
+
+        transform.SetParent(catchPoint);
+
+        if(grabPoint != null)
+        {
+            transform.localPosition = -grabPoint.localPosition;
+            transform.localRotation = Quaternion.Inverse(grabPoint.localRotation);
+        }
+        else
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+        if(rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
 
     #region Timer Visuals
     void UpdateRestoreTimer()

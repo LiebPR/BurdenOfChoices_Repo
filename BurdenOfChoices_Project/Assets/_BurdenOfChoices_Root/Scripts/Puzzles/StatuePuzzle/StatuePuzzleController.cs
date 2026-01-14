@@ -3,7 +3,10 @@ using UnityEngine;
 public class StatuePuzzleController : MonoBehaviour
 {
     [Header("Estatua del Puzzle")]
-    [SerializeField] Statue[] statues;
+    [SerializeField] Statue[] orderedStatues;
+
+    [Header("Pilares del puzzle")]
+    [SerializeField] Pillar[] pillars;
 
     [Header("Sala puzzle")]
     [SerializeField] PuzzleRoomTrigger puzzleRoom;
@@ -11,11 +14,12 @@ public class StatuePuzzleController : MonoBehaviour
     [Header("Sistema de Vidas")]
     [SerializeField] LifeSystemPuzzle lifeSystemPuzzle;
 
+    int currentIndex;
     bool isComplete = false;
 
     private void OnEnable()
     {
-        foreach(var statue in statues)
+        foreach(var statue in orderedStatues)
         {
             statue.OnFallen += HandleStatueFallen;
         }
@@ -23,7 +27,7 @@ public class StatuePuzzleController : MonoBehaviour
 
     private void OnDisable()
     {
-        foreach (var statue in statues)
+        foreach (var statue in orderedStatues)
         {
             statue.OnFallen -= HandleStatueFallen;
         }
@@ -36,16 +40,33 @@ public class StatuePuzzleController : MonoBehaviour
     {
         if(isComplete) return;
 
-        //Verifica si todas las estatuas han caído
-        foreach(var s in statues)
+        //Estatua incorrecta -> reset completo
+        if (orderedStatues[currentIndex] != fallenStatue)
         {
-            if(!s.IsFallen()) return;
+            ResetPuzzle();
+            return;
         }
 
-        CompletePuzzle();
+        currentIndex++;
+
+        if(currentIndex >= orderedStatues.Length)
+            CompletePuzzle();
     }
 
-    public void OnWrongHit()
+    void ResetPuzzle()
+    {
+        currentIndex = 0;
+
+        foreach (var statue in orderedStatues)
+            statue.ResetStatue();
+
+        foreach (var pillar in pillars)
+            pillar.ResetPillar();
+
+        OnWrong();
+    }
+
+    public void OnWrong()
     {
         if(isComplete) return;
 

@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float inertiaFactor = 0.15f; //amortiguación del cambio de dirección
     [SerializeField] float rotationNoise = 0.02f; //variación humana sutil
 
+    [Header("FreeRotation")]
+    [SerializeField] float freeRotationSensitivity = 3f;
+    [SerializeField] float freeRotationDamping = 15f; //damping al usar mouse
+
     [Header("Weight Factor")]
     [SerializeField] float weightSpeedSensitivity = 0.25f; //sensibilidad con la que el peso afecta a la velocidad
     [SerializeField] float weightAccelerationSensitivity = 0.1f; //miltiplicador mínimo de velocidad por peso
@@ -31,16 +35,24 @@ public class PlayerController : MonoBehaviour
     Vector3 currentVelocitySmooth; //usado para SmoothDamp
     bool isRuning; //estado interno que indica que el player esta corriendo.
     bool movementLocked; //bloquea el movimiento del jugador
+
+    public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     
     //AGACHARSE:
     bool isCrouching; //estado interno que indica que el player esta agachado.
+    bool crouchLocked; 
 
     //ROTACIÓN:
     Vector3 lastMoveDirection; //ultima dirección válida de movimiento
+    bool rotationLocked;
+    bool freeRotation;
 
     //PESO: 
     float currentEquipWeight = 1f; //peso actual del equipamiento
     float currentWeightSpeedMultiplier = 1f; //multiplicador de velocidad por peso
+
+    //DRAG
+    Vector3 dragAxisLocked = Vector3.zero; //eje que se bloquea durante drag
     #endregion
 
     #region Getters
@@ -48,7 +60,7 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region References
-    Rigidbody rb;
+    public Rigidbody rb;
     AnimatorManager animatorManager;
     #endregion
 
@@ -64,7 +76,31 @@ public class PlayerController : MonoBehaviour
         if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
             return;
 
-        HandleRotation();
+        if (freeRotation)
+        {
+            Vector2 lookInput = InputManager.LookInput;
+
+            if (lookInput.sqrMagnitude > 0.001f)
+            {
+                // Convertimos input a dirección en el plano XZ
+                Vector3 inputDir = new Vector3(lookInput.x, 0f, lookInput.y).normalized;
+
+                // Guardamos como última dirección
+                lastMoveDirection = inputDir;
+
+                // Rotación suave y natural usando RotateTowards
+                Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRot,
+                    freeRotationSensitivity * Time.deltaTime // multiplicador para ajustar velocidad
+                );
+            }
+        }
+        else
+        {
+            HandleRotation();
+        }
     }
 
     #region Input Event Subscriptions
@@ -131,6 +167,13 @@ public class PlayerController : MonoBehaviour
         inputDir.Normalize();
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
+        // Bloqueo de ejes
+        if (dragAxisLocked != Vector3.zero)
+        {
+            if (Mathf.Abs(dragAxisLocked.x) > 0f) desiredVelocity.x = 0f;
+            if (Mathf.Abs(dragAxisLocked.z) > 0f) desiredVelocity.z = 0f;
+        }
+
         // Suavizado
         float smoothTime = (desiredVelocity.magnitude > new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude) ? accelerationTime : decelerationTime;
         Vector3 smoothVelocity = Vector3.SmoothDamp(new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z), desiredVelocity, ref currentVelocitySmooth, smoothTime);
@@ -158,9 +201,28 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region Drag Movement Lock
+    public void LockMovementAxis(Vector3 axis)
+    {
+        dragAxisLocked = axis;
+    }
+
+    public void UnlockMovementAxis()
+    {
+        dragAxisLocked = Vector3.zero;
+    }
+    #endregion
+
+    #region Crouch Locks
+    public void LockCrouch() => crouchLocked = true;
+    public void UnlockCrouch() => crouchLocked = false;
+    #endregion
+
     #region Rotation Logic
     void HandleRotation()
     {
+        if(rotationLocked) return;
+
         // Velocidad planar y magnitud
         Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speed = planarVelocity.magnitude;
@@ -210,6 +272,21 @@ public class PlayerController : MonoBehaviour
         Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
     }
+
+    public void EnableFreeRotation(bool value)
+    {
+        freeRotation = value;
+    }
+
+    public void LockRotation()
+    {
+        rotationLocked = true;
+    }
+
+    public void UnlockRotation()
+    {
+        rotationLocked = false;
+    }
     #endregion
 
     #region Ipunts Callbacks
@@ -220,6 +297,8 @@ public class PlayerController : MonoBehaviour
     void OnRunChanged(bool runState) => isRuning = runState;
     void OnCrouchChanged(bool crouchState)
     {
+        if (crouchLocked) return;
+
         isCrouching = crouchState;
 
         if (animatorManager != null)
@@ -264,6 +343,12 @@ public class PlayerController : MonoBehaviour
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         float multiplier = 1f - penalty;
         currentWeightSpeedMultiplier = Mathf.Clamp(multiplier, weightAccelerationSensitivity, 1f);
+    }
+
+    public void SetDraggedWeight(float weight)
+    {
+        currentEquipWeight = weight;
+        RecalculateWeightMultiplier();
     }
     #endregion
 

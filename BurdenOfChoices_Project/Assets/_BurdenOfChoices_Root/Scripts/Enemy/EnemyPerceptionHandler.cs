@@ -7,8 +7,13 @@ public class EnemyPerceptionHandler : MonoBehaviour
     [SerializeField] EnemyData data;
 
     #region Internal States
-    Vector3 lastTargetPosition;
     Transform lastTarget;
+    float lastHeardTime;
+    #endregion
+
+    #region Getter
+    public Vector3 LastTargetPosition {  get; private set; }
+    public bool IsHearingNoise { get; private set; } 
     #endregion
 
     #region References
@@ -26,6 +31,14 @@ public class EnemyPerceptionHandler : MonoBehaviour
         hearingSystem = GetComponent<HearingSystem>();
         turnToTargetState = GetComponent<TurnToTargetState>();
         stunState = GetComponent<StunState>();
+    }
+
+    private void Update()
+    {
+        if(IsHearingNoise && !HasValidSound())
+        {
+            IsHearingNoise = false;
+        }
     }
 
     #region Subscription Events
@@ -89,9 +102,11 @@ public class EnemyPerceptionHandler : MonoBehaviour
         if (visionSystem.CanSeeTarget()) return;
         if (lastTarget != null && IsPlayerDead(lastTarget)) return;
 
-        lastTargetPosition = soundPosition;
-        fsm.OnTurnTuTarget(null);
-        fsm.ChangeState(EnemyState.Alert);
+        LastTargetPosition = soundPosition;
+        lastHeardTime = Time.time;
+        IsHearingNoise = true;
+
+        fsm.OnInvestigateSound();
     }
     #endregion
 
@@ -101,5 +116,16 @@ public class EnemyPerceptionHandler : MonoBehaviour
         PlayerHealth playerHealth = target.GetComponent<PlayerHealth>();
         return playerHealth != null && !playerHealth.IsAlive;
     }
+
+    public bool HasValidSound()
+    {
+        return Time.time - lastHeardTime <= data.noiseMemoryTime;
+    }
+
+    public void ForgetSound()
+    {
+        IsHearingNoise = false;
+    }
+
     #endregion
 }

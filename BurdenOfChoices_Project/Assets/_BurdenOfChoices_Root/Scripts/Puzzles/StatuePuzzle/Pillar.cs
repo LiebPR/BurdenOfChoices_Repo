@@ -18,6 +18,7 @@ public class Pillar : MonoBehaviour
     #region Internal States
     bool activated;
     Vector3 originalPosition;
+    Coroutine feedbackRoutine;
     #endregion
 
     private void Awake()
@@ -36,15 +37,29 @@ public class Pillar : MonoBehaviour
         {
             if(puzzleController != null)
             {
-                puzzleController.OnWrongHit();
+                puzzleController.OnWrong();
             }
             return;
         }
 
         activated = true;
-        StartCoroutine(PushReaction());
+        feedbackRoutine = StartCoroutine(PushReaction());
         statue.DropStatue(transform.forward);
     }
+
+    #region Public API
+    public void ResetPillar()
+    {
+        if(feedbackRoutine != null)
+        {
+            StopCoroutine(feedbackRoutine);
+            feedbackRoutine = null;
+        }
+
+        activated = false;
+        transform.position = originalPosition;
+    }
+    #endregion
 
     #region Feedback
     IEnumerator PushReaction()

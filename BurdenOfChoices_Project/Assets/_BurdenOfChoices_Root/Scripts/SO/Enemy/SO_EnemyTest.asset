@@ -20,17 +20,23 @@ MonoBehaviour:
     m_Bits: 0
   perceptionDelay: 1
   visionDelay: 0.1
-  lostDelay: 2
+  lostDelay: 3
   maxHearingRadius: 15
   noiseMemoryTime: 3
-  hearingDelayWalk: 1
-  hearingDelayRun: 0.5
+  hearingDelayWalk: 2
+  hearingDelayRun: 1
+  soundReactionDelay: 0.1
+  investigateSpeed: 1
+  soundInspectTime: 0.3
+  soundTurnAlignmentAngle: 8
+  rotationSoundStiffness: 45
+  rotationSoundDamping: 15
   patrolSpeed: 1
   chaseSpeed: 3
   rotationSpeed: 360
   destinationUpdateThreshold: 0.2
-  rotationChaseStiffness: 45
-  rotationChaseDamping: 15
+  rotationChaseStiffness: 50
+  rotationChaseDamping: 20
   chaseAlignmentAngle: 80
   rotationStiffness: 25
   rotationDamping: 15

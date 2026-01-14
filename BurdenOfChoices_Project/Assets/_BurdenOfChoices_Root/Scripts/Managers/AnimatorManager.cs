@@ -8,7 +8,9 @@ using UnityEngine;
 public class AnimatorManager : MonoBehaviour
 {
     #region Inspector
-    [SerializeField] Animator animator;
+    [SerializeField] Animator smAnimator;
+    [SerializeField] Animator catchPointAnimator;
+    [SerializeField] Animator colliderAnimator;
 
     [Header("Animations Speed")]
     [SerializeField] float walkBaseFrameRate = 35f;
@@ -22,6 +24,7 @@ public class AnimatorManager : MonoBehaviour
     static readonly int IsSlashingHash = Animator.StringToHash("IsSlashing");
     static readonly int IsPickingHash = Animator.StringToHash("IsPicking");
     static readonly int IsThrowingHash = Animator.StringToHash("IsThrowing");
+    static readonly int ThrowHash = Animator.StringToHash("Throw");
     static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
     #endregion
 
@@ -60,7 +63,7 @@ public class AnimatorManager : MonoBehaviour
     public void SetVelocity(float value)
     {
         velocity = value;
-        animator.SetFloat(VelocityHash, velocity, 0.05f, Time.deltaTime);
+        smAnimator.SetFloat(VelocityHash, velocity, 0.05f, Time.deltaTime);
     }
 
     public void SetMovementRatio(float ratio)
@@ -71,34 +74,46 @@ public class AnimatorManager : MonoBehaviour
     public void SetCrouching(bool value)
     {
         isCrouching = value;
-        animator.SetBool(IsCrouchingHash, value);
+        smAnimator.SetBool(IsCrouchingHash, value);
+        catchPointAnimator.SetBool(IsCrouchingHash, value);
+        colliderAnimator.SetBool(IsCrouchingHash, value);
     }
 
     public void SetRelaxed(float value)
     {
         isRelaxed = Mathf.Clamp01(value);
-        animator.SetFloat(IsRelaxedHash, isRelaxed);
+        smAnimator.SetFloat(IsRelaxedHash, isRelaxed);
     }
 
     public void PlayAttack(float slashingValue)
     {
-        animator.SetFloat(IsSlashingHash, Mathf.Clamp01(slashingValue));
-        animator.SetTrigger(IsAttackHash);
+        smAnimator.SetFloat(IsSlashingHash, Mathf.Clamp01(slashingValue));
+        smAnimator.SetTrigger(IsAttackHash);
     }
 
-    public void SetPicking(bool value)
+    public void SetGrabbing(bool value)
     {
-        animator.SetBool(IsPickingHash, value);
+        smAnimator.SetBool(IsPickingHash, value);
     }
 
-    public void SetThrowing(bool value)
+    public void StartHold()
     {
-        animator.SetBool(IsThrowingHash, value);
+        smAnimator.SetBool(IsThrowingHash, true);
+    }
+
+    public void EndHold()
+    {
+        smAnimator.SetBool(IsThrowingHash, false);
+    }
+
+    public void TriggerThrow()
+    {
+        smAnimator.SetTrigger(ThrowHash);
     }
 
     public void DeathAnim()
     {
-        animator.SetTrigger(IsDeathHash);
+        smAnimator.SetTrigger(IsDeathHash);
     }
     #endregion
 
@@ -109,7 +124,7 @@ public class AnimatorManager : MonoBehaviour
         if (velocity < 0.1f)
         {
             // Idle o detenido ? animación normal
-            animator.speed = 1f;
+            smAnimator.speed = 1f;
             currentWalkFrameRate = walkBaseFrameRate;
             return;
         }
@@ -122,19 +137,19 @@ public class AnimatorManager : MonoBehaviour
         currentWalkFrameRate = Mathf.SmoothDamp(currentWalkFrameRate, targetFrameRate, ref walkFrameRateVelocity, 0.1f);
 
         // Aplicamos solo a Walk
-        animator.speed = currentWalkFrameRate / walkBaseFrameRate;
+        smAnimator.speed = currentWalkFrameRate / walkBaseFrameRate;
     }
     #endregion
 
     #region Handles
     void HandlePick(PickableBehaviour p)
     {
-        SetPicking(true);
+        SetGrabbing(true);
     }
 
     void HandleDrop(PickableBehaviour p)
     {
-        SetPicking(false);
+        SetGrabbing(false);
     }
     #endregion
 }

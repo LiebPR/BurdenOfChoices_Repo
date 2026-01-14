@@ -10,6 +10,9 @@ public class PlayerThrowController : MonoBehaviour
     [SerializeField] Transform throwDirectionSource; //transform que indica la dirección de lanzamiento
     [SerializeField] Transform throwPreview; //imagen que indica el punto final del lanzamiento
 
+    [Header("Cooldown")]
+    [SerializeField] float throwCooldown = 1.0f; //segundos entre lanzamientos
+
     [Header("Hold Settings")]
     [SerializeField] float holdSpeed = 0.5f; //velocidad de carga
     [SerializeField] float verticalThrowForce = 0.25f; //fuerza vertical aplicada al lanzar
@@ -19,11 +22,15 @@ public class PlayerThrowController : MonoBehaviour
     [Header("PreviewPoint")]
     [SerializeField] float simulationAirResistance = 0.1f; //resistencia al aire usada en la preview
     [SerializeField] float previewHeightOffset = 0.05f; //altura por encima del suelo del preview
+    [SerializeField] float throwFollowSpeed = 8f; //cuán ráìdo sigue la rotación del jugador
     #endregion
 
     #region Internal States
     float holdTime;
     bool isHolding;
+
+    //Cooldown
+    float cooldownEndTime;
 
     //Valores ajustados en tiempo de ejecución
     float currentWeight = 1f; 
@@ -32,6 +39,8 @@ public class PlayerThrowController : MonoBehaviour
     float effectiveMinThrowDistance;
     float effectiveMaxThrowDistance;
     float effectiveVerticalThrowForce;
+
+    Vector3 throwDirectionSmoothed; //direccion suavizada para la previa
     #endregion
 
     #region References
@@ -76,10 +85,25 @@ public class PlayerThrowController : MonoBehaviour
 
     private void Update()
     {
-        if(isHolding && pickable != null)
+        if (isHolding)
         {
+            // Si ya no hay throwable, cancelamos Hold
+            if (throwable == null || pickable == null || !pickable.IsCatched)
+            {
+                CancelHold();
+                return;
+            }
+
+            // Chequeo de cooldown
+            if (IsInCooldown())
+            {
+                CancelHold();
+                return;
+            }
+
+            // Aumentar holdTime
             holdTime += Time.deltaTime * effectiveHoldSpeed;
-            holdTime = Mathf.Clamp01(holdTime); //siempre entre 0 y 1
+            holdTime = Mathf.Clamp01(holdTime);
 
             UpdateThrowPreview();
         }
@@ -125,70 +149,161 @@ public class PlayerThrowController : MonoBehaviour
 
             //Restauramos valores por defecto
             ResetEffectiveValues();
+
+            if (isHolding)
+            {
+                isHolding = false;
+                animatorManager.EndHold();
+            }
+
+            //Restauramos movimiento y agachado
+            var playerController = GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.ResumePlayer();//desbloqueamos movimiento
+                playerController.UnlockCrouch(); //desbloqueamos agachar
+                playerController.EnableFreeRotation(false); //vuelvea rotación normal en movimiento 
+            }
         }
     }
 
     void StartHold()
     {
+        var playerController = GetComponent<PlayerController>();
+
+        //No lanzar agachado
+        if (playerController != null && playerController.IsCrouching)
+            return;
+
+        //No lanzar si está en cooldown
+        if (IsInCooldown()) return;
+
+        //No lanzar si no hay objeto agarrado
         if (pickable == null || !pickable.IsCatched) return;
 
-        animatorManager.SetThrowing(true);
+        //No lanzar si no tiene ThrowableBehaviour
+        if (throwable == null) return;
 
+        //Solo si es lanzable activamos Hold
+        animatorManager.StartHold();
         isHolding = true;
         holdTime = 0f;
+
+        // Bloqueo de movimiento y crouch
+        if (playerController != null)
+        {
+            playerController.PausePlayer();
+            playerController.LockCrouch();
+            playerController.EnableFreeRotation(true);
+        }
+
+        // Inicializamos dirección suavizada para la preview
+        throwDirectionSmoothed = throwDirectionSource.forward;
 
         if (throwPreview != null && throwDirectionSource != null)
         {
             throwPreview.gameObject.SetActive(true);
 
-            //Preview inicial: calcula con la fuerza mínima efectiva
             float previewForce = effectiveMinThrowDistance;
-            Vector3 origin = throwDirectionSource.position;
-            Vector3 dir = throwDirectionSource.forward;
-            Vector3 predicted = PredictLandingPoint(origin, dir, previewForce, effectiveVerticalThrowForce);
+            Vector3 predicted = PredictLandingPoint(
+                throwDirectionSource.position,
+                throwDirectionSmoothed,
+                previewForce,
+                effectiveVerticalThrowForce
+            );
             throwPreview.position = predicted;
+        }
+    }
+
+    void CancelHold()
+    {
+        isHolding = false;
+        holdTime = 0f;
+
+        if(throwPreview != null)
+            throwPreview.gameObject.SetActive(false);
+
+        animatorManager.EndHold();
+
+        var playerController = GetComponent<PlayerController>();
+        if(playerController != null)
+        {
+            playerController.ResumePlayer();
+            playerController.UnlockCrouch();
+            playerController.EnableFreeRotation(false);
         }
     }
 
     void ReleaseThrow()
     {
-        if (!isHolding) return;
+        //Si no hay throwable, cancelamos animación
+        if(!isHolding || throwable == null)
+        {
+            CancelHold();
+            return;
+        }
 
         isHolding = false;
-        animatorManager.SetThrowing(false);
+        animatorManager.TriggerThrow();
+
         if(throwPreview != null)
             throwPreview.gameObject.SetActive(false);
 
+        //Restauramos movimiento y agachado
+        var playerController = GetComponent<PlayerController>();
+        if(playerController != null)
+        {
+            playerController.ResumePlayer();//desbloqueamos movimiento
+            playerController.UnlockCrouch(); //desbloqueamos agachar
+            playerController.EnableFreeRotation(false); //vuelvea rotación normal en movimiento 
+        }
+        //Guardamos la fuerza final, pero NO lanzamos aquí
+        holdTime = Mathf.Clamp01(holdTime);
+    }
+
+    public void ExecuteThrow()
+    {
+        //Solo lanzar si hay objeto y es lanzable
         if (pickable == null || throwable == null) return;
 
         float throwDistance = Mathf.Lerp(effectiveMinThrowDistance, effectiveMaxThrowDistance, holdTime);
 
-        Vector3 direction = throwDirectionSource != null ? throwDirectionSource.forward : Vector3.forward;
-        throwable.OnThrow(direction, throwDistance, effectiveVerticalThrowForce); //el objeto decidirá cómo usarlo
+        // Usamos la dirección suavizada en lugar de la dirección directa
+        throwable.OnThrow(throwDirectionSmoothed, throwDistance, effectiveVerticalThrowForce);
 
+        StartCooldown();
         holdTime = 0f;
     }
+
+    #region Cooldown Logic
+    bool IsInCooldown()
+    {
+        return Time.time < cooldownEndTime;
+    }
+
+    void StartCooldown()
+    {
+        cooldownEndTime = Time.time + throwCooldown;
+    }
+    #endregion
 
     #region Preview Hold Methods
     void UpdateThrowPreview()
     {
         if (throwPreview == null || throwDirectionSource == null) return;
 
-        //Calculamos la fuerza (horizontal) que tendrá si soltamos ahora
         float currentForce = Mathf.Lerp(effectiveMinThrowDistance, effectiveMaxThrowDistance, holdTime);
-
         Vector3 origin = throwDirectionSource.position;
-        Vector3 dir = throwDirectionSource.forward;
 
-        //Usamos la predicción completa para situar el punto del preview
-        Vector3 predicted = PredictLandingPoint(origin, dir, currentForce, effectiveVerticalThrowForce);
+        // Suavizamos la dirección hacia la actual del jugador
+        throwDirectionSmoothed = Vector3.Slerp(throwDirectionSmoothed, throwDirectionSource.forward, throwFollowSpeed * Time.deltaTime);
 
+        // Calculamos la predicción usando la dirección suavizada
+        Vector3 predicted = PredictLandingPoint(origin, throwDirectionSmoothed, currentForce, effectiveVerticalThrowForce);
         throwPreview.position = predicted;
 
-        if (throwPreview.gameObject.activeSelf)
-        {
+        if (!throwPreview.gameObject.activeSelf)
             throwPreview.gameObject.SetActive(true);
-        }
     }
 
     //Predice el punto de impacto de un impulso aplicado en 'origin' en la dirección y componente vertical indicadas.

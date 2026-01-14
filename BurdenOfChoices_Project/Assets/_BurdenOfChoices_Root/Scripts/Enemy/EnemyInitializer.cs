@@ -10,7 +10,8 @@ public class EnemyInitializer : MonoBehaviour
     TurnToTargetState turnState;
     DeathState death;
     StunState stun;
-    
+    InvestigateSoundState investigateSound;
+
     EnemyFSM fsm;
     EnemyMovementCommands commands;
     VisionSystem vision;
@@ -18,6 +19,7 @@ public class EnemyInitializer : MonoBehaviour
     EnemyHealth health;
     Rigidbody rb;
     NavMeshAgent agent;
+    EnemyPerceptionHandler perceptionHandler;
     #endregion
 
     private void Awake()
@@ -28,6 +30,7 @@ public class EnemyInitializer : MonoBehaviour
         turnState = GetComponent<TurnToTargetState>();
         death = GetComponent<DeathState>();
         stun = GetComponent<StunState>();
+        investigateSound = GetComponent<InvestigateSoundState>();
 
         fsm = GetComponent<EnemyFSM>();
         vision = GetComponent<VisionSystem>();
@@ -35,7 +38,8 @@ public class EnemyInitializer : MonoBehaviour
         moveContext = GetComponent<EnemyMotionContext>();
         health = GetComponent<EnemyHealth>();
         rb = GetComponent<Rigidbody>();
-        agent = GetComponent<NavMeshAgent>();   
+        agent = GetComponent<NavMeshAgent>();
+        perceptionHandler = GetComponent<EnemyPerceptionHandler>();
 
 
         // Inicializamos cada estado
@@ -45,6 +49,7 @@ public class EnemyInitializer : MonoBehaviour
         turnState.Initialize(fsm, commands);
         death.Initialize(fsm, commands);
         stun.Initialize(fsm, commands, health, rb, agent);
+        investigateSound.Initialize(fsm, commands, vision, perceptionHandler, moveContext);
 
         // Registramos estados en la FSM
         fsm.RegisterState(EnemyState.Patrol, patrol);
@@ -53,6 +58,7 @@ public class EnemyInitializer : MonoBehaviour
         fsm.RegisterState(EnemyState.TurnToTarget, turnState);
         fsm.RegisterState(EnemyState.Death, death);
         fsm.RegisterState(EnemyState.Stun, stun);
+        fsm.RegisterState(EnemyState.InvestigateSound, investigateSound);
 
         // Activamos el primer estado
         fsm.ResetState(); // Esto llamará a ChangeState(EnemyState.Patrol) y ejecutará Enter()

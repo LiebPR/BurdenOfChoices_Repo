@@ -39,40 +39,62 @@ public class AttackSystem : MonoBehaviour
     /// <summary>
     /// Evento de ataque, crea y ejecuta comando según el arma.
     /// </summary>
-    void HandleAttack()
+    private void HandleAttack()
     {
-        if(onCooldown) return;
+        if (onCooldown) return;
 
         PickableBehaviour pickable = pickSystem.GetCurrentPickable();
         if (pickable == null) return;
 
         IWeapon weapon = pickable.GetComponent<IWeapon>();
+        WeaponData data = weapon != null ? weapon.GetWeaponData() : null;
 
-        WeaponData data = weapon.GetWeaponData();
-        if(data == null) return;
-
-        //Ejecuta animación según tipo de ataque
-        float slashingValue = (data.attackType == WeaponAttackType.Slash) ? 1f : 0f;
+        // ---- Animación del jugador ----
+        // Mantener exactamente como estaba
+        float slashingValue = (data != null && data.attackType == WeaponAttackType.Slash) ? 1f : 0f;
         animatorManager.PlayAttack(slashingValue);
 
-        // Crear y ejecutar comando según el tipo de ataque
-        AttackCommand command = CreateCommand(weapon, data);
-        if (command != null)
+        if (weapon != null && data != null)
         {
-            command.Execute();
-        }
-            
+            // ---- Animación del arma ----
+            BaseWeaponHandler weaponHandler = weapon as BaseWeaponHandler;
+            weaponHandler?.PlayWeaponAttack();
 
-        StartCoroutine(AttackRoutine(weapon, data));
+            // ---- Ataque con delay ----
+            StartCoroutine(DelayedAttack(weapon, data));
+
+            // ---- Cooldown ----
+            StartCoroutine(AttackRoutine(data));
+        }
+        else
+        {
+            // Si no hay arma, aplicar cooldown por defecto
+            StartCoroutine(AttackRoutine(new WeaponData { cooldown = 0.5f }));
+        }
     }
     #endregion
 
-    #region Routine
-    IEnumerator AttackRoutine(IWeapon weapon, WeaponData data)
+    #region Coroutines
+    /// <summary>
+    /// Ejecuta el daño y knockback después de attackDelay
+    /// </summary>
+    private IEnumerator DelayedAttack(IWeapon weapon, WeaponData data)
     {
-        onCooldown = true; 
+        yield return new WaitForSeconds(data.attackdelay);
 
-        yield return new WaitForSeconds(data.cooldown); //espera el tiempo de cooldown
+        AttackCommand command = CreateCommand(weapon, data);
+        command?.Execute(); // Aquí se aplicará daño y knockback
+    }
+
+    /// <summary>
+    /// Controla el cooldown entre ataques
+    /// </summary>
+    private IEnumerator AttackRoutine(WeaponData data)
+    {
+        onCooldown = true;
+
+        yield return new WaitForSeconds(data.cooldown);
+
         onCooldown = false;
     }
     #endregion

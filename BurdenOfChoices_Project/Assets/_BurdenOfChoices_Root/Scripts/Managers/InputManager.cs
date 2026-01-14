@@ -18,6 +18,9 @@ public class InputManager : MonoBehaviour
     public static event Action<bool> OnRunChanged;
     public static event Action<bool> OnCrouchChanged;
 
+    //ROTACIÓN
+    public static event Action<Vector2> OnLookChanged; //opcional, si quieres reaccionar por eventos
+
     // ACCIONES
     public static event Action OnAttack;
     public static event Action OnThrowPressed;   // cuando empieza a presionar
@@ -26,6 +29,10 @@ public class InputManager : MonoBehaviour
     public static event Action OnGatherCanceled;
     public static event Action OnCatch;
     public static event Action OnCatchCanceled;
+    #endregion
+
+    #region Getter
+    public static Vector2 LookInput => inputA != null ? inputA.GamePlay.Look.ReadValue<Vector2>() : Vector2.zero;
     #endregion
 
     private void Awake()
@@ -43,6 +50,10 @@ public class InputManager : MonoBehaviour
         // MOVIMIENTO
         inputA.GamePlay.Movement.performed += OnMovementPerformed;
         inputA.GamePlay.Movement.canceled += OnMovementCanceled;
+
+        //LOOK
+        inputA.GamePlay.Look.performed += ctx => OnLookChanged?.Invoke(ctx.ReadValue<Vector2>());
+        inputA.GamePlay.Look.canceled += ctx => OnLookChanged?.Invoke(Vector2.zero);
 
         // CORRER
         inputA.GamePlay.Run.started += OnRunStarted;
@@ -103,6 +114,10 @@ public class InputManager : MonoBehaviour
         // MOVIMIENTO
         inputA.GamePlay.Movement.performed -= OnMovementPerformed;
         inputA.GamePlay.Movement.canceled -= OnMovementCanceled;
+
+        //LOOK
+        inputA.GamePlay.Look.performed -= ctx => OnLookChanged?.Invoke(ctx.ReadValue<Vector2>());
+        inputA.GamePlay.Look.canceled -= ctx => OnLookChanged?.Invoke(Vector2.zero);
 
         // CORRER
         inputA.GamePlay.Run.started -= OnRunStarted;

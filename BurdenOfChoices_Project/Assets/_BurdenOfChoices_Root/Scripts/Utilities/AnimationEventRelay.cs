@@ -7,6 +7,7 @@ public class AnimationEventRelay : MonoBehaviour
     [SerializeField] AnimatorManager animatorManager;
     [SerializeField] PlayerController playerController;
     [SerializeField] PlayerHealth health;
+    [SerializeField] PlayerThrowController throwController;
 
     #region Animation Events
     public void OnAttackStart()
@@ -30,7 +31,7 @@ public class AnimationEventRelay : MonoBehaviour
     public void OnPickStart()
     {
         if (animatorManager != null)
-            animatorManager.SetPicking(true);
+            animatorManager.SetGrabbing(true);
     }
     #endregion
 
@@ -41,4 +42,13 @@ public class AnimationEventRelay : MonoBehaviour
             health.OnDeathAnimationFinished();
     }
     #endregion
+
+    /// <summary>
+    /// Frame exacto en el que sale el objeto sale de la mano
+    /// </summary>
+    public void OnThrowExecute()
+    {
+        if(throwController != null)
+            throwController.ExecuteThrow();
+    }
 }

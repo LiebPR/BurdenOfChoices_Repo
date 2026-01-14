@@ -10,7 +10,8 @@ public enum EnemyState
     Chase,
     Stun,
     Death,
-    TurnToTarget
+    TurnToTarget, 
+    InvestigateSound
 }
 
 public class EnemyFSM : MonoBehaviour
@@ -167,6 +168,7 @@ public class EnemyFSM : MonoBehaviour
         // Cambiamos al estado TurnToTarget
         ChangeState(EnemyState.TurnToTarget);
     }
+    public void OnInvestigateSound() => ChangeState(EnemyState.InvestigateSound);
     #endregion
 
     #region Public API
