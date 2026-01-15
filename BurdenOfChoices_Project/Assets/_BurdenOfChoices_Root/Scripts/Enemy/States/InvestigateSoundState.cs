@@ -60,7 +60,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
         animatorHandle.SetVelocityLegs(0f);
         animatorHandle.SetIsRunningBody(false);
         animatorHandle.SetIsRunningLegs(false);
-        animatorHandle.SetTurnningBody(true);
+        animatorHandle.SetTurnningBody(false);
 
     }
 
@@ -73,9 +73,6 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
 
             if (perception.IsHearingNoise)
             {
-
-                UpdateTurnDirection(perception.LastTargetPosition);
-
                 movementCommands.RotateTowards(
                     perception.LastTargetPosition,
                     enemyData.rotationSoundStiffness,
@@ -98,8 +95,6 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             if (perception.IsHearingNoise)
             {
                 soundMemoryTimer = enemyData.noiseMemoryTime;
-
-                UpdateTurnDirection(perception.LastTargetPosition);
 
                 movementCommands.RotateTowards(
                     perception.LastTargetPosition,
@@ -142,8 +137,6 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 return;
             }
 
-            animatorHandle.SetTurnningBody(false);
-
             // Ya está alineado → ahora sí puede moverse
             movementCommands.ResumeMovement(
                 enemyData.investigateSpeed,
@@ -185,23 +178,4 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
         movementCommands.ResetRotation();
         animatorHandle.SetTurnningBody(false);
     }
-
-    #region Turn Direction
-    void UpdateTurnDirection(Vector3 targetPos)
-    {
-        Vector3 dir = targetPos - movementCommands.Transform.position;
-        dir.y = 0f;
-
-        if (dir.sqrMagnitude < 0.0001f)
-            return;
-
-        float crossY = Vector3.Cross(
-            movementCommands.Transform.forward,
-            dir.normalized
-        ).y;
-
-        float turnDir = crossY < 0f ? 0f : 1f;
-        animatorHandle.SetTurnDirection(turnDir);
-    }
-    #endregion
 }
