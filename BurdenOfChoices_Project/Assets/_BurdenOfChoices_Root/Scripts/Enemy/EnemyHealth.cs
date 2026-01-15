@@ -39,6 +39,7 @@ public class EnemyHealth : MonoBehaviour
     EnemyFSM fsm;
     Rigidbody rb;
     EnemyMovementCommands movementCommands;
+    EnemyAnimationHandler animationHandler;
     #endregion
 
     #region Getters
@@ -51,6 +52,7 @@ public class EnemyHealth : MonoBehaviour
         healthSystem = GetComponent<HealthSystem>();
         fsm = GetComponent<EnemyFSM>();
         rb = GetComponent<Rigidbody>();
+        animationHandler = GetComponent<EnemyAnimationHandler>();
         movementCommands = GetComponent<EnemyMotionContext>().Commands;
     }
 
@@ -130,6 +132,18 @@ public class EnemyHealth : MonoBehaviour
     void HandleDeath()
     {
         isDead = true;
+
+        animationHandler.SetVelocityBody(0f);
+        animationHandler.SetVelocityLegs(0f);
+
+        animationHandler.SetIsRunningBody(false);
+        animationHandler.SetIsRunningLegs(false);
+
+        animationHandler.SetTurnningBody(false);
+
+        animationHandler.SetDeathBody(true);
+        animationHandler.SetDeathLegs(true);
+
         fsm.OnDeath();
     }
     #endregion
@@ -141,6 +155,22 @@ public class EnemyHealth : MonoBehaviour
     void EnterStun()
     {
         stunTimer = stunDuration;
+
+        //Aniamtios
+        animationHandler.SetVelocityBody(0f);
+        animationHandler.SetVelocityLegs(0f);
+
+        animationHandler.SetIsRunningBody(false);
+        animationHandler.SetIsRunningLegs(false);
+
+        animationHandler.SetTurnningBody(false);
+
+        animationHandler.SetDeathBody(false);
+        animationHandler.SetDeathLegs(false); 
+
+        animationHandler.SetStunnedBody(true);
+        animationHandler.SetStunnedLegs(true);
+
         fsm.OnStun();
     }
 
@@ -166,6 +196,9 @@ public class EnemyHealth : MonoBehaviour
     {
         firstLifeBroken = false;
         healthSystem.HealFull(); // Recupera la primera vida
+
+        animationHandler.SetStunnedBody(false);
+        animationHandler.SetStunnedLegs(false);
 
         movementCommands.ExitPhysicalMode(enemyData.patrolSpeed, enemyData.normalAcceleration);
         fsm.OnPatrol(); // Volver al estado de patrulla o idle
