@@ -33,6 +33,9 @@ public class IdleState : MonoBehaviour, IEnemyState
         //Animator
         animatorHandle.SetVelocityBody(0f);
         animatorHandle.SetVelocityLegs(0f);
+        animatorHandle.SetIsRunningBody(false);
+        animatorHandle.SetIsRunningLegs(false);
+        animatorHandle.SetTurnningBody(false);
     }
 
     public void Handle()

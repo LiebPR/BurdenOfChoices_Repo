@@ -109,4 +109,9 @@ public class EnemyData : ScriptableObject
     [Tooltip("Tiempo que el enemigo permanece inactivo en un punto.")]
     public float idleTime = 2f;
     #endregion
+
+    #region TurnToTarget
+    public float turnStiffness = 6f;
+    public float turnDamping = 10f;
+    #endregion
 }

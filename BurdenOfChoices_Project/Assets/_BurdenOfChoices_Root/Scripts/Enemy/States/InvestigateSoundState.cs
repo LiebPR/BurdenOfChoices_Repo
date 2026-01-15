@@ -26,15 +26,17 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
     VisionSystem vision;
     EnemyPerceptionHandler perception;
     EnemyMotionContext moveContext;
+    EnemyAnimationHandler animatorHandle;
     #endregion
 
-    public void Initialize(EnemyFSM enemyFSM, EnemyMovementCommands command, VisionSystem visionSystem, EnemyPerceptionHandler perceptionHandler, EnemyMotionContext move)
+    public void Initialize(EnemyFSM enemyFSM, EnemyMovementCommands command, VisionSystem visionSystem, EnemyPerceptionHandler perceptionHandler, EnemyMotionContext move, EnemyAnimationHandler enemyAnimator)
     {
         fsm = enemyFSM;
         movementCommands = command;
         vision = visionSystem;
         perception = perceptionHandler;
         moveContext = move;
+        animatorHandle = enemyAnimator;
     }
 
     public void Enter()
@@ -51,6 +53,15 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
         isMoving = false;   
 
         movementCommands.PauseMovement();
+
+
+        animatorHandle.SetHearBody();
+        animatorHandle.SetVelocityBody(0f);
+        animatorHandle.SetVelocityLegs(0f);
+        animatorHandle.SetIsRunningBody(false);
+        animatorHandle.SetIsRunningLegs(false);
+        animatorHandle.SetTurnningBody(true);
+
     }
 
     public void Handle()
@@ -62,6 +73,9 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
 
             if (perception.IsHearingNoise)
             {
+
+                UpdateTurnDirection(perception.LastTargetPosition);
+
                 movementCommands.RotateTowards(
                     perception.LastTargetPosition,
                     enemyData.rotationSoundStiffness,
@@ -84,6 +98,8 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             if (perception.IsHearingNoise)
             {
                 soundMemoryTimer = enemyData.noiseMemoryTime;
+
+                UpdateTurnDirection(perception.LastTargetPosition);
 
                 movementCommands.RotateTowards(
                     perception.LastTargetPosition,
@@ -126,6 +142,8 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 return;
             }
 
+            animatorHandle.SetTurnningBody(false);
+
             // Ya está alineado → ahora sí puede moverse
             movementCommands.ResumeMovement(
                 enemyData.investigateSpeed,
@@ -139,6 +157,9 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
         //Movimiento (Sin Rotar)
         if (isMoving)
         {
+            animatorHandle.SetVelocityBody(1f);
+            animatorHandle.SetVelocityLegs(1f);
+
             movementCommands.SetMoveTarget(
                 lockedInvestigatePoint,
                 enemyData.investigateSpeed,
@@ -162,5 +183,25 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
     public void Exit()
     {
         movementCommands.ResetRotation();
+        animatorHandle.SetTurnningBody(false);
     }
+
+    #region Turn Direction
+    void UpdateTurnDirection(Vector3 targetPos)
+    {
+        Vector3 dir = targetPos - movementCommands.Transform.position;
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude < 0.0001f)
+            return;
+
+        float crossY = Vector3.Cross(
+            movementCommands.Transform.forward,
+            dir.normalized
+        ).y;
+
+        float turnDir = crossY < 0f ? 0f : 1f;
+        animatorHandle.SetTurnDirection(turnDir);
+    }
+    #endregion
 }

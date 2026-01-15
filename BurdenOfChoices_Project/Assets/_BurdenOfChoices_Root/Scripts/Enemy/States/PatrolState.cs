@@ -20,14 +20,16 @@ public class PatrolState : MonoBehaviour, IEnemyState
     EnemyMovementCommands movementCommands;
     TurnToTargetState turnState;
     EnemyMotionContext moveContext;
+    EnemyAnimationHandler animatorHandle;  
     #endregion
 
-    public void Initialize(EnemyFSM enemyfsm, EnemyMovementCommands command, TurnToTargetState turn, EnemyMotionContext move)
+    public void Initialize(EnemyFSM enemyfsm, EnemyMovementCommands command, TurnToTargetState turn, EnemyMotionContext move, EnemyAnimationHandler enemyAnimator)
     {
         fsm = enemyfsm;
         movementCommands = command;
         turnState = turn;
         moveContext = move;
+        animatorHandle = enemyAnimator;
     }
 
     #region State Flow
@@ -39,8 +41,15 @@ public class PatrolState : MonoBehaviour, IEnemyState
         //Reanudamos movimiento con parámetros de patrulla
         movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.normalAcceleration);
 
+        //Animator
+        animatorHandle.SetVelocityBody(1f);
+        animatorHandle.SetVelocityLegs(1f);
+        animatorHandle.SetIsRunningBody(false);
+        animatorHandle.SetIsRunningLegs(false);
+        animatorHandle.SetTurnningBody(false);
+
         //Asignamos objetivo inicial
-        if(patrolPoints.Length > 0)
+        if (patrolPoints.Length > 0)
         {
             movementCommands.SetMoveTarget(patrolPoints[currentIndex].position, enemyData.patrolSpeed, enemyData.destinationUpdateThreshold);
         }
