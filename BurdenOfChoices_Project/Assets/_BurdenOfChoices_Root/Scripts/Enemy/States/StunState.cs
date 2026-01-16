@@ -11,6 +11,7 @@ public class StunState : MonoBehaviour, IEnemyState
     EnemyHealth health;
     Rigidbody rb;
     NavMeshAgent agent;
+    EnemyLightHandler lightHandler;
     #endregion
 
     //Internal States
@@ -19,18 +20,20 @@ public class StunState : MonoBehaviour, IEnemyState
     //Getter
     public bool IsStunned => isStunned;
 
-    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, EnemyHealth enemyHeatlth, Rigidbody rigidbody, NavMeshAgent navAgent)
+    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, EnemyHealth enemyHeatlth, Rigidbody rigidbody, NavMeshAgent navAgent, EnemyLightHandler enemyLight)
     {
         fsm = enemyFsm;
         movementCommands = commands;
         health = enemyHeatlth;
         rb = rigidbody;
         agent = navAgent;
+        lightHandler = enemyLight;
     }
 
     public void Enter()
     {
         isStunned = true;
+        lightHandler.TurnOff();
     }
 
     public void Handle()
@@ -44,5 +47,6 @@ public class StunState : MonoBehaviour, IEnemyState
         agent.enabled = true;
         rb.isKinematic = true;
         isStunned = false;
+        lightHandler.TurnOn();
     }
 }

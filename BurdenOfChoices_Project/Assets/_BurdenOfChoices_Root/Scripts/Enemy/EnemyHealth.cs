@@ -31,6 +31,7 @@ public class EnemyHealth : MonoBehaviour
     #region Internal States
     bool firstLifeBroken; // Indica si el primer golpe ya ocurrió
     bool isDead; // Indica si el enemigo murió
+    bool isStunned;
     float stunTimer; // Temporizador de stun
     #endregion
 
@@ -154,6 +155,9 @@ public class EnemyHealth : MonoBehaviour
     /// </summary>
     void EnterStun()
     {
+        if (isStunned) return;
+
+        isStunned = true;
         stunTimer = stunDuration;
 
         //Aniamtios
@@ -166,7 +170,10 @@ public class EnemyHealth : MonoBehaviour
         animationHandler.SetTurnningBody(false);
 
         animationHandler.SetDeathBody(false);
-        animationHandler.SetDeathLegs(false); 
+        animationHandler.SetDeathLegs(false);
+
+        animationHandler.SetStunBody();
+        animationHandler.SetStunLegs();
 
         animationHandler.SetStunnedBody(true);
         animationHandler.SetStunnedLegs(true);
@@ -194,7 +201,9 @@ public class EnemyHealth : MonoBehaviour
     /// </summary>
     void RecoverFromStun()
     {
+        isStunned = false;
         firstLifeBroken = false;
+
         healthSystem.HealFull(); // Recupera la primera vida
 
         animationHandler.SetStunnedBody(false);

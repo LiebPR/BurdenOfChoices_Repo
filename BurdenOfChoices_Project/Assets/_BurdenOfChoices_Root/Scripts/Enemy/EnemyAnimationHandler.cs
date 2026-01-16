@@ -12,10 +12,12 @@ public class EnemyAnimationHandler : MonoBehaviour
     static readonly int VelocityHash = Animator.StringToHash("Velocity");
     static readonly int IsRunningHash = Animator.StringToHash("IsRunning");
     static readonly int IsStunnedHash = Animator.StringToHash("IsStunned");
+    static readonly int IStunHash = Animator.StringToHash("IStun");
     static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
     static readonly int IsTurnningHash = Animator.StringToHash("IsTurnning");
     static readonly int TurnDirectionHash = Animator.StringToHash("Angular");
     static readonly int IHearHash = Animator.StringToHash("IHear");
+    static readonly int IAttackingHash = Animator.StringToHash("IAttacking");
     #endregion
 
     #region Velocity
@@ -89,6 +91,25 @@ public class EnemyAnimationHandler : MonoBehaviour
     public void SetStunnedLegs(bool isStunned)
     {
         legs.SetBool(IsStunnedHash, isStunned);
+    }
+
+    public void SetStunBody()
+    {
+        body.SetTrigger(IStunHash);
+        farol.SetTrigger(IStunHash);
+    }
+
+    public void SetStunLegs()
+    {
+        legs.SetTrigger(IStunHash);
+    }
+    #endregion
+
+    #region Attack
+    public void SetAttackBody()
+    {
+        body.SetTrigger(IAttackingHash);
+        farol.SetTrigger(IAttackingHash);
     }
     #endregion
 }
