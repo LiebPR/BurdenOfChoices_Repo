@@ -121,6 +121,84 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1001 &8193747888770464351
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8948149734868976241}
+    m_Modifications:
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.346
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0435
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8049634792507247190, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+      propertyPath: m_Name
+      value: VFXVela
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+--- !u!4 &1998214560478689552 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7641799072195363663, guid: f7527201e3a64b547a5e8aac9948c98e, type: 3}
+  m_PrefabInstance: {fileID: 8193747888770464351}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8909403997130089882
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -199,6 +277,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a8b8f9083302e5a4ab196ddff7bc8575, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7464285324177710405}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a8b8f9083302e5a4ab196ddff7bc8575, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1998214560478689552}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a8b8f9083302e5a4ab196ddff7bc8575, type: 3}
 --- !u!4 &8948149734868976241 stripped
