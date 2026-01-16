@@ -12,12 +12,14 @@ public class EnemyAttack : MonoBehaviour
     #region Internal States
     Transform player;
     EnemyFSM fsm;
+    EnemyAnimationHandler animHandler;
     float lastAttackTime;
     #endregion
 
     private void Awake()
     {
         fsm = GetComponent<EnemyFSM>();
+        animHandler = GetComponent<EnemyAnimationHandler>();
     }
 
     private void Update()
@@ -34,7 +36,8 @@ public class EnemyAttack : MonoBehaviour
         float distance = Vector3.Distance(attackPoint.transform.position, player.position);
         if(distance <= attackRange && Time.time - lastAttackTime >= attackCooldown)
         {
-            AttackPlayer();
+            //Animator
+            animHandler.SetAttackBody();
             lastAttackTime = Time.time;
         }
     }
@@ -44,6 +47,11 @@ public class EnemyAttack : MonoBehaviour
     public void SetTarget(Transform target)
     {
         player = target;
+    }
+
+    public void ResolveAttackHit()
+    {
+        AttackPlayer();
     }
     #endregion
 
@@ -55,6 +63,7 @@ public class EnemyAttack : MonoBehaviour
         // Llamamos al PlayerHealth
         PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
         if(playerHealth == null || !playerHealth.IsAlive) return;
+
         Vector3 hitDirection = (player.position - transform.position).normalized;
         playerHealth.TakeHit(hitDirection);
     }

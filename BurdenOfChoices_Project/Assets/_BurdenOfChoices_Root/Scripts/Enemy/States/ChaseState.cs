@@ -9,13 +9,15 @@ public class ChaseState : MonoBehaviour, IEnemyState
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
     VisionSystem visionSystem;
+    EnemyAnimationHandler animatorHandle;
     #endregion
 
-    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, VisionSystem vision)
+    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, VisionSystem vision, EnemyAnimationHandler enemyAnimator)
     {
         fsm = enemyFsm;
         movementCommands = commands;
         visionSystem = vision;
+        animatorHandle = enemyAnimator;
     }
 
     #region State Flow
@@ -30,6 +32,13 @@ public class ChaseState : MonoBehaviour, IEnemyState
         // Activamos la lógica de frenado progresivo
         movementCommands.EnableStopLogic(true);
         movementCommands.ConfigureStopArea(enemyData.stopStartDistance, enemyData.stopHardDistance);
+
+        //Animator
+        animatorHandle.SetVelocityBody(1f);
+        animatorHandle.SetVelocityLegs(1f);
+        animatorHandle.SetIsRunningBody(true);
+        animatorHandle.SetIsRunningLegs(true);
+        animatorHandle.SetTurnningBody(false);
     }
 
     public void Handle()

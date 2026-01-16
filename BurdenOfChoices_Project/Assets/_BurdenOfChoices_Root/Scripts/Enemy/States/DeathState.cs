@@ -1,34 +1,47 @@
 using UnityEngine;
-using UnityEngine.Rendering.RenderGraphModule;
 
 public class DeathState : MonoBehaviour, IEnemyState
 {
-    [SerializeField] EnemyData enemyData;
-
     #region References
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
+    EnemyLightHandler enemyLight;
     #endregion
 
-    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands)
+    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, EnemyLightHandler lightHandler)
     {
         fsm = enemyFsm;
         movementCommands = commands;
+        enemyLight = lightHandler;
     }
 
     public void Enter()
     {
+        // Detener cualquier movimiento controlado
+        movementCommands.PauseMovement();
 
-        Destroy(gameObject);
+        // FSM ya no debe procesar lógica
+        fsm.enabled = false;
+
+        enemyLight.TurnOff();
+
+        // Desactivar todos los componentes innecesarios
+        DisableEnemyLogic();
     }
 
-    public void Handle()
+    public void Handle() { }
+
+    public void Exit() { }
+
+    #region Utilities
+    void DisableEnemyLogic()
     {
-        Debug.Log("Estoy Muerto");
-    }
+        foreach (var mb in GetComponents<MonoBehaviour>())
+        {
+            if (mb == this) continue;
 
-    public void Exit()
-    {
-
+            mb.enabled = false;
+        }
     }
+    #endregion
 }

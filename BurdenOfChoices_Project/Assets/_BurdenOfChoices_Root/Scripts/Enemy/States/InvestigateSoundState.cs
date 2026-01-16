@@ -1,4 +1,4 @@
-using Mono.Cecil.Cil;
+ï»¿using Mono.Cecil.Cil;
 using UnityEngine;
 
 public class InvestigateSoundState : MonoBehaviour, IEnemyState
@@ -26,15 +26,17 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
     VisionSystem vision;
     EnemyPerceptionHandler perception;
     EnemyMotionContext moveContext;
+    EnemyAnimationHandler animatorHandle;
     #endregion
 
-    public void Initialize(EnemyFSM enemyFSM, EnemyMovementCommands command, VisionSystem visionSystem, EnemyPerceptionHandler perceptionHandler, EnemyMotionContext move)
+    public void Initialize(EnemyFSM enemyFSM, EnemyMovementCommands command, VisionSystem visionSystem, EnemyPerceptionHandler perceptionHandler, EnemyMotionContext move, EnemyAnimationHandler enemyAnimator)
     {
         fsm = enemyFSM;
         movementCommands = command;
         vision = visionSystem;
         perception = perceptionHandler;
         moveContext = move;
+        animatorHandle = enemyAnimator;
     }
 
     public void Enter()
@@ -51,11 +53,20 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
         isMoving = false;   
 
         movementCommands.PauseMovement();
+
+
+        animatorHandle.SetHearBody();
+        animatorHandle.SetVelocityBody(0f);
+        animatorHandle.SetVelocityLegs(0f);
+        animatorHandle.SetIsRunningBody(false);
+        animatorHandle.SetIsRunningLegs(false);
+        animatorHandle.SetTurnningBody(false);
+
     }
 
     public void Handle()
     {
-        //Reacción / Duda
+        //ReacciÃ³n / Duda
         if (isReacting)
         {
             reactionTimer -= Time.deltaTime;
@@ -78,7 +89,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             return;
         }
 
-        //Rotación + Memoria
+        //RotaciÃ³n + Memoria
         if (isRotating)
         {
             if (perception.IsHearingNoise)
@@ -101,7 +112,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 lockedInvestigatePoint = perception.LastTargetPosition;
                 hasLockedPoint = true;
 
-                // ?? IMPORTANTE
+                //IMPORTANTE
                 perception.ForgetSound();
 
                 isRotating = false;
@@ -111,7 +122,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
             return;
         }
 
-        //Espera alineación
+        //Espera alineaciÃ³n
         if (isWaitingAlignment)
         {
             if (!movementCommands.IsAlignedTo(
@@ -126,7 +137,7 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
                 return;
             }
 
-            // Ya está alineado ? ahora sí puede moverse
+            // Ya estÃ¡ alineado â†’ ahora sÃ­ puede moverse
             movementCommands.ResumeMovement(
                 enemyData.investigateSpeed,
                 enemyData.normalAcceleration
@@ -139,6 +150,9 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
         //Movimiento (Sin Rotar)
         if (isMoving)
         {
+            animatorHandle.SetVelocityBody(1f);
+            animatorHandle.SetVelocityLegs(1f);
+
             movementCommands.SetMoveTarget(
                 lockedInvestigatePoint,
                 enemyData.investigateSpeed,
@@ -162,5 +176,6 @@ public class InvestigateSoundState : MonoBehaviour, IEnemyState
     public void Exit()
     {
         movementCommands.ResetRotation();
+        animatorHandle.SetTurnningBody(false);
     }
 }

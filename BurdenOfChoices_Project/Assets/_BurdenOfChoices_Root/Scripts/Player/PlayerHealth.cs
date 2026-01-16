@@ -158,7 +158,8 @@ public class PlayerHealth : MonoBehaviour
         yield return new WaitForSeconds(respawnDelay);
         ReappearAtPoint(respawnPoint);
 
-        if (deathCamera != null) deathCamera.Priority = cameraHighPriority;
+        if (deathCamera != null)
+            CameraManager.Instance.ActivateCamera(deathCamera, cameraHighPriority);
         if (fadeController != null) yield return fadeController.FadeIn();
     }
     #endregion

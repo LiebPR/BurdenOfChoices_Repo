@@ -14,11 +14,11 @@ public class Door : MonoBehaviour, IInteractable
     [SerializeField] string closeEntryTrigger = "Close";
     [SerializeField] float entryDoorAnimDuration = 1f;
     [SerializeField] string idleTrigger = "Idle";
+    [SerializeField] string lockedTrigger = "ILocked";
 
     [SerializeField] Transform playerSpawnPoint; //punto donde aparecera el jugador en la nueva sala
 
     [Header("CineMachine Settings")]
-    [SerializeField] CinemachineCamera exitCamera;
     [SerializeField] CinemachineCamera entryCamera;
     #endregion
 
@@ -49,8 +49,22 @@ public class Door : MonoBehaviour, IInteractable
     public void OnPress()
     {
         if (isInteracting) return;
-        if(locked) return;
+
+        if (locked)
+        {
+            PlayLockedAnimation();
+            return;
+        }
+
         StartCoroutine(HandleDoorRoutine());
+    }
+
+    void PlayLockedAnimation()
+    {
+        if (exitDoorAnimator != null)
+        {
+            exitDoorAnimator.SetTrigger(lockedTrigger);
+        }
     }
 
     #region Block System (Public API)
@@ -93,9 +107,7 @@ public class Door : MonoBehaviour, IInteractable
         if (player != null && playerSpawnPoint != null)
             player.position = playerSpawnPoint.position;
 
-        // Cambio de proridad
-        if (exitCamera != null) exitCamera.Priority = 0;
-        if(entryCamera != null) entryCamera.Priority = 1;
+        CameraManager.Instance.ActivateCamera(entryCamera);
 
         // Cerrar puerta de entrada en la nueva sala
         if (entryDoorAnimator != null)

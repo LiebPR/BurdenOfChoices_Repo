@@ -13,12 +13,14 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
     //References
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
+    EnemyAnimationHandler animatorHandle;
 
 
-    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands movement)
+    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands movement, EnemyAnimationHandler enemyAnimation)
     {
         fsm = enemyFsm;
         movementCommands = movement;
+        animatorHandle = enemyAnimation;
     }
 
     #region State Flow
@@ -26,6 +28,12 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
     {
         //Reanuda movimeinto para no bloquear NavMeshAgent
         movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.breackAcceleration);
+
+        //Animator
+        animatorHandle.SetVelocityBody(0f);
+        animatorHandle.SetVelocityLegs(0f);
+        animatorHandle.SetIsRunningBody(false);
+        animatorHandle.SetIsRunningLegs(false);
     }
 
     public void Handle()
@@ -47,7 +55,18 @@ public class TurnToTargetState : MonoBehaviour, IEnemyState
             return;
         }
 
-        movementCommands.RotateTowards(targetPos, enemyData.rotationStiffness, enemyData.rotationDamping);
+        Vector3 forward = movementCommands.Transform.forward;
+        Vector3 dirNormalized = dir.normalized;
+
+        // Producto cruzado para saber el lado del giro
+        float crossY = Vector3.Cross(movementCommands.Transform.forward, dir.normalized).y;
+
+        // 0 = Left | 1 = Right
+        float turnDir = crossY < 0f ? 0f : 1f;
+        animatorHandle.SetTurnDirection(turnDir);
+        animatorHandle.SetTurnningBody(true);
+
+        movementCommands.RotateTowards(targetPos, enemyData.turnStiffness, enemyData.turnDamping);
 
         float angle = Vector3.Angle(movementCommands.Transform.forward, dir.normalized);
         if (angle < threshold)

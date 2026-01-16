@@ -14,6 +14,8 @@ public class AnimationEventRelay : MonoBehaviour
     {
         if (playerController != null)
             playerController.PausePlayer();
+        if(playerController != null)
+            playerController.LockRotation();
     }
     
     /// <summary>
@@ -23,6 +25,8 @@ public class AnimationEventRelay : MonoBehaviour
     {
         if (playerController != null)
             playerController.ResumePlayer(); // reanuda el player
+        if (playerController != null)
+            playerController.UnlockRotation();
     }
 
     /// <summary>

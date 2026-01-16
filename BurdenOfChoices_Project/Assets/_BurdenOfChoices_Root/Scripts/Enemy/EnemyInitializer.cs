@@ -20,6 +20,8 @@ public class EnemyInitializer : MonoBehaviour
     Rigidbody rb;
     NavMeshAgent agent;
     EnemyPerceptionHandler perceptionHandler;
+    EnemyAnimationHandler animatorHandler;
+    EnemyLightHandler lightHandler;
     #endregion
 
     private void Awake()
@@ -40,16 +42,17 @@ public class EnemyInitializer : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
         perceptionHandler = GetComponent<EnemyPerceptionHandler>();
-
+        animatorHandler = GetComponent<EnemyAnimationHandler>();
+        lightHandler = GetComponent<EnemyLightHandler>();
 
         // Inicializamos cada estado
-        patrol.Initialize(fsm, commands, turnState, moveContext);
-        idle.Initialize(fsm, commands, patrol, turnState);
-        chase.Initialize(fsm, commands, vision);
-        turnState.Initialize(fsm, commands);
-        death.Initialize(fsm, commands);
-        stun.Initialize(fsm, commands, health, rb, agent);
-        investigateSound.Initialize(fsm, commands, vision, perceptionHandler, moveContext);
+        patrol.Initialize(fsm, commands, turnState, moveContext, animatorHandler);
+        idle.Initialize(fsm, commands, patrol, turnState, animatorHandler);
+        chase.Initialize(fsm, commands, vision, animatorHandler);
+        turnState.Initialize(fsm, commands, animatorHandler);
+        death.Initialize(fsm, commands, lightHandler);
+        stun.Initialize(fsm, commands, health, rb, agent, lightHandler);
+        investigateSound.Initialize(fsm, commands, vision, perceptionHandler, moveContext, animatorHandler);
 
         // Registramos estados en la FSM
         fsm.RegisterState(EnemyState.Patrol, patrol);

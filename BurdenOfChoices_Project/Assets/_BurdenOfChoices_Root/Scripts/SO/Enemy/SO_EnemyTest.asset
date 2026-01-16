@@ -27,21 +27,23 @@ MonoBehaviour:
   hearingDelayRun: 1
   soundReactionDelay: 0.1
   investigateSpeed: 1
-  soundInspectTime: 0.3
+  soundInspectTime: 0
   soundTurnAlignmentAngle: 8
-  rotationSoundStiffness: 45
-  rotationSoundDamping: 15
+  rotationSoundStiffness: 60
+  rotationSoundDamping: 20
   patrolSpeed: 1
   chaseSpeed: 3
   rotationSpeed: 360
   destinationUpdateThreshold: 0.2
-  rotationChaseStiffness: 50
+  rotationChaseStiffness: 60
   rotationChaseDamping: 20
   chaseAlignmentAngle: 80
-  rotationStiffness: 25
+  rotationStiffness: 35
   rotationDamping: 15
   stopStartDistance: 2
   stopHardDistance: 0.8
   normalAcceleration: 8
   breackAcceleration: 25
-  idleTime: 2
+  idleTime: 1.5
+  turnStiffness: 60
+  turnDamping: 20
