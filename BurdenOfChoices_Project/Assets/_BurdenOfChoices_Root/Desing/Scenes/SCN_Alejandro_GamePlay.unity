@@ -2258,32 +2258,6 @@ Transform:
   - {fileID: 641043580}
   m_Father: {fileID: 1462785256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &124406393 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
-  m_PrefabInstance: {fileID: 586939579}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &124406399
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124406393}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 139.32953, y: 77.20518, z: 14.907323}
-  m_Center: {x: 68.53052, y: -36.124744, z: 6.2889233}
 --- !u!95 &124406405 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 7519800149659497514, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
@@ -7922,6 +7896,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1575771512}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: isSecondaryDoor
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: exitDoorAnimator
       value: 
       objectReference: {fileID: 124406405}
@@ -7936,6 +7914,10 @@ PrefabInstance:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryDoorAnimDuration
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: exitDoorAnimatorDuration
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
@@ -8012,10 +7994,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 124406399}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
 --- !u!4 &586939580 stripped
 Transform:
