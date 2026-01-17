@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5208895130417730973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8887876186190624293}
+  m_Layer: 0
+  m_Name: RayOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8887876186190624293
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5208895130417730973}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.463, y: 0.364, z: -1.576}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3645540939327068194}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &5970297201943019793
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,7 +195,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -6753082726924983184, guid: e001ed2c62302b44a99471b9537f6612, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4998622767000772635, guid: e001ed2c62302b44a99471b9537f6612, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -219,6 +250,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: e001ed2c62302b44a99471b9537f6612, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8140940248105435580}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: e001ed2c62302b44a99471b9537f6612, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8887876186190624293}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4250372935941778005, guid: e001ed2c62302b44a99471b9537f6612, type: 3}
       insertIndex: -1
@@ -295,7 +329,7 @@ Animator:
   m_GameObject: {fileID: 1681270222956911545}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 11ca808b00588b2489881e9e3752ebce, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -322,14 +356,20 @@ MonoBehaviour:
   isSecondaryDoor: 0
   exitDoorAnimator: {fileID: 0}
   openExitTrigger: Open
-  exitDoorAnimatorDuration: 1
+  exitDoorAnimatorDuration: 1.2
   entryDoorAnimator: {fileID: 0}
   closeEntryTrigger: Close
-  entryDoorAnimDuration: 1
+  entryDoorAnimDuration: 0.7
   idleTrigger: Idle
+  lockedTrigger: ILocked
   playerSpawnPoint: {fileID: 0}
-  exitCamera: {fileID: 0}
   entryCamera: {fileID: 0}
+  rayOrigin: {fileID: 8887876186190624293}
+  rayDirection: {x: 0, y: 0, z: 1}
+  rayDistance: 0.3
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!4 &3645540939327068194 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e001ed2c62302b44a99471b9537f6612, type: 3}
