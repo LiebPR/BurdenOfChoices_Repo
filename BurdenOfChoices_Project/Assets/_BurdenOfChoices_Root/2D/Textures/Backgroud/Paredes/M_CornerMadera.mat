@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-580505355073856849
+--- !u!114 &-5714410732313873696
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,9 +20,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Rodapies
+  m_Name: M_CornerMadera
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: 72fb9292ea1e8d4498e1f38522160b96, type: 2}
+  m_Parent: {fileID: 2100000, guid: f7fb81ee7429de544a02ad7cec2a3377, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _NORMALMAP
@@ -42,15 +42,15 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 3d2925b092cca9b419f9350fb70c7ad5, type: 3}
+        m_Texture: {fileID: 2800000, guid: e40292ebb57f8f24d9b54cefd0728d1c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: b4849db48b99a9b46b9731d3b1e079e5, type: 3}
+        m_Texture: {fileID: 2800000, guid: 60330af23ae2dab48b6fbd64913bd684, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 3d2925b092cca9b419f9350fb70c7ad5, type: 3}
+        m_Texture: {fileID: 2800000, guid: e40292ebb57f8f24d9b54cefd0728d1c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -58,16 +58,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 2800000, guid: 430411d3123165d41a8cbc21829c7c16, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7c4291c7d51ce5c489d9ccbbc8d22077, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
-        m_Texture: {fileID: 2800000, guid: a6e98c6d9d16f48428a72e5f24d24dc3, type: 3}
+        m_Texture: {fileID: 2800000, guid: 198a3552262febf46b5a304f978c133e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats:
-    - _Smoothness: 0.07
+    m_Floats: []
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
