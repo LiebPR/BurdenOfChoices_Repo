@@ -84,10 +84,10 @@ public class DraggableBehaviour : MonoBehaviour
     {
         activeFace = DragFace.None;
 
-        float dPosX = Vector3.Distance(player.position, pushPosX.position);
-        float dNegX = Vector3.Distance(player.position, pushNegX.position);
-        float dPosZ = Vector3.Distance(player.position, pushPosZ.position);
-        float dNegZ = Vector3.Distance(player.position, pushNegZ.position);
+        float dPosX = pushPosX ? Vector3.Distance(player.position, pushPosX.position) : float.MaxValue;
+        float dNegX = pushNegX ? Vector3.Distance(player.position, pushNegX.position) : float.MaxValue;
+        float dPosZ = pushPosZ ? Vector3.Distance(player.position, pushPosZ.position) : float.MaxValue;
+        float dNegZ = pushNegZ ? Vector3.Distance(player.position, pushNegZ.position) : float.MaxValue;
 
         float min = Mathf.Min(dPosX, dNegX, dPosZ, dNegZ);
         if (min > 0.6f) return;

@@ -20,6 +20,12 @@ public class Door : MonoBehaviour, IInteractable
 
     [Header("CineMachine Settings")]
     [SerializeField] CinemachineCamera entryCamera;
+
+    [Header("Obstacle Ray Settings")]
+    [SerializeField] Transform rayOrigin;
+    [SerializeField] Vector3 rayDirection = Vector3.forward;
+    [SerializeField] float rayDistance = 0.6f;
+    [SerializeField] LayerMask obstacleMask;
     #endregion
 
     #region Internal States
@@ -50,6 +56,8 @@ public class Door : MonoBehaviour, IInteractable
     {
         if (isInteracting) return;
 
+        if (HasObstacleInFront()) return;
+
         if (locked)
         {
             PlayLockedAnimation();
@@ -65,6 +73,14 @@ public class Door : MonoBehaviour, IInteractable
         {
             exitDoorAnimator.SetTrigger(lockedTrigger);
         }
+    }
+
+    bool HasObstacleInFront()
+    {
+        if (rayOrigin == null) return false;
+
+        Vector3 direction = rayOrigin.TransformDirection(rayDirection.normalized);
+        return Physics.Raycast(rayOrigin.position, direction, rayDistance, obstacleMask);
     }
 
     #region Block System (Public API)
@@ -109,10 +125,11 @@ public class Door : MonoBehaviour, IInteractable
 
         CameraManager.Instance.ActivateCamera(entryCamera);
 
+        yield return new WaitForSeconds(entryDoorAnimDuration);
+
         // Cerrar puerta de entrada en la nueva sala
         if (entryDoorAnimator != null)
             entryDoorAnimator.SetTrigger(closeEntryTrigger);
-        yield return new WaitForSeconds(entryDoorAnimDuration);
 
         // Fade in
         if (fadeController != null)
@@ -127,4 +144,13 @@ public class Door : MonoBehaviour, IInteractable
         entryDoorAnimator.SetTrigger(idleTrigger);
     }
     #endregion
+
+    private void OnDrawGizmosSelected()
+    {
+        if (rayOrigin == null) return;
+
+        Gizmos.color = Color.red;
+        Vector3 dir = rayOrigin.TransformDirection(rayDirection.normalized);
+        Gizmos.DrawRay(rayOrigin.position, dir * rayDistance);
+    }
 }

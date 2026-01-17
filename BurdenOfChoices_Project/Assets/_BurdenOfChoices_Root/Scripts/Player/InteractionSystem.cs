@@ -1,7 +1,7 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 /// <summary>
-/// InteractionSystem: Gestiona el raycast y la interacciÛn del jugador.
+/// InteractionSystem: Gestiona el raycast y la interacci√≥n del jugador.
 /// </summary>
 public class InteractionSystem : MonoBehaviour
 {
@@ -11,15 +11,15 @@ public class InteractionSystem : MonoBehaviour
 
     [Header("Ray Config")]
     [SerializeField] float interactRange = 2f; //alcance del rayo
-    [SerializeField] LayerMask interactMask = ~0; //capas v·lidas
-    [SerializeField] bool debugRay = true; //mostrar rayo para depuraciÛn
+    [SerializeField] LayerMask interactMask = ~0; //capas v√°lidas
+    [SerializeField] bool debugRay = true; //mostrar rayo para depuraci√≥n
 
     [Header("Points")]
     [SerializeField] Transform interactionPoints; //empty desde donde se dispara
     #endregion
 
     #region Internal States
-    IInteractable currentTarget; //objeto que se est· presionando
+    IInteractable currentTarget; //objeto que se est√° presionando
     IInteractable highlightedTarget; //objeto al que se apunta con el raycast
     #endregion 
 
@@ -70,7 +70,7 @@ public class InteractionSystem : MonoBehaviour
         //Obtener todos los hits del raycast
         RaycastHit[] hits = Physics.RaycastAll(ray, interactRange, interactMask);
 
-        //Objeto que est· en la mano
+        //Objeto que est√° en la mano
         PickableBehaviour pickedObject = pickSystem != null ? pickSystem.GetCurrentPickable() : null;
 
         IInteractable closestInteractable = null;
@@ -78,7 +78,7 @@ public class InteractionSystem : MonoBehaviour
 
         foreach(var hit in hits)
         {
-            //Ignorar el objeto que est· cogido
+            //Ignorar el objeto que est√° cogido
             if (pickedObject != null && hit.collider.gameObject == pickedObject.gameObject) continue;
 
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
@@ -93,7 +93,7 @@ public class InteractionSystem : MonoBehaviour
             }
         }
 
-        //Aplicar hightlight al interactable m·s cercano
+        //Aplicar hightlight al interactable m√°s cercano
         if(closestInteractable != highlightedTarget)
         {
             RemoveHighlight();
