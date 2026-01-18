@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class StairsHandler : MonoBehaviour, IInteractable
+public class StairsHandler : MonoBehaviour
 {
     #region Inspector States
     [Header("References")]
@@ -11,18 +11,21 @@ public class StairsHandler : MonoBehaviour, IInteractable
     [SerializeField] string nextScene;
     #endregion
 
-    #region IInteractable
-    public void OnPress()
+    void OnTriggerEnter(Collider other)
     {
-        if(cell == null)
+        // Solo el jugador puede activar la escalera
+        if (!other.TryGetComponent<PlayerController>(out _))
+            return;
+
+        if (cell == null)
         {
-            Debug.LogError("StairHandler: No Cell asignada.");
+            Debug.LogError("StairsHandler: No Cell asignada.");
             return;
         }
 
         if (!cell.AreAllLocksUnlocked)
         {
-            //Poner algo para el sistema de dialogos
+            // Aquí irá el sistema de diálogos
             Debug.Log("Tendría que salvar al MOCOSO");
             return;
         }
@@ -30,15 +33,17 @@ public class StairsHandler : MonoBehaviour, IInteractable
         LoadNextScene();
     }
 
-    public void OnRelease() { }
-    public void OnHighlight() { }
-    public void OnRemoveHighlight() { }
-    #endregion
-
-    #region Private API
+    #region Private
     void LoadNextScene()
     {
-        SceneManager.LoadScene(nextScene);
+        if (SceneController.Instance != null)
+        {
+            SceneController.Instance.LoadScene(nextScene);
+        }
+        else
+        {
+            Debug.LogError("StairsHandler: SceneController no encontrado.");
+        }
     }
     #endregion
 }

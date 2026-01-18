@@ -1,28 +1,27 @@
 using UnityEngine;
 
 /// <summary>
-/// CursorManager: controla solo la visibilidad del cursor mientras el jugador exista.
+/// CursorManager:
+/// Controla la visibilidad del cursor únicamente mientras esta escena esté activa.
 /// </summary>
 public class CursorManager : MonoBehaviour
 {
     [Header("Gameplay Settings")]
-    [SerializeField] bool hideCursorDuringGameplay = true; // por defecto, cursor invisible
+    [SerializeField] bool hideCursorDuringGameplay = true;
 
-    // Control de visibilidad forzada
     bool isCursorForcedVisible = false;
 
-    private void Awake()
+    void OnEnable()
     {
-        UpdateCursorVisibility();
+        ApplyVisibility();
     }
 
-    private void Update()
+    void OnDisable()
     {
-        // Opcional: asegurar que el cursor se mantiene invisible en cada frame
-        UpdateCursorVisibility();
+        RestoreCursor();
     }
 
-    void UpdateCursorVisibility()
+    void ApplyVisibility()
     {
         if (isCursorForcedVisible)
         {
@@ -30,16 +29,21 @@ public class CursorManager : MonoBehaviour
         }
         else
         {
-            Cursor.visible = !hideCursorDuringGameplay ? true : false;
+            Cursor.visible = !hideCursorDuringGameplay;
         }
     }
 
+    void RestoreCursor()
+    {
+        Cursor.visible = true;
+    }
+
     /// <summary>
-    /// Fuerza que el cursor se vea temporalmente (ejemplo: menú).
+    /// Fuerza la visibilidad del cursor (ej: menús).
     /// </summary>
     public void ForceCursorVisible(bool value)
     {
         isCursorForcedVisible = value;
-        UpdateCursorVisibility();
+        ApplyVisibility();
     }
 }

@@ -3,44 +3,39 @@ using UnityEngine;
 /// <summary>
 /// RoomTrigger
 /// Define el estado emocional del jugador
-/// según la presencia de enmigos en la sala.
+/// según la presencia de enemigos en la sala.
 /// </summary>
 public class RoomTrigger : MonoBehaviour
 {
-    #region Inspector VAriables
-    [SerializeField] bool hasEnemies; //Indica si la sala tiene enemigos
+    #region Inspector
+    [SerializeField] bool hasEnemies;
     #endregion
 
-    #region References
-    AnimatorManager animatorManager;
-    #endregion
-
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if(!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player")) return;
 
-        animatorManager = other.GetComponent<AnimatorManager>();
-        if(animatorManager == null) return;
+        AnimatorManager animator = other.GetComponent<AnimatorManager>();
+        if (animator == null) return;
 
-        ApplyRoomState();
+        ApplyRoomState(animator);
     }
 
-    private void OnTriggerExit(Collider other)
+    void OnTriggerExit(Collider other)
     {
-        if(!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player")) return;
 
-        if (animatorManager != null)
-            animatorManager.SetRelaxed(1f);
+        AnimatorManager animator = other.GetComponent<AnimatorManager>();
+        if (animator == null) return;
 
-        animatorManager = null;
+        animator.SetRelaxed(1f);
     }
 
     #region Core
-    void ApplyRoomState()
+    void ApplyRoomState(AnimatorManager animator)
     {
-        //Sala hostil => jugador tenso (0 = tenso, 1 = relajado)
         float relaxedValue = hasEnemies ? 0f : 1f;
-        animatorManager.SetRelaxed(relaxedValue);
+        animator.SetRelaxed(relaxedValue);
     }
     #endregion
 }
