@@ -490,6 +490,7 @@ GameObject:
   - component: {fileID: 4043575438529007375}
   - component: {fileID: 6123856337557802127}
   - component: {fileID: 587096104400431562}
+  - component: {fileID: 8153602329760755979}
   m_Layer: 0
   m_Name: "PF_Estanter\xEDa_Draggable"
   m_TagString: Untagged
@@ -636,6 +637,23 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
+--- !u!114 &8153602329760755979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416110439011474818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35e95dc5ff2b64380880dd7ac5922847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_Size: {x: 0.28797, y: 1.5297842, z: 0.7499418}
+  m_Center: {x: -0.15681615, y: 0.7861998, z: -0.40899336}
+  m_Area: 0
+  m_AffectedAgents: ffffffff
 --- !u!1 &4615825702450802816
 GameObject:
   m_ObjectHideFlags: 0

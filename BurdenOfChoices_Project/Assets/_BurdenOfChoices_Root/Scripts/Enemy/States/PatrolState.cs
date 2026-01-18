@@ -35,6 +35,22 @@ public class PatrolState : MonoBehaviour, IEnemyState
     #region State Flow
     public void Enter()
     {
+        if (movementCommands == null)
+        {
+            Debug.LogError("[PatrolState] movementCommands es null en Enter");
+            return;
+        }
+        if (enemyData == null)
+        {
+            Debug.LogError("[PatrolState] enemyData no asignado en Enter");
+            return;
+        }
+        if (patrolPoints == null || patrolPoints.Length == 0)
+        {
+            Debug.LogError("[PatrolState] patrolPoints vacíos en Enter");
+            return;
+        }
+
         idleInProgress = false;
 
 

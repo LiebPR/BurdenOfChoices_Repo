@@ -69,7 +69,7 @@ public class EnemyPerceptionHandler : MonoBehaviour
         if (fsm.CurrentState == EnemyState.Chase) return;
 
         lastTarget = target;
-        fsm.OnTurnTuTarget(target);
+        fsm.OnTurnToTarget(target);
     }
 
     void HandleSeeTarget(Transform target)
