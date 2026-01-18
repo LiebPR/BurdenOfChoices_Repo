@@ -515,6 +515,7 @@ Transform:
   - {fileID: 9123751253254388173}
   - {fileID: 6108570381673796145}
   - {fileID: 5544181113842845750}
+  - {fileID: 5561952642429002550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7475437897301892546
@@ -584,9 +585,9 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 1
   restoreDelay: 1.5
-  grabPoint: {fileID: 0}
-  coll: {fileID: 0}
-  rb: {fileID: 0}
+  grabPoint: {fileID: 5561952642429002550}
+  coll: {fileID: 6123856337557802127}
+  rb: {fileID: 587096104400431562}
 --- !u!65 &6123856337557802127
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -919,6 +920,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.15, y: 0.5, z: 0.111}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2513508386682939215}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8933474273429143200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5561952642429002550}
+  m_Layer: 0
+  m_Name: GrabPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5561952642429002550
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8933474273429143200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.145, y: 0.461, z: -0.431}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
