@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public enum EnemyState
 {
@@ -10,7 +9,7 @@ public enum EnemyState
     Chase,
     Stun,
     Death,
-    TurnToTarget, 
+    TurnToTarget,
     InvestigateSound
 }
 
@@ -20,40 +19,40 @@ public class EnemyFSM : MonoBehaviour
 
     IEnemyState currentStateInstance;
 
-    // Inicializamos directamente para evitar null
+    // Diccionario de instancias de estados
     Dictionary<EnemyState, IEnemyState> stateInstances = new Dictionary<EnemyState, IEnemyState>();
 
     bool isChangingState;
     bool hasPendingStateRequest;
     EnemyState pendingStateRequest;
 
-    // Nombres cacheados de estados para evitar allocations al loggear
+    // Cache de nombres de estados para logs
     string[] stateNames;
 
-    #region Getter
+    #region Getters
     public EnemyState CurrentState { get; private set; } = EnemyState.Patrol;
     public IEnemyState CurrentStateInstance => currentStateInstance;
     #endregion
 
     #region Events
-    public event System.Action<EnemyState> OnStateChanged; // Se dispara cuando cambia de estado
+    public event System.Action<EnemyState> OnStateChanged; 
     #endregion
 
     private void Awake()
     {
-        // Cacheamos los nombres de los estados (una sola allocation al inicio)
+        // Cacheamos nombres de estados para logs
         stateNames = System.Enum.GetNames(typeof(EnemyState));
     }
 
     private void Update()
     {
         if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
-            return; // El enemigo no ejecuta lógica mientras el juego está pausado
+            return;
 
-        // Ejecutar la lógica del estado actual
+        // Lógica del estado actual
         currentStateInstance?.Handle();
 
-        // Procesar cualquier cambio de estado pendiente fuera del stack de ChangeState
+        // Procesar cambios de estado pendientes
         if (!isChangingState && hasPendingStateRequest)
         {
             var pending = pendingStateRequest;
@@ -62,60 +61,55 @@ public class EnemyFSM : MonoBehaviour
         }
     }
 
-    //Registra un estado en el FSM
+    #region Registro de Estados
+    /// <summary>
+    /// Registra un estado en la FSM
+    /// </summary>
     public void RegisterState(EnemyState state, IEnemyState instance)
     {
         if (instance == null)
         {
+            Debug.LogWarning($"[FSM] Intento de registrar estado null: {state}");
             return;
         }
 
         stateInstances[state] = instance;
     }
+    #endregion
 
-    //Cambia de estado si es diferente al actual
+    #region Cambio de Estado
+    /// <summary>
+    /// Cambia de estado si es diferente al actual
+    /// </summary>
     public void ChangeState(EnemyState newState)
     {
-        // Log temprano para depuración
-        if (debugLog)
-            Debug.Log($"[FSM] Solicitud de cambio: {CurrentState} → {newState}");
-
-        // Evitar cambios redundantes
         if (newState == CurrentState) return;
 
-        // Si ya estamos cambiando de estado, encolamos la petición.
         if (isChangingState)
         {
+            // Encolamos la petición
             hasPendingStateRequest = true;
             pendingStateRequest = newState;
-
-            if (debugLog)
-                Debug.Log($"[FSM] Cambio encolado: {newState}");
-
             return;
         }
 
         isChangingState = true;
 
-        // EXIT
+        // EXIT del estado actual
         currentStateInstance?.Exit();
 
         // Actualizamos estado
         CurrentState = newState;
 
-        if (debugLog)
-            Debug.Log($"[FSM] Cambio ejecutado: nuevo estado = {CurrentState}");
+        // Evento
+        try { OnStateChanged?.Invoke(CurrentState); } catch { }
 
-        try
-        {
-            OnStateChanged?.Invoke(CurrentState);
-        }
-        catch { }
-
-        // Instancia del nuevo estado
+        // Obtener la instancia del nuevo estado
         if (!stateInstances.TryGetValue(newState, out currentStateInstance) || currentStateInstance == null)
         {
             isChangingState = false;
+            if (debugLog)
+                Debug.LogWarning($"[FSM] No existe instancia del estado {newState}");
             return;
         }
 
@@ -124,71 +118,73 @@ public class EnemyFSM : MonoBehaviour
 
         isChangingState = false;
     }
+    #endregion
 
-
-    // Resetea el FSM al estado inicial
-    public void ResetState()
+    #region Inicialización Segura
+    /// <summary>
+    /// Inicializa la FSM y asigna el estado inicial sin llamar Enter todavía.
+    /// </summary>
+    public void InitializeFSM(EnemyState initialState = EnemyState.Patrol)
     {
-        CurrentState = EnemyState.Patrol; // Patrol como inicial
-        try
-        {
-            OnStateChanged?.Invoke(CurrentState);
-        }
-        catch
-        {
-            // silencioso
-        }
+        CurrentState = initialState;
 
-        // Instanciamos e iniciamos el estado inicial
-        if (stateInstances.ContainsKey(CurrentState))
+        if (stateInstances.TryGetValue(initialState, out currentStateInstance))
         {
-            currentStateInstance = stateInstances[CurrentState];
-            currentStateInstance.Enter();
+            // Solo asigna, no llama Enter todavía
         }
     }
 
-    #region Public Handlers
+    /// <summary>
+    /// Inicia la FSM, llamando Enter en el estado actual.
+    /// </summary>
+    public void StartFSM()
+    {
+        if (currentStateInstance != null)
+        {
+            currentStateInstance.Enter();
+            OnStateChanged?.Invoke(CurrentState);
+        }
+        else if (debugLog)
+        {
+            Debug.LogWarning("[FSM] StartFSM llamado pero el estado inicial es null");
+        }
+    }
+    #endregion
+
+    #region Handlers Públicos
     public void OnPatrol() => ChangeState(EnemyState.Patrol);
     public void OnIdle() => ChangeState(EnemyState.Idle);
     public void OnChase() => ChangeState(EnemyState.Chase);
     public void OnStun() => ChangeState(EnemyState.Stun);
     public void OnDeath() => ChangeState(EnemyState.Death);
-    public void OnTurnTuTarget(Transform target)
+    public void OnTurnToTarget(Transform target)
     {
-        // Obtenemos la instancia del estado TurnToTarget
         if (stateInstances.TryGetValue(EnemyState.TurnToTarget, out IEnemyState state))
         {
-            TurnToTargetState turnState = state as TurnToTargetState;
-            if (turnState != null)
+            if (state is TurnToTargetState turnState)
             {
                 turnState.SetTarget(target);
             }
         }
-
-        // Cambiamos al estado TurnToTarget
         ChangeState(EnemyState.TurnToTarget);
     }
     public void OnInvestigateSound() => ChangeState(EnemyState.InvestigateSound);
     #endregion
 
-    #region Public API
+    #region Reseteo Forzado
     public void ForceResetToPatrol()
     {
-        // Limpiar estado interno
         isChangingState = false;
         hasPendingStateRequest = false;
 
-        // Forzar estado PATROL
         CurrentState = EnemyState.Patrol;
 
-        // Obtener la instancia del estado
         if (stateInstances.TryGetValue(EnemyState.Patrol, out IEnemyState patrolState))
         {
             currentStateInstance = patrolState;
-            currentStateInstance.Enter(); // Reiniciamos su lógica
+            currentStateInstance.Enter();
         }
 
-        // Avisamos a quien esté escuchando
         OnStateChanged?.Invoke(CurrentState);
     }
     #endregion

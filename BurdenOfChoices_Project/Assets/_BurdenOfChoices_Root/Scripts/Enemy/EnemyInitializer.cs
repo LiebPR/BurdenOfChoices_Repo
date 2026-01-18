@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyInitializer : MonoBehaviour
@@ -26,18 +26,12 @@ public class EnemyInitializer : MonoBehaviour
 
     private void Awake()
     {
-        patrol = GetComponent<PatrolState>();
-        idle = GetComponent<IdleState>();
-        chase = GetComponent<ChaseState>();
-        turnState = GetComponent<TurnToTargetState>();
-        death = GetComponent<DeathState>();
-        stun = GetComponent<StunState>();
-        investigateSound = GetComponent<InvestigateSoundState>();
+
+        // Obtenemos referencias que dependen de otros componentes inicializados en Awake()
+        moveContext = GetComponent<EnemyMotionContext>();
 
         fsm = GetComponent<EnemyFSM>();
         vision = GetComponent<VisionSystem>();
-        commands = GetComponent<EnemyMotionContext>().Commands;
-        moveContext = GetComponent<EnemyMotionContext>();
         health = GetComponent<EnemyHealth>();
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
@@ -45,7 +39,20 @@ public class EnemyInitializer : MonoBehaviour
         animatorHandler = GetComponent<EnemyAnimationHandler>();
         lightHandler = GetComponent<EnemyLightHandler>();
 
-        // Inicializamos cada estado
+        patrol = GetComponent<PatrolState>();
+        idle = GetComponent<IdleState>();
+        chase = GetComponent<ChaseState>();
+        turnState = GetComponent<TurnToTargetState>();
+        death = GetComponent<DeathState>();
+        stun = GetComponent<StunState>();
+        investigateSound = GetComponent<InvestigateSoundState>();
+    }
+
+    private void Start()
+    {
+
+        commands = moveContext.Commands; // Ahora Commands NO será null
+
         patrol.Initialize(fsm, commands, turnState, moveContext, animatorHandler);
         idle.Initialize(fsm, commands, patrol, turnState, animatorHandler);
         chase.Initialize(fsm, commands, vision, animatorHandler);
@@ -62,8 +69,10 @@ public class EnemyInitializer : MonoBehaviour
         fsm.RegisterState(EnemyState.Death, death);
         fsm.RegisterState(EnemyState.Stun, stun);
         fsm.RegisterState(EnemyState.InvestigateSound, investigateSound);
+        // 3️⃣ Inicializamos la FSM de forma segura (no entra Enter todavía)
+        fsm.InitializeFSM(EnemyState.Patrol);
 
-        // Activamos el primer estado
-        fsm.ResetState(); // Esto llamar� a ChangeState(EnemyState.Patrol) y ejecutar� Enter()
+        // 4️⃣ Finalmente arrancamos la FSM
+        fsm.StartFSM(); // PatrolState.Enter() ahora corre con movementCommands ya asignado
     }
 }

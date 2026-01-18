@@ -50,7 +50,7 @@ public class IdleState : MonoBehaviour, IEnemyState
             Transform next = patrolState.GetCurrentPoint();
             turnState.SetTarget(next);
 
-            fsm.OnTurnTuTarget(next);
+            fsm.OnTurnToTarget(next);
         }
     }
 
