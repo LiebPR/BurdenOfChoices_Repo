@@ -68,11 +68,4 @@ public class EnemyAttack : MonoBehaviour
         playerHealth.TakeHit(hitDirection);
     }
     #endregion
-
-    private void OnDrawGizmosSelected()
-    {
-        // Dibujar un círculo que representa el rango de ataque
-        Handles.color = Color.red;
-        Handles.DrawWireDisc(attackPoint.transform.position, Vector3.up, attackRange);
-    }
 }
