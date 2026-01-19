@@ -13,7 +13,8 @@ public class EnemyAnimationHandler : MonoBehaviour
     static readonly int IsRunningHash = Animator.StringToHash("IsRunning");
     static readonly int IsStunnedHash = Animator.StringToHash("IsStunned");
     static readonly int IStunHash = Animator.StringToHash("IStun");
-    static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
+    static readonly int IsDeathAfterStunHash = Animator.StringToHash("DeathAfterDelay");
+    static readonly int IDeathHash = Animator.StringToHash("IDeath"); 
     static readonly int IsTurnningHash = Animator.StringToHash("IsTurnning");
     static readonly int TurnDirectionHash = Animator.StringToHash("Angular");
     static readonly int IHearHash = Animator.StringToHash("IHear");
@@ -69,15 +70,26 @@ public class EnemyAnimationHandler : MonoBehaviour
     #endregion
 
     #region Death
-    public void SetDeathBody(bool isDeath)
+    public void SetDeathBody()
     {
-        body.SetBool(IsDeathHash, isDeath);
-        farol.SetBool(IsDeathHash, isDeath);
+        body.SetTrigger(IDeathHash);
+        farol.SetTrigger(IDeathHash);
     }
 
-    public void SetDeathLegs(bool isDeath)
+    public void SetDeathLegs()
     {
-        legs.SetBool (IsDeathHash, isDeath);
+        legs.SetTrigger(IDeathHash);
+    }
+
+    public void SetDeathAfterStunBody(bool isDeath)
+    {
+        body.SetBool(IsDeathAfterStunHash, isDeath);
+        farol.SetBool(IsDeathAfterStunHash, isDeath);
+    }
+
+    public void SetDeathAfterStunLegs(bool isDeath)
+    {
+        legs.SetBool (IsDeathAfterStunHash, isDeath);
     }
     #endregion
 

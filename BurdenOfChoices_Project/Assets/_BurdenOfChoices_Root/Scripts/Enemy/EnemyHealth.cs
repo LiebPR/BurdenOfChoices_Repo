@@ -140,10 +140,13 @@ public class EnemyHealth : MonoBehaviour
         animationHandler.SetIsRunningBody(false);
         animationHandler.SetIsRunningLegs(false);
 
+        animationHandler.SetStunnedBody(false);
+        animationHandler.SetStunnedLegs(false);
+
         animationHandler.SetTurnningBody(false);
 
-        animationHandler.SetDeathBody(true);
-        animationHandler.SetDeathLegs(true);
+        animationHandler.SetDeathBody();
+        animationHandler.SetDeathLegs();
 
         fsm.OnDeath();
     }
@@ -168,9 +171,6 @@ public class EnemyHealth : MonoBehaviour
         animationHandler.SetIsRunningLegs(false);
 
         animationHandler.SetTurnningBody(false);
-
-        animationHandler.SetDeathBody(false);
-        animationHandler.SetDeathLegs(false);
 
         animationHandler.SetStunBody();
         animationHandler.SetStunLegs();
