@@ -351,6 +351,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckDistance: 1
+  groundStickTime: 0.05
   debugDrawGroundRay: 1
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 1
@@ -384,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anim: {fileID: 1555737076036093945}
-  destroyDelay: 2.5
+  destroyDelay: 5
 --- !u!1001 &437690662932099919
 PrefabInstance:
   m_ObjectHideFlags: 0
