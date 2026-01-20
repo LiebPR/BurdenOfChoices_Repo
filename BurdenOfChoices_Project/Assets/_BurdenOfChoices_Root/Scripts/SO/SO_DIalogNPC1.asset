@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e06c407c33644246907429f23dc8a8d, type: 3}
   m_Name: SO_DIalogNPC1
   m_EditorClassIdentifier: 
-  speakerName: Mocoso
+  speakerName: Bibbo
   lines:
   - Save me! Save me!
   - 'They captured me  inside this cage! '
   - Find the keys to release me
   emotions:
-  - name: Asustado
-    portrait: {fileID: -194704408, guid: 52c6edeb59cab4e4a9567ea1357bef60, type: 3}
-  - name: Preocupado
-    portrait: {fileID: 931930496, guid: 52c6edeb59cab4e4a9567ea1357bef60, type: 3}
-  - name: Pena
-    portrait: {fileID: 1883714578, guid: 52c6edeb59cab4e4a9567ea1357bef60, type: 3}
+  - name: Happy
+    portrait: {fileID: 21300000, guid: 92ecf6837443b0943a78ac597974fbe0, type: 3}
+  - name: Regular
+    portrait: {fileID: 21300000, guid: 094d3aa5543a07c4a8e153dcb853cac6, type: 3}
+  - name: Sad
+    portrait: {fileID: 21300000, guid: 94da09ce64a1d874baf0d306691cb7be, type: 3}
   autoAdvance: 1
   autoAdvanceDelay: 2
   blockPlayerController: 1
