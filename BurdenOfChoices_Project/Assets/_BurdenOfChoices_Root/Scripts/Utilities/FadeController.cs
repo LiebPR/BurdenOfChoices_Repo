@@ -1,36 +1,46 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class FadeController : MonoBehaviour
 {
+    public static FadeController Instance;
+
+    #region Inspector
     [Header("UI References")]
-    public Image fadeImage;
+    [SerializeField] Image fadeImage;
 
     [Header("Fade Settings")]
-    public float defaultFadeTime = 0.5f;
+    [SerializeField] float defaultFadeTime = 0.5f;
+    #endregion
 
-    private Canvas fadeCanvas;
-    private GraphicRaycaster raycaster;
+    #region Internal
+    Canvas fadeCanvas;
+    GraphicRaycaster raycaster;
+    Coroutine fadeRoutine;
+    #endregion
 
+    #region Getters
+    public bool IsFading => fadeRoutine != null;
+    #endregion
+
+    #region Unity Lifecycle
     void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-
-        fadeCanvas = GetComponent<Canvas>();
-        if (fadeCanvas != null)
+        if (Instance != null && Instance != this)
         {
-            fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            fadeCanvas.sortingOrder = 1000;
+            Destroy(gameObject);
+            return;
         }
 
-        raycaster = GetComponent<GraphicRaycaster>();
-        if (raycaster == null)
-            raycaster = gameObject.AddComponent<GraphicRaycaster>();
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
+        SetupCanvas();
         TryFindFadeImage();
-        if (fadeImage != null) SetAlpha(0f);
+        SetAlpha(0f);
     }
 
     void OnEnable()
@@ -42,75 +52,119 @@ public class FadeController : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
+    #endregion
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    #region Scene Handling
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         TryFindFadeImage();
-        if (fadeImage != null) SetAlpha(0f);
+        SetAlpha(0f);
     }
+    #endregion
 
-    private void TryFindFadeImage()
-    {
-        if (fadeImage != null) return;
-
-        // Buscar dentro del Canvas de la escena
-        GameObject canvasObj = GameObject.Find("C_Fade");
-        if (canvasObj != null)
-        {
-            fadeImage = canvasObj.transform.Find("P_Fade")?.GetComponent<Image>();
-            if (fadeImage == null)
-                Debug.LogWarning("FadeController: No se encontró P_Fade dentro de C_Fade.");
-        }
-        else
-        {
-            Debug.LogWarning("FadeController: No se encontró C_Fade en la escena.");
-        }
-    }
-
-    #region Public API
+    #region Public API — Coroutine (compatibilidad)
     public IEnumerator FadeOut(float duration = -1f)
     {
-        float t = duration <= 0 ? defaultFadeTime : duration;
-        if (raycaster != null) raycaster.enabled = true;
-        yield return CrossFade(0f, 1f, t);
+        yield return StartFade(0f, 1f, duration);
     }
 
     public IEnumerator FadeIn(float duration = -1f)
     {
-        float t = duration <= 0 ? defaultFadeTime : duration;
-        yield return CrossFade(1f, 0f, t);
-        if (raycaster != null) raycaster.enabled = false;
+        yield return StartFade(1f, 0f, duration);
     }
     #endregion
 
-    #region Internal
-    private IEnumerator CrossFade(float from, float to, float duration)
+    #region Public API — Callback (SECUENCIAS)
+    public void FadeOut(Action onFinished, float duration = -1f)
+    {
+        StartCoroutine(FadeWithCallback(0f, 1f, duration, onFinished));
+    }
+
+    public void FadeIn(Action onFinished, float duration = -1f)
+    {
+        StartCoroutine(FadeWithCallback(1f, 0f, duration, onFinished));
+    }
+    #endregion
+
+    #region Core Fade Logic
+    IEnumerator FadeWithCallback(float from, float to, float duration, Action onFinished)
+    {
+        yield return StartFade(from, to, duration);
+        onFinished?.Invoke();
+    }
+
+    IEnumerator StartFade(float from, float to, float duration)
+    {
+        if (fadeRoutine != null)
+            StopCoroutine(fadeRoutine);
+
+        fadeRoutine = StartCoroutine(CrossFade(from, to, duration));
+        yield return fadeRoutine;
+        fadeRoutine = null;
+    }
+
+    IEnumerator CrossFade(float from, float to, float duration)
     {
         if (fadeImage == null) yield break;
 
+        float time = duration <= 0 ? defaultFadeTime : duration;
         float elapsed = 0f;
+
+        if (raycaster != null)
+            raycaster.enabled = to > from;
+
         Color c = fadeImage.color;
 
-        while (elapsed < duration)
+        while (elapsed < time)
         {
             elapsed += Time.unscaledDeltaTime;
-            float alpha = Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration));
-            c.a = alpha;
+            c.a = Mathf.Lerp(from, to, elapsed / time);
             fadeImage.color = c;
             yield return null;
         }
 
         c.a = to;
         fadeImage.color = c;
+
+        if (raycaster != null)
+            raycaster.enabled = to > 0f;
+    }
+    #endregion
+
+    #region Setup
+    void SetupCanvas()
+    {
+        fadeCanvas = GetComponent<Canvas>();
+        if (fadeCanvas == null) return;
+
+        fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        fadeCanvas.sortingOrder = 1000;
+
+        raycaster = GetComponent<GraphicRaycaster>();
+        if (raycaster == null)
+            raycaster = gameObject.AddComponent<GraphicRaycaster>();
     }
 
-    private void SetAlpha(float a)
+    void TryFindFadeImage()
+    {
+        if (fadeImage != null) return;
+
+        GameObject canvasObj = GameObject.Find("C_Fade");
+        if (canvasObj == null) return;
+
+        fadeImage = canvasObj.transform.Find("P_Fade")?.GetComponent<Image>();
+    }
+
+    void SetAlpha(float alpha)
     {
         if (fadeImage == null) return;
+
         Color c = fadeImage.color;
-        c.a = a;
+        c.a = alpha;
         fadeImage.color = c;
-        if (raycaster != null) raycaster.enabled = a > 0f;
+
+        if (raycaster != null)
+            raycaster.enabled = alpha > 0f;
     }
     #endregion
 }

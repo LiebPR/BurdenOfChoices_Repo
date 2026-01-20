@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -16,6 +17,10 @@ public class DialogSystem : MonoBehaviour
     bool isActive;
     int currentLineIndex;
     DialogData currentDialog;
+    #endregion
+
+    #region Events
+    public event Action onDialogFinished;
     #endregion
 
     #region Public API
@@ -95,6 +100,9 @@ public class DialogSystem : MonoBehaviour
         currentDialog = null;
 
         dialogUI.Hide();
+
+        onDialogFinished?.Invoke();
+        onDialogFinished = null;
     }
     #endregion
 

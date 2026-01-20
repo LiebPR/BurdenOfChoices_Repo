@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using System;
 
 public class Cell : MonoBehaviour
 {
@@ -13,6 +13,10 @@ public class Cell : MonoBehaviour
 
     #region Internal States
     int lockedCount;
+    #endregion
+
+    #region Event
+    public event Action OnCellUnlocked;
     #endregion
 
     #region Animator
@@ -33,7 +37,10 @@ public class Cell : MonoBehaviour
     {
         lockedCount = Mathf.Max(lockedCount - 1, 0);
         if (AreAllLocksUnlocked)
+        {
+            OnCellUnlocked?.Invoke();
             StartCoroutine(OpenDoorWithDelay());
+        }
     }
     #endregion
 
