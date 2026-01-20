@@ -7,6 +7,7 @@ using UnityEngine.AI;
 /// Gestiona las fases de vida del enemigo y su reacción a los golpes. 
 /// Coordina daño, stun, knockback y transición a estados de la FSM.
 /// </summary>
+[RequireComponent(typeof(EnemyMotionContext))]
 public class EnemyHealth : MonoBehaviour
 {
     #region Inspector Variables
@@ -56,7 +57,14 @@ public class EnemyHealth : MonoBehaviour
         fsm = GetComponent<EnemyFSM>();
         rb = GetComponent<Rigidbody>();
         animationHandler = GetComponent<EnemyAnimationHandler>();
+    }
+
+    private void Start()
+    {
         movementCommands = GetComponent<EnemyMotionContext>().Commands;
+
+        if (movementCommands == null)
+            Debug.LogError("EnemyHealth: Commands sigue siendo NULL en Start", this);
     }
 
     private void OnEnable()
@@ -116,7 +124,7 @@ public class EnemyHealth : MonoBehaviour
         {
             firstLifeBroken = true;
 
-            movementCommands.EnterPhysicalMode();
+            movementCommands.EnterPhysicalMode();  
             RotateOppositeToHit(LastHitDirection);
             StartCoroutine(KnockbackRoutine(LastHitDirection, LastKncokBack));
 

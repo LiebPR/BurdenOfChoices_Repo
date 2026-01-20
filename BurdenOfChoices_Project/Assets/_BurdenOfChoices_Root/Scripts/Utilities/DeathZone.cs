@@ -8,10 +8,17 @@ public class DeathZone : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //Solo el jugador activa la zona de muerte
-        if(!other.TryGetComponent<PlayerController>(out _))
+        if(other.TryGetComponent<PlayerController>(out _))
+        {
+            HandlePlayerFallenDeath();
             return;
+        }
 
-        HandlePlayerFallenDeath();
+        //Destruccion del enemigo
+        if (other.TryGetComponent<EnemyFSM>(out var enmy))
+        {
+            Destroy(enmy.gameObject);
+        }
     }
 
     void HandlePlayerFallenDeath()

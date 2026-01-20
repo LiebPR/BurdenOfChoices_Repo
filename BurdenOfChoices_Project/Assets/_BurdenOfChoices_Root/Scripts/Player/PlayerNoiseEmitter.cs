@@ -4,7 +4,6 @@ public class PlayerNoiseEmitter : MonoBehaviour
 {
     #region Inspector Variables
     [SerializeField] float walkNoiseInterval = 0.6f;
-    [SerializeField] float runNoiseInterval = 0.35f;
 
     [SerializeField] float walkNoiseDelay = 0.25f;
     [SerializeField] float runNoiseDelay = 0.15f;

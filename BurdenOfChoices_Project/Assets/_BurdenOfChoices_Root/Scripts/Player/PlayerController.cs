@@ -22,7 +22,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("FreeRotation")]
     [SerializeField] float freeRotationSensitivity = 3f;
-    [SerializeField] float freeRotationDamping = 15f; //damping al usar mouse
 
     [Header("Weight Factor")]
     [SerializeField] float weightSpeedSensitivity = 0.25f; //sensibilidad con la que el peso afecta a la velocidad

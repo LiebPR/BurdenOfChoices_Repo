@@ -10,7 +10,6 @@ public class Lock : MonoBehaviour
 
     [Header("Disable Timings")]
     [SerializeField] float lockDisableDelay = 1f;
-    [SerializeField] float chainFadeDelay = 0.3f;
 
     [SerializeField] GameObject chain;
     #endregion
