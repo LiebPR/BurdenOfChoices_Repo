@@ -81,8 +81,6 @@ public class PlayerController : MonoBehaviour
         if (isPaused && !wasGamePaused)
         {
             PausePlayer();
-
-            animatorManager.RestoreAnimator();
         }
         // TRANSICIÓN: Paused → Playing
         else if (!isPaused && wasGamePaused)
@@ -149,9 +147,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (movementLocked) return;
+        if (!movementLocked)
+        {
+            HandleMovementSpeed();
+        }
 
-        HandleMovementSpeed();
         UpdateAnimatorVelocity();
     }
 

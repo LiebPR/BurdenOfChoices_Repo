@@ -109,7 +109,6 @@ public class Door : MonoBehaviour, IInteractable
         isInteracting = true;
 
         GameStopManager.Instance.PauseGame(); //parar tiempo de juego
-        animatorManager.RestoreAnimator();
 
         // Abrir la puerta de salida
         if (exitDoorAnimator != null)

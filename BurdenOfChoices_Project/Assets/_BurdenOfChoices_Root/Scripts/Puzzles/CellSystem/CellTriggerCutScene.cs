@@ -4,6 +4,11 @@ public class CellTriggerCutScene : MonoBehaviour
 {
     [SerializeField] Cell cell;
     [SerializeField] SequenceController freedomSequenceController;
+    [SerializeField] Animator bibboAnimator;
+
+    #region Animator Parameters
+    static readonly int IFreedomHash = Animator.StringToHash("IFreedom");
+    #endregion
 
     private void OnEnable()
     {
@@ -21,5 +26,6 @@ public class CellTriggerCutScene : MonoBehaviour
     {
         if (freedomSequenceController != null)
             freedomSequenceController.Play();
+        bibboAnimator.SetBool(IFreedomHash, true);
     }
 }
