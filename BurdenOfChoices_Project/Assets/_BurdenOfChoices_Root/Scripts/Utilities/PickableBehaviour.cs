@@ -349,7 +349,7 @@ public class PickableBehaviour : MonoBehaviour
 
         transform.SetParent(catchPoint);
 
-        if(grabPoint != null)
+        if (grabPoint != null)
         {
             transform.localPosition = -grabPoint.localPosition;
             transform.localRotation = Quaternion.Inverse(grabPoint.localRotation);
@@ -359,10 +359,13 @@ public class PickableBehaviour : MonoBehaviour
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
         }
-        if(rb != null)
+
+        // No tocar velocities
+        if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = true;
         }
     }
 

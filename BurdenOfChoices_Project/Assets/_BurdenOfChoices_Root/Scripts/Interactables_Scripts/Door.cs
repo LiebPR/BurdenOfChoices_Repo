@@ -35,6 +35,7 @@ public class Door : MonoBehaviour, IInteractable
 
     #region References
     FadeController fadeController;
+    AnimatorManager animatorManager;
     #endregion
 
     private void Awake()
@@ -43,7 +44,11 @@ public class Door : MonoBehaviour, IInteractable
         {
             fadeController = FindAnyObjectByType<FadeController>();
         }
+        animatorManager = FindAnyObjectByType<AnimatorManager>();
+    }
 
+    private void Start()
+    {
         if (isSecondaryDoor)
             locked = true;
     }
@@ -103,8 +108,8 @@ public class Door : MonoBehaviour, IInteractable
     {
         isInteracting = true;
 
-        // Cambiar fase del juego
-        GameDirector.Instance.SetPhase(GamePhase.Cutscene);
+        GameStopManager.Instance.PauseGame(); //parar tiempo de juego
+        animatorManager.RestoreAnimator();
 
         // Abrir la puerta de salida
         if (exitDoorAnimator != null)
@@ -140,17 +145,10 @@ public class Door : MonoBehaviour, IInteractable
 
         isInteracting = false;
 
+        GameStopManager.Instance.ResumeGame(); //Retomar tiempo de juego
+
         // Volver a Idle después de cerrar
         entryDoorAnimator.SetTrigger(idleTrigger);
     }
     #endregion
-
-    private void OnDrawGizmosSelected()
-    {
-        if (rayOrigin == null) return;
-
-        Gizmos.color = Color.red;
-        Vector3 dir = rayOrigin.TransformDirection(rayDirection.normalized);
-        Gizmos.DrawRay(rayOrigin.position, dir * rayDistance);
-    }
 }

@@ -11,7 +11,9 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Respawn System")]
     [SerializeField] Transform firstDeathRespawnPoint; // punto donde reaparece en la primera muerte
-    [SerializeField] float respawnDelay = 1.2f; // tiempo en pantalla negra
+
+    [Header("Fade Settings")]
+    [SerializeField] float fadeInDelay = 0.7f; // tiempo configurable antes de permitir fade
 
     [Header("Cinemachine Cameras")]
     [SerializeField] CinemachineCamera deathCamera;
@@ -65,8 +67,6 @@ public class PlayerHealth : MonoBehaviour
         {
             if(firstDeathRespawnPoint != null)
                 StartCoroutine(RespawnRoutine(firstDeathRespawnPoint));
-            else
-                ResetPlayerState();
         }
         else
         {
@@ -90,9 +90,7 @@ public class PlayerHealth : MonoBehaviour
 
         animatorManager.DeathAnim();
 
-        //Deshabilitar el controlador para que no se mueva más 
-        var controller = GetComponent<PlayerController>();
-        if (controller != null) controller.enabled = false;
+        GameStopManager.Instance.PauseGame();
 
         var vision = FindAnyObjectByType<VisionSystem>();
         if (vision != null) vision.ResetVisionToDefault();
@@ -123,17 +121,6 @@ public class PlayerHealth : MonoBehaviour
         isAlive = true;
     }
 
-    void ResetPlayerState()
-    {
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        var controller = GetComponent<PlayerController>();
-        if (controller != null) controller.enabled = true;
-
-        isAlive = true;
-    }
-
     void RotateAwayFromHit()
     {
         // El vector del golpe ya se planea en el plano XZ
@@ -154,13 +141,21 @@ public class PlayerHealth : MonoBehaviour
     #region Routine
     IEnumerator RespawnRoutine(Transform respawnPoint)
     {
-        if (fadeController != null) yield return fadeController.FadeOut();
-        yield return new WaitForSeconds(respawnDelay);
+        if (fadeController != null)
+            yield return fadeController.FadeOut();
+
         ReappearAtPoint(respawnPoint);
 
         if (deathCamera != null)
             CameraManager.Instance.ActivateCamera(deathCamera, cameraHighPriority);
-        if (fadeController != null) yield return fadeController.FadeIn();
+        
+        
+        yield return new WaitForSeconds(fadeInDelay);
+        // 5. Fade in
+        if (fadeController != null)
+            yield return fadeController.FadeIn();
+        GameStopManager.Instance.ResumeGame();
     }
+
     #endregion
 }

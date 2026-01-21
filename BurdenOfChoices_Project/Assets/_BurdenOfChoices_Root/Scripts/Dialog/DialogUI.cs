@@ -87,14 +87,16 @@ public class DialogUI : MonoBehaviour
     #region Typewriter Coroutine
     IEnumerator TypeTextCoroutine(string text, float typeSpeed)
     {
-        dialogText.text = "";
-        foreach(char c in text)
+        dialogText.text = text;
+        dialogText.maxVisibleCharacters = 0;
+
+        for (int i = 0; i <= text.Length; i++)
         {
-            dialogText.text += c;
+            dialogText.maxVisibleCharacters = i;
             yield return new WaitForSeconds(typeSpeed);
         }
 
-        typingCoroutine = null; 
+        typingCoroutine = null;
     }
     #endregion
 }

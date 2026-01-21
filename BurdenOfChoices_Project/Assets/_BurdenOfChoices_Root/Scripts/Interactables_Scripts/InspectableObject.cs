@@ -70,10 +70,6 @@ public class InspectableObject : MonoBehaviour, IInteractable
         
         GameStopManager.Instance.PauseGame();
         InspectionUIManager.Instance.Hide();
-       
-        PlayerController player = FindAnyObjectByType<PlayerController>();
-        if (player != null)
-            player.PausePlayer();
     }
 
     // No se usa
@@ -128,10 +124,6 @@ public class InspectableObject : MonoBehaviour, IInteractable
         isReturning = true;
 
         GameStopManager.Instance.ResumeGame();
-
-        PlayerController player = FindAnyObjectByType<PlayerController>();
-        if (player != null)
-            player.ResumePlayer();
     }
 
     void ReturnToOriginalTransform()

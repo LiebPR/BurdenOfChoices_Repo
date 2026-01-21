@@ -1,18 +1,19 @@
-using UnityEditor;
 using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
 {
     #region Inspector Variables
-    [SerializeField] float attackRange = 2f; //distancia máxima para golpear
-    [SerializeField] float attackCooldown = 1f; //tiempo entre ataques
-    [SerializeField] Transform attackPoint; //Punto desde donde se mide el rango de ataque
+    [SerializeField] float attackRange = 2f; // distancia máxima para golpear
+    [SerializeField] Transform attackPoint;  // punto desde donde se mide el rango de ataque
+    [SerializeField] float attackCooldown = 1f;
     #endregion
 
     #region Internal States
     Transform player;
     EnemyFSM fsm;
     EnemyAnimationHandler animHandler;
+
+    bool isAttacking;
     float lastAttackTime;
     #endregion
 
@@ -25,47 +26,65 @@ public class EnemyAttack : MonoBehaviour
     private void Update()
     {
         if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
-            return; // El enemigo no ejecuta lógica mientras el juego está pausado
+            return;
 
         if (player == null) return;
 
-        //Solo atacar si estamos persiguiendo
-        if(fsm.CurrentState != EnemyState.Chase) return;
-
-        //Verificar distancia
-        float distance = Vector3.Distance(attackPoint.transform.position, player.position);
-        if(distance <= attackRange && Time.time - lastAttackTime >= attackCooldown)
+        if (fsm.CurrentState == EnemyState.Chase)
         {
-            //Animator
-            animHandler.SetAttackBody();
-            lastAttackTime = Time.time;
+            // Rotación suave hacia jugador
+            Vector3 direction = (player.position - transform.position).normalized;
+            direction.y = 0f;
+
+            float distance = Vector3.Distance(attackPoint.position, player.position);
+            bool canAttack = !isAttacking && Time.time - lastAttackTime >= attackCooldown;
+
+            // Solo atacamos si estamos en rango, no estamos atacando y pasó el cooldown
+            if (distance <= attackRange && canAttack)
+            {
+                isAttacking = true;
+                lastAttackTime = Time.time;
+
+                // Detenemos movimiento y animaciones
+                animHandler.SetVelocityBody(0f);
+                animHandler.SetVelocityLegs(0f);
+                animHandler.SetIsRunningBody(false);
+                animHandler.SetIsRunningLegs(false);
+                animHandler.SetTurnningBody(false);
+                animHandler.SetStunnedBody(false);
+                animHandler.SetStunnedLegs(false);
+
+                // Lanza animación de ataque
+                animHandler.SetAttackBody();
+            }
         }
     }
 
     #region Public Methods
-    // Asigna el objetivo del jugador
     public void SetTarget(Transform target)
     {
         player = target;
     }
 
+    /// <summary>
+    /// Llamado desde Animation Event en el momento del golpe
+    /// </summary>
     public void ResolveAttackHit()
-    {
-        AttackPlayer();
-    }
-    #endregion
-
-    #region Internal Logic
-    void AttackPlayer()
     {
         if (player == null) return;
 
-        // Llamamos al PlayerHealth
-        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-        if(playerHealth == null || !playerHealth.IsAlive) return;
+        float distance = Vector3.Distance(attackPoint.position, player.position);
+        if (distance > attackRange) return;
 
         Vector3 hitDirection = (player.position - transform.position).normalized;
-        playerHealth.TakeHit(hitDirection);
+        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+        if (playerHealth != null && playerHealth.IsAlive)
+        {
+            playerHealth.TakeHit(hitDirection);
+        }
+
+        // Desbloquea para el próximo ataque
+        isAttacking = false;
     }
     #endregion
 }

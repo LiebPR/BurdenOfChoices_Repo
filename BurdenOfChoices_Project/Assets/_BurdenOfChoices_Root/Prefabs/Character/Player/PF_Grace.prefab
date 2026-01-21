@@ -1717,7 +1717,6 @@ MonoBehaviour:
   inertiaFactor: 0.15
   rotationNoise: 0.02
   freeRotationSensitivity: 150
-  freeRotationDamping: 0
   weightSpeedSensitivity: 0.3
   weightAccelerationSensitivity: 0.1
   rb: {fileID: 0}
@@ -1889,7 +1888,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkNoiseInterval: 0.6
-  runNoiseInterval: 0.35
   walkNoiseDelay: 0.25
   runNoiseDelay: 0.15
   minSpeedToEmit: 0.2

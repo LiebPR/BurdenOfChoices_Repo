@@ -74,7 +74,7 @@ public class DialogSystem : MonoBehaviour
             return;
         }
 
-        dialogUI.SetText(currentDialog.lines[currentLineIndex]);
+        dialogUI.SetText(currentDialog.lines[currentLineIndex], currentDialog.typeSpeed);
 
         // Actualizar retrato con fade
         Sprite portrait = null;

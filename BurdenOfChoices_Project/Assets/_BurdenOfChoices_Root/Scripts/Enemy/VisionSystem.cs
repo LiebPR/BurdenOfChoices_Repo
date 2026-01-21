@@ -151,12 +151,6 @@ public class VisionSystem : MonoBehaviour
         {
             perceptionTimer = 0f;
         }
-
-        // Debug centralizado
-        if (perceptionDebuging)
-        {
-            Debug.Log($"[VisionDebug] Target:{Target.name} CanSee:{canSeePlayer} InCone:{inCone} Obstacle:{obstacleRay} InPerception:{inPerception}");
-        }
     }
     #endregion
 

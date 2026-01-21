@@ -21,6 +21,7 @@ public class DialogData : ScriptableObject
     [Header("Settings")]
     [Tooltip("Avance automático del diálogo.")]
     public bool autoAdvance;
+    public float typeSpeed = 0.03f;
 
     [Tooltip("Tiempo entre líneas si el avance es automático.")]
     public float autoAdvanceDelay = 2f;

@@ -30,11 +30,11 @@ public class EnemyHealth : MonoBehaviour
     #endregion
 
     #region Internal States
-    bool firstLifeBroken; // Indica si el primer golpe ya ocurrió
-    bool isDead; // Indica si el enemigo murió
-    bool deadAfterStun; //Indica si has muerto tras el stun
+    bool firstLifeBroken;
+    bool isDead;
+    bool deadAfterStun;
     bool isStunned;
-    float stunTimer; // Temporizador de stun
+    float stunTimer;
     int lastHitDamage;
     #endregion
 
@@ -44,11 +44,12 @@ public class EnemyHealth : MonoBehaviour
     Rigidbody rb;
     EnemyMovementCommands movementCommands;
     EnemyAnimationHandler animationHandler;
+    EnemyPerceptionFeedback perceptionFeedback;
     #endregion
 
     #region Getters
-    public Vector3 LastHitDirection {  get; private set; } //Diracción del último impacto
-    public float LastKncokBack {  get; private set; } //Fuerza del último impacto.
+    public Vector3 LastHitDirection { get; private set; }
+    public float LastKncokBack { get; private set; }
     #endregion
 
     private void Awake()
@@ -57,6 +58,7 @@ public class EnemyHealth : MonoBehaviour
         fsm = GetComponent<EnemyFSM>();
         rb = GetComponent<Rigidbody>();
         animationHandler = GetComponent<EnemyAnimationHandler>();
+        perceptionFeedback = GetComponent<EnemyPerceptionFeedback>();
     }
 
     private void Start()
@@ -69,7 +71,6 @@ public class EnemyHealth : MonoBehaviour
 
     private void OnEnable()
     {
-        //Escucha eventos de vida
         healthSystem.OnHit += HandleHit;
         healthSystem.OnDeath += HandleDeath;
     }
@@ -82,18 +83,13 @@ public class EnemyHealth : MonoBehaviour
 
     private void Update()
     {
-        //Controla la salida del stun
         HandleStunRecovery();
     }
 
     #region Public API
-    /// <summary>
-    /// Entrada externa de daño.
-    /// Registra contexto del golpe antes de delegar en HealthSystem.
-    /// </summary>
     public void TakeHit(int damage, Vector3 hitDirection, float knockBack)
     {
-        if(isDead) return;
+        if (isDead) return;
 
         lastHitDamage = damage;
         LastHitDirection = hitDirection;
@@ -104,33 +100,26 @@ public class EnemyHealth : MonoBehaviour
     #endregion
 
     #region Event Handlers
-    /// <summary>
-    /// Reacciona a un golpe recibido.
-    /// Decide entre stun, muerte o ignorar.
-    /// </summary>
     void HandleHit(int currentHealth)
     {
         if (isDead) return;
-        
-        //Muerte instantánea REAL
-        if(lastHitDamage >= instantKillDamage && currentHealth <= 0)
+
+        if (lastHitDamage >= instantKillDamage && currentHealth <= 0)
         {
             deadAfterStun = false;
-            return; //OnDeath llegará desde HealthSystem
+            return;
         }
 
-        // Primer golpe → STUN
         if (!firstLifeBroken && currentHealth > 0)
         {
             firstLifeBroken = true;
 
-            movementCommands.EnterPhysicalMode();  
+            movementCommands.EnterPhysicalMode();
             RotateOppositeToHit(LastHitDirection);
             StartCoroutine(KnockbackRoutine(LastHitDirection, LastKncokBack));
 
             EnterStun();
         }
-        // Segundo golpe → muerte tras stun
         else if (firstLifeBroken && currentHealth <= 0)
         {
             isDead = true;
@@ -139,13 +128,11 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Respuesta directa a muerte confirmada.
-    /// </summary>
     void HandleDeath()
     {
         isDead = true;
 
+        // Apagar todos los sprites de animación y viñeta
         animationHandler.SetVelocityBody(0f);
         animationHandler.SetVelocityLegs(0f);
 
@@ -168,14 +155,17 @@ public class EnemyHealth : MonoBehaviour
             animationHandler.SetDeathLegs();
         }
 
+        // Apagar feedback de viñeta para evitar accesos inválidos
+        if (perceptionFeedback != null)
+        {
+            perceptionFeedback.ClearFeedback();
+        }
+
         fsm.OnDeath();
     }
     #endregion
 
     #region Stun Logic
-    /// <summary>
-    /// Entrada al estado de stun.
-    /// </summary>
     void EnterStun()
     {
         if (isStunned) return;
@@ -183,7 +173,6 @@ public class EnemyHealth : MonoBehaviour
         isStunned = true;
         stunTimer = stunDuration;
 
-        //Aniamtios
         animationHandler.SetStunBody();
         animationHandler.SetStunLegs();
 
@@ -195,16 +184,12 @@ public class EnemyHealth : MonoBehaviour
 
         animationHandler.SetTurnningBody(false);
 
-
         animationHandler.SetStunnedBody(true);
         animationHandler.SetStunnedLegs(true);
 
         fsm.OnStun();
     }
 
-    /// <summary>
-    /// Controla el tiempo de recuperación del stun.
-    /// </summary>
     void HandleStunRecovery()
     {
         if (fsm.CurrentState != EnemyState.Stun) return;
@@ -217,28 +202,22 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Restaura estado normal tras el stun.
-    /// </summary>
     void RecoverFromStun()
     {
         isStunned = false;
         firstLifeBroken = false;
 
-        healthSystem.HealFull(); // Recupera la primera vida
+        healthSystem.HealFull();
 
         animationHandler.SetStunnedBody(false);
         animationHandler.SetStunnedLegs(false);
 
         movementCommands.ExitPhysicalMode(enemyData.patrolSpeed, enemyData.normalAcceleration);
-        fsm.OnPatrol(); // Volver al estado de patrulla o idle
+        fsm.OnPatrol();
     }
     #endregion
 
     #region Knockback Coroutine
-    /// <summary>
-    /// Aplica retroceso físico usando Rigidbody.
-    /// </summary>
     IEnumerator KnockbackRoutine(Vector3 direction, float force)
     {
         if (rb == null) yield break;
@@ -246,13 +225,12 @@ public class EnemyHealth : MonoBehaviour
         Vector3 planarDir = new Vector3(direction.x, 0f, direction.z).normalized;
 
         float elapsed = 0f;
-        while(elapsed < knockbackDuration)
+        while (elapsed < knockbackDuration)
         {
             float t = elapsed / knockbackDuration;
             float multiplier = knockbackCurve.Evaluate(t);
 
-            //Movimiento físico directo
-            rb.linearVelocity = planarDir * force * multiplier; // Asignamos velocidad directamente
+            rb.linearVelocity = planarDir * force * multiplier;
 
             elapsed += Time.deltaTime;
             yield return null;
@@ -260,14 +238,13 @@ public class EnemyHealth : MonoBehaviour
     }
     #endregion
 
-    #region Utilitis
+    #region Utilities
     void RotateOppositeToHit(Vector3 hitDirection)
     {
         Vector3 planarDir = new Vector3(hitDirection.x, 0f, hitDirection.z);
 
         if (planarDir.sqrMagnitude < 0.0001f) return;
 
-        // Mirar en dirección contraria al golpe
         Quaternion targetRotation = Quaternion.LookRotation(-planarDir.normalized);
         transform.rotation = targetRotation;
     }

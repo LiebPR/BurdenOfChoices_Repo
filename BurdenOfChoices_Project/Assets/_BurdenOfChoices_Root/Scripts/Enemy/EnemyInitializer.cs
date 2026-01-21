@@ -29,7 +29,6 @@ public class EnemyInitializer : MonoBehaviour
 
         // Obtenemos referencias que dependen de otros componentes inicializados en Awake()
         moveContext = GetComponent<EnemyMotionContext>();
-
         fsm = GetComponent<EnemyFSM>();
         vision = GetComponent<VisionSystem>();
         health = GetComponent<EnemyHealth>();

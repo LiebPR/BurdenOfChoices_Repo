@@ -52,6 +52,9 @@ public class PlayerController : MonoBehaviour
 
     //DRAG
     Vector3 dragAxisLocked = Vector3.zero; //eje que se bloquea durante drag
+
+    //GAME STOP MANAGER
+    bool wasGamePaused;
     #endregion
 
     #region Getters
@@ -72,7 +75,24 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+        bool isPaused = GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused;
+
+        // TRANSICIÓN: Playing → Paused
+        if (isPaused && !wasGamePaused)
+        {
+            PausePlayer();
+
+            animatorManager.RestoreAnimator();
+        }
+        // TRANSICIÓN: Paused → Playing
+        else if (!isPaused && wasGamePaused)
+        {
+            ResumePlayer();
+        }
+
+        wasGamePaused = isPaused;
+
+        if (isPaused)
             return;
 
         if (freeRotation)
@@ -129,8 +149,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
-            return;
+        if (movementLocked) return;
 
         HandleMovementSpeed();
         UpdateAnimatorVelocity();
@@ -182,11 +201,15 @@ public class PlayerController : MonoBehaviour
     public void PausePlayer()
     {
         movementLocked = true;
-        rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+
+        // Reset de velocidad planar y vertical
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
         // Bloquear Rigidbody completamente
         rb.isKinematic = true;
 
-        // Reset SmoothDamp
+        // Reset SmoothDamp y input
         currentVelocitySmooth = Vector3.zero;
         inputMovement = Vector2.zero;
     }
