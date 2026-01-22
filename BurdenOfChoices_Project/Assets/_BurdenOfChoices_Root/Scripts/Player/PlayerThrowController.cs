@@ -1,70 +1,102 @@
-using UnityEngine;
+ï»¿using UnityEngine;
+using System.Collections;
 
 /// <summary>
-/// PlayerThrowController: Es el que gestiona el input de lanzar objetos.
+/// PlayerThrowController: Gestiona el input, carga y lanzamiento de objetos.
+/// Toda la lÃ³gica de gameplay vive aquÃ­. El Animator es solo visual.
 /// </summary>
 public class PlayerThrowController : MonoBehaviour
 {
     #region Inspector Variables
-    [Header("Refs")]
-    [SerializeField] Transform throwDirectionSource; //transform que indica la dirección de lanzamiento
-    [SerializeField] Transform throwPreview; //imagen que indica el punto final del lanzamiento
 
-    [Header("Cooldown")]
-    [SerializeField] float throwCooldown = 1.0f; //segundos entre lanzamientos
+    [Header("Refs")]
+    [SerializeField] Transform throwDirectionSource;
+    [SerializeField] Transform throwPreview;
+
+    [Header("Throw Settings")]
+    [SerializeField] float throwDelay = 0.25f;
 
     [Header("Hold Settings")]
-    [SerializeField] float holdSpeed = 0.5f; //velocidad de carga
-    [SerializeField] float verticalThrowForce = 0.25f; //fuerza vertical aplicada al lanzar
-    [SerializeField] float minThrowDistance = 2f; //fuerza mínima
-    [SerializeField] float maxThrowDistance = 10f; //fuerza máxima
+    [SerializeField] float holdSpeed = 0.5f;
+    [SerializeField] float verticalThrowForce = 0.25f;
+    [SerializeField] float minThrowDistance = 2f;
+    [SerializeField] float maxThrowDistance = 10f;
 
-    [Header("PreviewPoint")]
-    [SerializeField] float simulationAirResistance = 0.1f; //resistencia al aire usada en la preview
-    [SerializeField] float previewHeightOffset = 0.05f; //altura por encima del suelo del preview
-    [SerializeField] float throwFollowSpeed = 8f; //cuán ráìdo sigue la rotación del jugador
+    [Header("Preview Settings")]
+    [SerializeField] float simulationAirResistance = 0.1f;
+    [SerializeField] float previewHeightOffset = 0.05f;
+    [SerializeField] float throwFollowSpeed = 8f;
+
     #endregion
 
-    #region Internal States
+    #region Internal State
+
     float holdTime;
     bool isHolding;
 
-    //Cooldown
-    float cooldownEndTime;
-
-    //Valores ajustados en tiempo de ejecución
-    float currentWeight = 1f; 
+    // Valores efectivos segÃºn peso
+    float currentWeight = 1f;
     float weightFactor = 1f;
     float effectiveHoldSpeed;
     float effectiveMinThrowDistance;
     float effectiveMaxThrowDistance;
     float effectiveVerticalThrowForce;
 
-    Vector3 throwDirectionSmoothed; //direccion suavizada para la previa
+    // DirecciÃ³n suavizada durante el hold
+    Vector3 throwDirectionSmoothed;
+
+    // ðŸ”’ Valores congelados al soltar
+    Vector3 cachedThrowDirection;
+    float cachedThrowDistance;
+
+    Coroutine throwCoroutine;
+
     #endregion
 
     #region References
+
     PickableBehaviour pickable;
     ThrowableBehaviour throwable;
     AnimatorManager animatorManager;
+
     #endregion
 
-    private void Awake()
+    #region Unity Lifecycle
+
+    void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
     }
 
-    private void Start()
+    void Start()
     {
         if (throwPreview != null)
-        {
             throwPreview.gameObject.SetActive(false);
-        }
-        ResetEffectiveValues();    
+
+        ResetEffectiveValues();
     }
 
-    #region Input Event Subscriptions
-    private void OnEnable()
+    void Update()
+    {
+        if (!isHolding) return;
+
+        if (pickable == null || throwable == null || !pickable.IsCatched)
+        {
+            CancelHold();
+            return;
+        }
+
+        holdTime += Time.deltaTime * effectiveHoldSpeed;
+        holdTime = Mathf.Clamp01(holdTime);
+
+        UpdateThrowPreview();
+    }
+
+    #endregion
+
+    #region Input Subscriptions
+
+    void OnEnable()
     {
         InputManager.OnThrowPressed += StartHold;
         InputManager.OnThrowReleased += ReleaseThrow;
@@ -73,7 +105,7 @@ public class PlayerThrowController : MonoBehaviour
         PickableBehaviour.OnDropped += ClearCurrentPickable;
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         InputManager.OnThrowPressed -= StartHold;
         InputManager.OnThrowReleased -= ReleaseThrow;
@@ -81,56 +113,23 @@ public class PlayerThrowController : MonoBehaviour
         PickableBehaviour.OnEquipped -= SetCurrentPickable;
         PickableBehaviour.OnDropped -= ClearCurrentPickable;
     }
+
     #endregion
 
-    private void Update()
-    {
-        if (isHolding)
-        {
-            // Si ya no hay throwable, cancelamos Hold
-            if (throwable == null || pickable == null || !pickable.IsCatched)
-            {
-                CancelHold();
-                return;
-            }
-
-            // Chequeo de cooldown
-            if (IsInCooldown())
-            {
-                CancelHold();
-                return;
-            }
-
-            // Aumentar holdTime
-            holdTime += Time.deltaTime * effectiveHoldSpeed;
-            holdTime = Mathf.Clamp01(holdTime);
-
-            UpdateThrowPreview();
-        }
-    }
+    #region Pickable Handling
 
     void SetCurrentPickable(PickableBehaviour p)
     {
         pickable = p;
         throwable = p.GetComponent<ThrowableBehaviour>();
 
-        //Intentamos obtener el EquipableData desde el componente EquipableItem
         var equipableItem = p.GetComponent<EquipableItem>();
-        if(equipableItem != null && equipableItem.Data != null)
-        {
-            currentWeight = equipableItem.Data.weight;
-        }
-        else
-        {
-            currentWeight = 1f; //valor por defecto
-        }
+        currentWeight = (equipableItem != null && equipableItem.Data != null)
+            ? equipableItem.Data.weight
+            : 1f;
 
-        //Calculamos el factor de peso.
-        //Evitamos división por cer y limitamos entre 0.15 y 1 para que no sea 0.
-        weightFactor = 1f / Mathf.Max(currentWeight, 0.1f);
-        weightFactor = Mathf.Clamp(weightFactor, 0.15f, 1f);
+        weightFactor = Mathf.Clamp(1f / Mathf.Max(currentWeight, 0.1f), 0.15f, 1f);
 
-        //Aplicamos el factor a las variables efectivas
         effectiveHoldSpeed = holdSpeed * weightFactor;
         effectiveMinThrowDistance = minThrowDistance * weightFactor;
         effectiveMaxThrowDistance = maxThrowDistance * weightFactor;
@@ -139,80 +138,114 @@ public class PlayerThrowController : MonoBehaviour
 
     void ClearCurrentPickable(PickableBehaviour p)
     {
-        if (pickable == p)
-        {
-            pickable = null;
-            throwable = null;
+        if (pickable != p) return;
 
-            if (throwPreview != null)
-                throwPreview.gameObject.SetActive(false);
+        CancelHold();
+        pickable = null;
+        throwable = null;
+        ResetEffectiveValues();
 
-            //Restauramos valores por defecto
-            ResetEffectiveValues();
-
-            if (isHolding)
-            {
-                isHolding = false;
-                animatorManager.EndHold();
-            }
-
-            //Restauramos movimiento y agachado
-            var playerController = GetComponent<PlayerController>();
-            if (playerController != null)
-            {
-                playerController.ResumePlayer();//desbloqueamos movimiento
-                playerController.UnlockCrouch(); //desbloqueamos agachar
-                playerController.EnableFreeRotation(false); //vuelvea rotación normal en movimiento 
-            }
-        }
+        if (throwPreview != null)
+            throwPreview.gameObject.SetActive(false);
     }
+
+    #endregion
+
+    #region Hold / Release Logic
 
     void StartHold()
     {
-        var playerController = GetComponent<PlayerController>();
+        var player = GetComponent<PlayerController>();
 
-        //No lanzar agachado
-        if (playerController != null && playerController.IsCrouching)
-            return;
+        if (player != null && player.IsCrouching) return;
+        if (pickable == null || throwable == null || !pickable.IsCatched) return;
 
-        //No lanzar si está en cooldown
-        if (IsInCooldown()) return;
-
-        //No lanzar si no hay objeto agarrado
-        if (pickable == null || !pickable.IsCatched) return;
-
-        //No lanzar si no tiene ThrowableBehaviour
-        if (throwable == null) return;
-
-        //Solo si es lanzable activamos Hold
-        animatorManager.StartHold();
         isHolding = true;
         holdTime = 0f;
 
-        // Bloqueo de movimiento y crouch
-        if (playerController != null)
+        animatorManager.StartHold();
+
+        if (player != null)
         {
-            playerController.PausePlayer();
-            playerController.LockCrouch();
-            playerController.EnableFreeRotation(true);
+            player.PausePlayer();
+            player.LockCrouch();
+            player.EnableFreeRotation(true);
         }
 
-        // Inicializamos dirección suavizada para la preview
         throwDirectionSmoothed = throwDirectionSource.forward;
 
-        if (throwPreview != null && throwDirectionSource != null)
-        {
+        if (throwPreview != null)
             throwPreview.gameObject.SetActive(true);
+    }
 
-            float previewForce = effectiveMinThrowDistance;
-            Vector3 predicted = PredictLandingPoint(
-                throwDirectionSource.position,
-                throwDirectionSmoothed,
-                previewForce,
-                effectiveVerticalThrowForce
-            );
-            throwPreview.position = predicted;
+    void ReleaseThrow()
+    {
+        if (!isHolding || throwable == null)
+        {
+            CancelHold();
+            return;
         }
+
+        isHolding = false;
+
+        // Congelamos datos definitivos
+        cachedThrowDirection = throwDirectionSmoothed;
+        cachedThrowDistance = Mathf.Lerp(
+            effectiveMinThrowDistance,
+            effectiveMaxThrowDistance,
+            holdTime
+        );
+
+        animatorManager.TriggerThrow();
+
+        if (throwPreview != null)
+            throwPreview.gameObject.SetActive(false);
+
+        var player = GetComponent<PlayerController>();
+        if (player != null)
+        {
+            player.ResumePlayer();
+            player.UnlockCrouch();
+            player.EnableFreeRotation(false);
+        }
+
+        if (throwCoroutine != null)
+            StopCoroutine(throwCoroutine);
+
+        throwCoroutine = StartCoroutine(DelayedThrow());
+    }
+
+    IEnumerator DelayedThrow()
+    {
+        yield return new WaitForSeconds(throwDelay);
+        yield return StartCoroutine(ExecuteThrowRoutine());
+    }
+
+    IEnumerator ExecuteThrowRoutine()
+    {
+        if (pickable == null || throwable == null)
+            yield break;
+
+        // LiberaciÃ³n fÃ­sica
+        pickable.transform.parent = null;
+
+        Rigidbody rb = pickable.rb;
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.constraints = RigidbodyConstraints.None;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.WakeUp();
+
+        // Esperamos a que el solver registre el cuerpo
+        yield return new WaitForFixedUpdate();
+
+        // Lanzamiento REAL
+        throwable.OnThrow(
+            cachedThrowDirection,
+            cachedThrowDistance,
+            effectiveVerticalThrowForce
+        );
     }
 
     void CancelHold()
@@ -220,161 +253,83 @@ public class PlayerThrowController : MonoBehaviour
         isHolding = false;
         holdTime = 0f;
 
-        if(throwPreview != null)
+        if (throwPreview != null)
             throwPreview.gameObject.SetActive(false);
 
         animatorManager.EndHold();
 
-        var playerController = GetComponent<PlayerController>();
-        if(playerController != null)
+        var player = GetComponent<PlayerController>();
+        if (player != null)
         {
-            playerController.ResumePlayer();
-            playerController.UnlockCrouch();
-            playerController.EnableFreeRotation(false);
+            player.ResumePlayer();
+            player.UnlockCrouch();
+            player.EnableFreeRotation(false);
         }
     }
 
-    void ReleaseThrow()
-    {
-        //Si no hay throwable, cancelamos animación
-        if(!isHolding || throwable == null)
-        {
-            CancelHold();
-            return;
-        }
-
-        isHolding = false;
-        animatorManager.TriggerThrow();
-
-        if(throwPreview != null)
-            throwPreview.gameObject.SetActive(false);
-
-        //Restauramos movimiento y agachado
-        var playerController = GetComponent<PlayerController>();
-        if(playerController != null)
-        {
-            playerController.ResumePlayer();//desbloqueamos movimiento
-            playerController.UnlockCrouch(); //desbloqueamos agachar
-            playerController.EnableFreeRotation(false); //vuelvea rotación normal en movimiento 
-        }
-        //Guardamos la fuerza final, pero NO lanzamos aquí
-        holdTime = Mathf.Clamp01(holdTime);
-    }
-
-    public void ExecuteThrow()
-    {
-        //Solo lanzar si hay objeto y es lanzable
-        if (pickable == null || throwable == null) return;
-
-        float throwDistance = Mathf.Lerp(effectiveMinThrowDistance, effectiveMaxThrowDistance, holdTime);
-
-        // Usamos la dirección suavizada en lugar de la dirección directa
-        throwable.OnThrow(throwDirectionSmoothed, throwDistance, effectiveVerticalThrowForce);
-
-        StartCooldown();
-        holdTime = 0f;
-    }
-
-    #region Cooldown Logic
-    bool IsInCooldown()
-    {
-        return Time.time < cooldownEndTime;
-    }
-
-    void StartCooldown()
-    {
-        cooldownEndTime = Time.time + throwCooldown;
-    }
     #endregion
 
-    #region Preview Hold Methods
+    #region Preview
+
     void UpdateThrowPreview()
     {
         if (throwPreview == null || throwDirectionSource == null) return;
 
-        float currentForce = Mathf.Lerp(effectiveMinThrowDistance, effectiveMaxThrowDistance, holdTime);
-        Vector3 origin = throwDirectionSource.position;
+        throwDirectionSmoothed = Vector3.Slerp(
+            throwDirectionSmoothed,
+            throwDirectionSource.forward,
+            throwFollowSpeed * Time.deltaTime
+        );
 
-        // Suavizamos la dirección hacia la actual del jugador
-        throwDirectionSmoothed = Vector3.Slerp(throwDirectionSmoothed, throwDirectionSource.forward, throwFollowSpeed * Time.deltaTime);
+        float force = Mathf.Lerp(
+            effectiveMinThrowDistance,
+            effectiveMaxThrowDistance,
+            holdTime
+        );
 
-        // Calculamos la predicción usando la dirección suavizada
-        Vector3 predicted = PredictLandingPoint(origin, throwDirectionSmoothed, currentForce, effectiveVerticalThrowForce);
+        Vector3 predicted = PredictLandingPoint(
+            throwDirectionSource.position,
+            throwDirectionSmoothed,
+            force,
+            effectiveVerticalThrowForce
+        );
+
         throwPreview.position = predicted;
-
-        if (!throwPreview.gameObject.activeSelf)
-            throwPreview.gameObject.SetActive(true);
     }
 
-    //Predice el punto de impacto de un impulso aplicado en 'origin' en la dirección y componente vertical indicadas.
     Vector3 PredictLandingPoint(Vector3 origin, Vector3 direction, float forceImpulse, float verticalImpulse)
     {
-        // Usamos la dirección tal cual (incluye su componente Y) para reflejar exactamente
-        Vector3 dirNormalized = (direction.sqrMagnitude > 0.0001f) ? direction.normalized : Vector3.forward;
+        Vector3 dir = direction.normalized;
 
-        // Determinar masa para convertir impulso a velocidad inicial
-        float mass = 1f;
-        if (pickable != null && pickable.rb != null)
-        {
-            mass = Mathf.Max(0.0001f, pickable.rb.mass);
-        }
+        float mass = (pickable != null && pickable.rb != null)
+            ? Mathf.Max(0.0001f, pickable.rb.mass)
+            : 1f;
 
-        // Usar simulationAirResistance en lugar de Rigidbody.drag (evita uso de propiedad obsoleta)
-        float simDrag = Mathf.Max(0f, simulationAirResistance);
-
-        // Calculamos el impulso exactamente como en el lanzamiento real
-        Vector3 impulse = dirNormalized * forceImpulse + Vector3.up * verticalImpulse;
-        Vector3 velocity = impulse / mass;
-
-        // Simulación discreta
-        float dt = 0.02f; // paso de simulación
-        float maxSimTime = 5f; // tiempo máximo a simular
+        Vector3 velocity = (dir * forceImpulse + Vector3.up * verticalImpulse) / mass;
         Vector3 pos = origin;
 
-        for (float t = 0f; t < maxSimTime; t += dt)
-        {
-            // Integración velocidad con gravedad
-            velocity += Physics.gravity * dt;
+        float dt = 0.02f;
+        float maxTime = 5f;
 
-            // Aproximación simple del efecto de resistencia del aire
-            if (simDrag > 0f)
-            {
-                velocity *= Mathf.Exp(-simDrag * dt);
-            }
+        for (float t = 0f; t < maxTime; t += dt)
+        {
+            velocity += Physics.gravity * dt;
+            velocity *= Mathf.Exp(-simulationAirResistance * dt);
 
             Vector3 nextPos = pos + velocity * dt;
 
-            // Raycast entre pos y nextPos para detectar colisión con el mundo
-            Vector3 segment = nextPos - pos;
-            float segmentLength = segment.magnitude;
-            if (segmentLength > 0f)
-            {
-                RaycastHit hit;
-                if(Physics.Raycast(pos, segment.normalized, out hit, segmentLength + 0.001f))
-                {
-                    return hit.point + Vector3.up * previewHeightOffset; //ajustamos un poco hacia arriba
-                }
-            }
+            if (Physics.Raycast(pos, nextPos - pos, out RaycastHit hit, (nextPos - pos).magnitude))
+                return hit.point + Vector3.up * previewHeightOffset;
 
             pos = nextPos;
-
-            // Si hemos caído muy por debajo del origen y no hay colisión, cortamos
-            if (pos.y < origin.y - 50f) break;
         }
 
-        // Si no colisionamos durante la simulación, hacemos un raycast hacia abajo desde la última posición simulada
-        RaycastHit groundHit;
-        Vector3 rayStart = pos + Vector3.up * 2f;
-        if (Physics.Raycast(rayStart, Vector3.down, out groundHit, 100f))
-        {
-            return groundHit.point;
-        }
-
-        // Fallback: devolver la última posición simulada manteniendo la altura de origen
-        pos.y = origin.y;
         return pos;
     }
+
     #endregion
+
+    #region Utils
 
     void ResetEffectiveValues()
     {
@@ -385,4 +340,6 @@ public class PlayerThrowController : MonoBehaviour
         effectiveMaxThrowDistance = maxThrowDistance;
         effectiveVerticalThrowForce = verticalThrowForce;
     }
+
+    #endregion
 }

@@ -1,7 +1,6 @@
 using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -52,9 +51,21 @@ public class PlayerHealth : MonoBehaviour
     {
         if (!isAlive) return;
 
-        isAlive = false; // jugador muere al primer golpe
+        isAlive = false;
         lastHitDirection = hitDirection;
+
+        //1. Pusar juego (estado global)
+        GameStopManager.Instance.PauseGame();
+
+        //2.Bloquear input del player (estado local)
+        var controller = GetComponent<PlayerController>();
+        if(controller != null)
+            controller.PausePlayer();
+
+        // Aplicar knockback inmediatamente
         ApplyKnockback(hitDirection);
+
+        // Manejar muerte (animación y lógica)
         HandleDeath();
     }
 
@@ -80,7 +91,14 @@ public class PlayerHealth : MonoBehaviour
     void ApplyKnockback(Vector3 hitDirection)
     {
         Vector3 planDir = new Vector3(hitDirection.x, 0f, hitDirection.z).normalized;
-        rb.AddForce(planDir * knockbackForce, ForceMode.Impulse);
+        float knockbackStrength = knockbackForce;
+
+        // Enviar el knockback al PlayerController
+        var controller = GetComponent<PlayerController>();
+        if (controller != null)
+        {
+            controller.AddExternalImpulse(planDir * knockbackForce);
+        }
     }
 
     void HandleDeath()
@@ -89,8 +107,6 @@ public class PlayerHealth : MonoBehaviour
         RotateAwayFromHit();
 
         animatorManager.DeathAnim();
-
-        GameStopManager.Instance.PauseGame();
 
         var vision = FindAnyObjectByType<VisionSystem>();
         if (vision != null) vision.ResetVisionToDefault();
@@ -109,14 +125,8 @@ public class PlayerHealth : MonoBehaviour
             return;
         }
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
         transform.position = respawnPoint.position;
         transform.rotation = respawnPoint.rotation;
-
-        var controller = GetComponent<PlayerController>();
-        if (controller != null) controller.enabled = true;
 
         isAlive = true;
     }

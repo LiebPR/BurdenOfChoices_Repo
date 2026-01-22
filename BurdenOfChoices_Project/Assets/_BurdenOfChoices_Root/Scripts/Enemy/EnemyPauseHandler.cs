@@ -17,7 +17,6 @@ public class EnemyPauseHandler : MonoBehaviour
 
     #region Internal States
     bool wasPaused = false;
-    string entryStateName = "Idle"; // nombre de animación base (Entry)
     #endregion
 
     private void Awake()

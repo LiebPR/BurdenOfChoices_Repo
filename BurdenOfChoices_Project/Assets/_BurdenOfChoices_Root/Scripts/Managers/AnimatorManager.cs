@@ -26,8 +26,6 @@ public class AnimatorManager : MonoBehaviour
     static readonly int IsThrowingHash = Animator.StringToHash("IsThrowing");
     static readonly int ThrowHash = Animator.StringToHash("Throw");
     static readonly int IsDeathHash = Animator.StringToHash("IsDeath");
-
-    static readonly int IsRestoreIdleHash = Animator.StringToHash("RestoreIdle");
     #endregion
 
     #region State

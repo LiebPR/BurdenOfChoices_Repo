@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BillboardFull : MonoBehaviour
+public class Billboard : MonoBehaviour
 {
     Camera mainCamera;
 

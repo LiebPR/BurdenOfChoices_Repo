@@ -178,19 +178,20 @@ public class PickableBehaviour : MonoBehaviour
     public void OnDrop(bool force = false)
     {
         //Si forzamos y no hay suelo detectado, no soltamos (se queda en la mano)
-        if(!force && !IsGrounded())
+        if (!force && !IsGrounded())
         {
             pendingDropRequest = true;
 
-            //Asegurar que el estado permanece como 'cogido' y que siga parentado al cathPoint
             isCatched = true;
             SnapTopGrabPoint();
-            if(rb != null)
+
+            if (rb != null)
             {
                 rb.isKinematic = true;
                 rb.useGravity = false;
                 coll.isTrigger = true;
             }
+
             return;
         }
 

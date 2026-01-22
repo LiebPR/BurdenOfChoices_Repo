@@ -23,7 +23,7 @@ public class ThrowableBehaviour : MonoBehaviour
         if (!pickable.IsCatched) return;
 
         //Priemro dropeamos para reactivar física
-        pickable.OnDrop();
+        pickable.OnDrop(true);
 
         Vector3 appliedForce = direction.normalized * horizontalForce + Vector3.up * verticalForce;
 

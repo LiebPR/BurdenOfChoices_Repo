@@ -6,13 +6,17 @@ public class DeathState : MonoBehaviour, IEnemyState
     EnemyFSM fsm;
     EnemyMovementCommands movementCommands;
     EnemyLightHandler enemyLight;
+    VisionSystem visionSystem;                       // Nueva referencia
+    EnemyPerceptionFeedback perceptionFeedback;    // Nueva referencia
     #endregion
 
-    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, EnemyLightHandler lightHandler)
+    public void Initialize(EnemyFSM enemyFsm, EnemyMovementCommands commands, EnemyLightHandler lightHandler, VisionSystem vision, EnemyPerceptionFeedback feedback)
     {
         fsm = enemyFsm;
         movementCommands = commands;
         enemyLight = lightHandler;
+        visionSystem = vision;
+        perceptionFeedback = feedback;
     }
 
     public void Enter()
@@ -20,13 +24,17 @@ public class DeathState : MonoBehaviour, IEnemyState
         // Detener cualquier movimiento controlado
         movementCommands.PauseMovement();
 
-        // FSM ya no debe procesar lógica
-        fsm.enabled = false;
-
+        // Apagar luz del enemigo
         enemyLight.TurnOff();
 
-        // Desactivar todos los componentes innecesarios
-        DisableEnemyLogic();
+        // Apagar visión y feedback
+        if (visionSystem != null)
+            visionSystem.enabled = false;
+
+        if (perceptionFeedback != null)
+            perceptionFeedback.enabled = false;
+
+        DisablePhysicsAndColliders();
     }
 
     public void Handle() { }
@@ -34,13 +42,18 @@ public class DeathState : MonoBehaviour, IEnemyState
     public void Exit() { }
 
     #region Utilities
-    void DisableEnemyLogic()
+    void DisablePhysicsAndColliders()
     {
-        foreach (var mb in GetComponents<MonoBehaviour>())
+        // Collider
+        foreach (var col in GetComponents<Collider>())
         {
-            if (mb == this) continue;
+            col.enabled = false;
+        }
 
-            mb.enabled = false;
+        // Opcional: otros componentes que afecten físicas
+        foreach (var joint in GetComponents<Joint>())
+        {
+            Destroy(joint); // si hay articulaciones, eliminarlas
         }
     }
     #endregion

@@ -47,12 +47,4 @@ public class AnimationEventRelay : MonoBehaviour
     }
     #endregion
 
-    /// <summary>
-    /// Frame exacto en el que sale el objeto sale de la mano
-    /// </summary>
-    public void OnThrowExecute()
-    {
-        if(throwController != null)
-            throwController.ExecuteThrow();
-    }
 }
