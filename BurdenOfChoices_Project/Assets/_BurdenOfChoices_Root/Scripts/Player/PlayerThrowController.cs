@@ -62,7 +62,6 @@ public class PlayerThrowController : MonoBehaviour
     #endregion
 
     #region Unity Lifecycle
-
     void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
@@ -91,11 +90,9 @@ public class PlayerThrowController : MonoBehaviour
 
         UpdateThrowPreview();
     }
-
     #endregion
 
     #region Input Subscriptions
-
     void OnEnable()
     {
         InputManager.OnThrowPressed += StartHold;
@@ -113,7 +110,6 @@ public class PlayerThrowController : MonoBehaviour
         PickableBehaviour.OnEquipped -= SetCurrentPickable;
         PickableBehaviour.OnDropped -= ClearCurrentPickable;
     }
-
     #endregion
 
     #region Pickable Handling
@@ -123,10 +119,8 @@ public class PlayerThrowController : MonoBehaviour
         pickable = p;
         throwable = p.GetComponent<ThrowableBehaviour>();
 
-        var equipableItem = p.GetComponent<EquipableItem>();
-        currentWeight = (equipableItem != null && equipableItem.Data != null)
-            ? equipableItem.Data.weight
-            : 1f;
+        //Cogemos el peso de PickableBehaviour directamente 
+        currentWeight = pickable != null ? pickable.Weight : 1f;
 
         weightFactor = Mathf.Clamp(1f / Mathf.Max(currentWeight, 0.1f), 0.15f, 1f);
 
@@ -152,7 +146,6 @@ public class PlayerThrowController : MonoBehaviour
     #endregion
 
     #region Hold / Release Logic
-
     void StartHold()
     {
         var player = GetComponent<PlayerController>();
@@ -266,11 +259,9 @@ public class PlayerThrowController : MonoBehaviour
             player.EnableFreeRotation(false);
         }
     }
-
     #endregion
 
     #region Preview
-
     void UpdateThrowPreview()
     {
         if (throwPreview == null || throwDirectionSource == null) return;
@@ -326,11 +317,9 @@ public class PlayerThrowController : MonoBehaviour
 
         return pos;
     }
-
     #endregion
 
     #region Utils
-
     void ResetEffectiveValues()
     {
         currentWeight = 1f;
@@ -340,6 +329,5 @@ public class PlayerThrowController : MonoBehaviour
         effectiveMaxThrowDistance = maxThrowDistance;
         effectiveVerticalThrowForce = verticalThrowForce;
     }
-
     #endregion
 }

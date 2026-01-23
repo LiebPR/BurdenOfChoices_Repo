@@ -27,7 +27,6 @@ public class ThrowImpactDamage : MonoBehaviour
     {
         if (!hasBeenThrown) return;
         if (hasCollided) return;
-        Debug.Log($"Impact layer: {LayerMask.LayerToName(collision.collider.gameObject.layer)}");
 
         EnemyHealth enemy = collision.collider.GetComponent<EnemyHealth>();
         if(enemy != null)

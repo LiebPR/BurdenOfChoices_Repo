@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// PlayerController: Contiene las lógicas de movimiento del jugador con suavizado completo.
@@ -71,7 +72,6 @@ public class PlayerController : MonoBehaviour
     public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     #endregion
 
-    #region Unity Callbacks
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -140,13 +140,12 @@ public class PlayerController : MonoBehaviour
         PickableBehaviour.OnEquipped -= OnPickableEquipped;
         PickableBehaviour.OnDropped -= OnPickableDropped;
     }
-    #endregion
 
     #region Movement Core
     void HandleMovementSpeed()
     {
         // Determinar velocidad objetivo
-        float targetSpeed = walkSpeed;
+        float targetSpeed = (isCrouching ? crouchSpeed : isRunning ? runSpeed : walkSpeed) * currentWeightSpeedMultiplier;
         if (isCrouching) targetSpeed = crouchSpeed;
         else if (isRunning) targetSpeed = runSpeed;
 
@@ -259,7 +258,10 @@ public class PlayerController : MonoBehaviour
         lastMoveDirection = inertialDir;
 
         Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+
+        // Aplicamos WeightFactor para hacer rotación más lenta si el objeto pesa más
+        float adjustedRotationSpeed = rotationSpeed * currentWeightSpeedMultiplier;
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, adjustedRotationSpeed * Time.deltaTime);
     }
 
     void HandleFreeRotation()
@@ -271,7 +273,10 @@ public class PlayerController : MonoBehaviour
         lastMoveDirection = inputDir;
 
         Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, freeRotationSensitivity * Time.deltaTime);
+
+        // También afectamos free rotation con peso
+        float adjustedFreeRotationSpeed = freeRotationSensitivity * 100f * currentWeightSpeedMultiplier;
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, adjustedFreeRotationSpeed * Time.deltaTime);
     }
 
     public void LockRotation() => rotationLocked = true;
@@ -293,9 +298,15 @@ public class PlayerController : MonoBehaviour
     #region Weight Handling
     void OnPickableEquipped(PickableBehaviour p)
     {
-        if (p == null) return;
-        var equipable = p.GetComponent<EquipableItem>();
-        currentEquipWeight = (equipable != null && equipable.Data != null) ? Mathf.Max(1f, equipable.Data.weight) : 1f;
+        if (p == null)
+        {
+            currentEquipWeight = 1f;
+            RecalculateWeightMultiplier();
+            return;
+        }
+
+        // Obtenemos el peso directamente del Pickable
+        currentEquipWeight = Mathf.Max(1f, p.Weight);
         RecalculateWeightMultiplier();
     }
 
@@ -313,6 +324,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // Penalización proporcional al peso
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         currentWeightSpeedMultiplier = Mathf.Clamp(1f - penalty, weightAccelerationSensitivity, 1f);
     }

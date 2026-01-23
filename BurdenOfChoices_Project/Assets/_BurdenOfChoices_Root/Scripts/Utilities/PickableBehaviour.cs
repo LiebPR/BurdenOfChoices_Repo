@@ -48,6 +48,7 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Rferences
     public Rigidbody rb;
+    DataProvider dataProvider;
     #endregion
 
     #region Getters
@@ -59,13 +60,35 @@ public class PickableBehaviour : MonoBehaviour
     public static event Action<PickableBehaviour> OnDropped;
     #endregion
 
+    /// <summary>
+    /// Peso del objeto. Se obtiene desde el DataProvider si existe.
+    /// </summary>
+    public float Weight
+    {
+        get
+        {
+            if (dataProvider == null) return 1f; //peso por defecto
+            var so = dataProvider.Data;
+            if (so == null) return 1f;
+
+            // Buscamos un campo llamado "weight" en el SO
+            var field = so.GetType().GetField("weight");
+            if (field != null)
+                return (float)field.GetValue(so);
+
+            return 1f; // fallback
+        }
+    }
+
     private void Awake()
     {
         if(rb == null)
             rb = GetComponent<Rigidbody>();
 
         if(coll == null)
-            coll = GetComponent<Collider>();
+            Debug.LogError("PickableBehaviour requiere un Collider asignado en el inspector.");
+
+        dataProvider = GetComponent<DataProvider>();
 
         //Guardamos el estado original del objeto
         originalPosition = transform.position;
@@ -203,7 +226,7 @@ public class PickableBehaviour : MonoBehaviour
         transform.SetParent(null);
 
         // Revisar si es arrastrable
-        var draggable = GetComponent<DraggableBehaviour>();
+        var draggable = GetComponent<LinearDraggableObject>();
         if (draggable != null)
         {
             // Siempre kinematic si es arrastrable
