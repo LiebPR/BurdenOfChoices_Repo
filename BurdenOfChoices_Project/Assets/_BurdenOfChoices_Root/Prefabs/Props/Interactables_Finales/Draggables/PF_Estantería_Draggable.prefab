@@ -484,8 +484,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2513508386682939215}
-  - component: {fileID: 7475437897301892546}
-  - component: {fileID: 7968725835112818267}
   - component: {fileID: 4987020913245031241}
   - component: {fileID: 4043575438529007375}
   - component: {fileID: 6123856337557802127}
@@ -519,38 +517,6 @@ Transform:
   - {fileID: 5561952642429002550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7475437897301892546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4416110439011474818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88e246e7b77584041b5e7c61b9b2e000, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &7968725835112818267
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4416110439011474818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54a2b68addefb5b4fab59a10569a1114, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushPosX: {fileID: 0}
-  pushNegX: {fileID: 0}
-  pushPosZ: {fileID: 0}
-  pushNegZ: {fileID: 0}
-  blockCheckDistance: 0.15
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 256
 --- !u!114 &4987020913245031241
 MonoBehaviour:
   m_ObjectHideFlags: 0

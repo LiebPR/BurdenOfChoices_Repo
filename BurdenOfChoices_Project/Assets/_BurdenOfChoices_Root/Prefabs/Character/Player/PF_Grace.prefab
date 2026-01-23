@@ -1618,6 +1618,7 @@ GameObject:
   - component: {fileID: 3225469293250627632}
   - component: {fileID: 6779723950620466736}
   - component: {fileID: 5853911336545188776}
+  - component: {fileID: 3281906536427343029}
   - component: {fileID: 3246851960515059402}
   - component: {fileID: 4657328812516123858}
   m_Layer: 7
@@ -1892,6 +1893,18 @@ MonoBehaviour:
   walkNoiseDelay: 0.25
   runNoiseDelay: 0.15
   minSpeedToEmit: 0.2
+--- !u!114 &3281906536427343029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6144243115190639110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f56fa022ad5bad4499e04035f3e4764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3246851960515059402
 MonoBehaviour:
   m_ObjectHideFlags: 0

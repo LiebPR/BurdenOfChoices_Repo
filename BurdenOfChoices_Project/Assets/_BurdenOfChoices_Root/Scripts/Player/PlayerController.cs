@@ -30,6 +30,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("External Forces")]
     [SerializeField] float externalDamping = 8f;
+
+    [Header("Drag Factor")]
+    [SerializeField] float dragWeightFactor = 0.3f; // cuanto reduce la velocidad al arrastrar
     #endregion
 
     #region Internal State
@@ -57,6 +60,10 @@ public class PlayerController : MonoBehaviour
 
     // DRAG
     Vector3 dragAxisLocked = Vector3.zero;
+    bool isBlockedByDrag;
+    float currentDragResistance = 1f;  // 1 = sin efecto, <1 = lento por drag
+    bool isDragging = false; // NUEVO: el jugador está arrastrando un objeto
+    float draggedWeight = 1f; // NUEVO: peso del objeto que arrastra
 
     // GAME STOP
     bool wasGamePaused;
@@ -69,7 +76,15 @@ public class PlayerController : MonoBehaviour
 
     #region Getters
     public bool IsCrouching => isCrouching;
+    public bool IsRunning => isRunning;
     public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+    public Vector2 InputMovement => inputMovement;
+
+    public float WeightSpeedMultiplier => currentWeightSpeedMultiplier;
+
+    public float WalkSpeed => walkSpeed;
+    public float RunSpeed => runSpeed;
+    public float CrouchSpeed => crouchSpeed;
     #endregion
 
     private void Awake()
@@ -102,7 +117,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!movementLocked)
+        if (!movementLocked || isDragging)
         {
             HandleMovementSpeed();
         }
@@ -156,24 +171,26 @@ public class PlayerController : MonoBehaviour
         Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
         // Si no hay input o movimiento bloqueado → frenar rápido
-        if (inputDir.sqrMagnitude < 0.01f || movementLocked)
+        if (inputDir.sqrMagnitude < 0.01f || (movementLocked && !isDragging))
         {
             // Factor de frenado extra
-            float brakeFactor = 10f; // más alto → frena más rápido
+            float brakeFactor = 10f;
             Vector3 targetVelocity = Vector3.zero;
 
-            // Lerp fuerte hacia cero, solo en plano XZ
+            planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             planarVelocity = Vector3.Lerp(planarVelocity, targetVelocity, brakeFactor * Time.fixedDeltaTime);
-
             rb.linearVelocity = new Vector3(planarVelocity.x, rb.linearVelocity.y, planarVelocity.z);
 
-            // Limpiar SmoothDamp
             currentVelocitySmooth = Vector3.zero;
             return;
         }
 
         inputDir.Normalize();
         Vector3 desiredVelocity = inputDir * targetSpeed;
+
+        // Aplicar resistencia por drag SOLO si está arrastrando
+        if (isDragging)
+            desiredVelocity *= currentDragResistance;
 
         // Bloqueo de ejes (drag)
         if (dragAxisLocked != Vector3.zero)
@@ -182,10 +199,17 @@ public class PlayerController : MonoBehaviour
             if (Mathf.Abs(dragAxisLocked.z) > 0f) desiredVelocity.z = 0f;
         }
 
-        // Suavizado normal de movimiento
+        // Bloqueo de movimiento fuera de la línea
+        if (isBlockedByDrag && !isDragging)
+        {
+            desiredVelocity = Vector3.zero;
+        }
+
+        // Aplicar suavizado entre velocidad actual y deseada
         float smoothTime = (desiredVelocity.magnitude > planarVelocity.magnitude) ? accelerationTime : decelerationTime;
         Vector3 smoothVelocity = Vector3.SmoothDamp(planarVelocity, desiredVelocity, ref currentVelocitySmooth, smoothTime);
 
+        // Asignar al Rigidbody
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
     }
 
@@ -220,6 +244,48 @@ public class PlayerController : MonoBehaviour
     #region Drag Movement Lock
     public void LockMovementAxis(Vector3 axis) => dragAxisLocked = axis;
     public void UnlockMovementAxis() => dragAxisLocked = Vector3.zero;
+
+    public void BlockMovement() => isBlockedByDrag = true;
+    public void AllowMovement() => isBlockedByDrag = false;
+
+    public void SetDraggedWeight(float weight)
+    {
+        draggedWeight = weight;               // NUEVO
+        isDragging = true;                    // NUEVO: activamos el modo drag
+        currentEquipWeight = weight;
+        RecalculateWeightMultiplier();
+
+        // Reducimos la velocidad proporcional al peso del objeto
+        currentDragResistance = Mathf.Clamp(1f - (weight - 1f) * dragWeightFactor, 0.3f, 1f);
+    }
+    public void SnapRotationToDraggedObject(DraggableObject draggedObject)
+    {
+        if (draggedObject == null) return;
+
+        Vector3 axis = draggedObject.dragAxis.normalized;
+
+        // Snap a la dirección opuesta del eje dominante
+        Vector3 lookDir = Vector3.zero;
+        if (Mathf.Abs(axis.x) > 0.1f)
+            lookDir = -Mathf.Sign(axis.x) * Vector3.right;  // contrario X
+        else if (Mathf.Abs(axis.z) > 0.1f)
+            lookDir = -Mathf.Sign(axis.z) * Vector3.forward; // contrario Z
+
+        if (lookDir != Vector3.zero)
+            transform.rotation = Quaternion.LookRotation(lookDir);
+    }
+
+    public void StopDragging()
+    {
+        isDragging = false;                   // NUEVO: dejamos de arrastrar
+        currentDragResistance = 1f;           // NUEVO: restauramos resistencia normal
+        draggedWeight = 1f;                   // NUEVO
+    }
+
+    public void ResetDraggedWeight()
+    {
+        currentDragResistance = 1f;
+    }
     #endregion
 
     #region Crouch Locks
@@ -279,6 +345,8 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, adjustedFreeRotationSpeed * Time.deltaTime);
     }
 
+
+
     public void LockRotation() => rotationLocked = true;
     public void UnlockRotation() => rotationLocked = false;
     public void EnableFreeRotation(bool value) => freeRotation = value;
@@ -327,12 +395,6 @@ public class PlayerController : MonoBehaviour
         // Penalización proporcional al peso
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
         currentWeightSpeedMultiplier = Mathf.Clamp(1f - penalty, weightAccelerationSensitivity, 1f);
-    }
-
-    public void SetDraggedWeight(float weight)
-    {
-        currentEquipWeight = weight;
-        RecalculateWeightMultiplier();
     }
     #endregion
 

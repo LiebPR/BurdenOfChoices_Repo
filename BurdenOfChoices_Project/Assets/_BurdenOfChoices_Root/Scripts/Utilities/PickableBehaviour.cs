@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System;
 
 /// <summary>
@@ -7,7 +7,7 @@ using System;
 public class PickableBehaviour : MonoBehaviour
 {
     #region Inspector Variables
-    [Tooltip("Si es falso, el objeto no se equipa y solo se usa para interacciÛn/drag.")]
+    [Tooltip("Si es falso, el objeto no se equipa y solo se usa para interacci√≥n/drag.")]
     public bool AllowEquip = true;
     [Header("Drop / GroundCheck")]
     [SerializeField] LayerMask groundLayer;
@@ -98,7 +98,7 @@ public class PickableBehaviour : MonoBehaviour
 
     private void Update()
     {
-        //Dibujar el rayo de comprobaciÛn del suelo sÛlo cuando el objeto esta cogido
+        //Dibujar el rayo de comprobaci√≥n del suelo s√≥lo cuando el objeto esta cogido
 #if UNITY_EDITOR
         if(debugDrawGroundRay && isCatched && groundCheckDistance > 0)
         {
@@ -108,7 +108,7 @@ public class PickableBehaviour : MonoBehaviour
         }
 #endif
 
-        //Si hay una peticiÛn pediente de soltado y ahora est· en suelo, ejecutarla
+        //Si hay una petici√≥n pediente de soltado y ahora est√° en suelo, ejecutarla
         if(pendingDropRequest && isCatched)
         {
             if (IsGrounded())
@@ -123,65 +123,59 @@ public class PickableBehaviour : MonoBehaviour
     //Coloca el obejto en la mano del jugador. 
     public void OnEquip(ICatcher catcher)
     {
-        //Cancelar cualquier restore pendiente
         CancelInvoke(nameof(RestoreInternal));
         CancelInvoke(nameof(UpdateRestoreTimer));
         restoreRunning = false;
 
-        if(catcher == null)
+        if (catcher == null)
         {
-            Debug.LogWarning("No se proporcionÛ un ICatcher v·lido");
+            Debug.LogWarning("No se proporcion√≥ un ICatcher v√°lido");
             return;
         }
 
-        if (!AllowEquip)
+        // Comprobamos si es un objeto arrastrable
+        var draggable = GetComponent<DraggableObject>();
+        if (draggable != null)
         {
-            //Solo notifica que fue pickeado, sin equipar
+            // Es arrastrable ‚Üí usar DragController del jugador
+            var playerRoot = catcher.GetCatchPoint().root;
+            var dragController = playerRoot.GetComponent<DragController>();
+            if (dragController != null)
+            {
+                dragController.TryStartDrag(draggable); // SOLO un argumento
+                draggable.currentPlayer = playerRoot;   // Guardamos referencia al jugador
+            }
+
+            isCatched = true;
+            catchPoint = null;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = false;
+
+            OnEquipped?.Invoke(this);
             NotifyEquipListeners(catcher);
             return;
         }
 
+        // Si no es arrastrable, equip normal
+        if (!AllowEquip)
+        {
+            NotifyEquipListeners(catcher);
+            return;
+        }
 
         catchPoint = catcher.GetCatchPoint();
         isCatched = true;
-
-        if(rb != null)
-        {
-            //Desactivar la fÌsica completamente
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            coll.isTrigger = true;
-        }
-
-        //Parent al catchPoint
-        SnapTopGrabPoint();
-
-        OnEquipped?.Invoke(this); //notifica que se equipÛ
-        NotifyEquipListeners(catcher);
-        NotifyEquipListeners(catcher);
-    }
-
-    /// <summary>
-    /// Marca el objeto como cogido pero sin equiparlo en la mano
-    /// Pensado para objetos arrastrables.
-    /// </summary>
-    public void OnDragEquip(ICatcher catcher)
-    {
-        CancelInvoke(nameof(RestoreInternal));
-        CancelInvoke(nameof(UpdateRestoreTimer));
-        restoreRunning = false;
-
-        isCatched = true;
-        catchPoint = null;
 
         if (rb != null)
         {
             rb.isKinematic = true;
             rb.useGravity = false;
-            coll.isTrigger = false;
+            coll.isTrigger = true;
         }
 
-        Debug.Log("OnDragEquip -> Disparando OnEquipped para: " + gameObject.name);
+        SnapTopGrabPoint();
+
         OnEquipped?.Invoke(this);
         NotifyEquipListeners(catcher);
     }
@@ -196,11 +190,34 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Drop
     //Suelta el objeto en el mundo.
-    //Si force == false, sÛlo soltar· si detecta suelo debajo.
-    //Si force == true, obligar· el drop.
+    //Si force == false, s√≥lo soltar√° si detecta suelo debajo.
+    //Si force == true, obligar√° el drop.
     public void OnDrop(bool force = false)
     {
-        //Si forzamos y no hay suelo detectado, no soltamos (se queda en la mano)
+        var draggable = GetComponent<DraggableObject>();
+        if (draggable != null)
+        {
+            // Si est√° siendo arrastrado, avisamos al DragController
+            if (draggable.currentPlayer != null)
+            {
+                var dragController = draggable.currentPlayer.GetComponent<DragController>();
+                if (dragController != null)
+                    dragController.StopDrag();
+
+                draggable.currentPlayer = null; // Limpiamos referencia
+            }
+
+            isCatched = false;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = false;
+
+            OnDropped?.Invoke(this);
+            NotifyDropListeners();
+            return;
+        }
+
+        // Comportamiento normal para objetos equipables
         if (!force && !IsGrounded())
         {
             pendingDropRequest = true;
@@ -218,43 +235,23 @@ public class PickableBehaviour : MonoBehaviour
             return;
         }
 
-        //Drop normal
         pendingDropRequest = false;
         isCatched = false;
 
-        //Quita el parent
         transform.SetParent(null);
 
-        // Revisar si es arrastrable
-        var draggable = GetComponent<LinearDraggableObject>();
-        if (draggable != null)
+        if (rb != null)
         {
-            // Siempre kinematic si es arrastrable
-            if (rb != null)
-            {
-                rb.isKinematic = true;
-                rb.useGravity = false;
-                coll.isTrigger = false;
-            }
-        }
-        else
-        {
-            // FÌsica normal para objetos normales
-            if (rb != null)
-            {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-                coll.isTrigger = false;
-            }
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            coll.isTrigger = false;
         }
 
-        //Restauramos el tamaÒo si se a alterado
         transform.localScale = originalScale;
 
-        OnDropped?.Invoke(this); //notifica que se soltÛ
+        OnDropped?.Invoke(this);
         NotifyDropListeners();
 
-        //Restore condicional
         if (isRestoreWithTime)
         {
             restoreTimer = restoreDelay;
@@ -327,7 +324,7 @@ public class PickableBehaviour : MonoBehaviour
     {
         if (blockDrop)
             return;
-        //Llamamos a OnDrop sin forzar: se encargar· de encolar si no hay suelo
+        //Llamamos a OnDrop sin forzar: se encargar√° de encolar si no hay suelo
         OnDrop(false);
     }
 
@@ -362,7 +359,7 @@ public class PickableBehaviour : MonoBehaviour
         //Hay suelo -> empezamos a contar estabilidad
         groundedStableTimer += Time.deltaTime;
 
-        //Mientras no supere el buffer, seguimos consider·ndolo grounded
+        //Mientras no supere el buffer, seguimos consider√°ndolo grounded
         return groundedStableTimer >= groundStickTime;
     }
     #endregion
