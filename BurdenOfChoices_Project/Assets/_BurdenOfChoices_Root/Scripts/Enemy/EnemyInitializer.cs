@@ -20,6 +20,7 @@ public class EnemyInitializer : MonoBehaviour
     Rigidbody rb;
     NavMeshAgent agent;
     EnemyPerceptionHandler perceptionHandler;
+    EnemyPerceptionFeedback perceptionFeedback;
     EnemyAnimationHandler animatorHandler;
     EnemyLightHandler lightHandler;
     #endregion
@@ -29,16 +30,16 @@ public class EnemyInitializer : MonoBehaviour
 
         // Obtenemos referencias que dependen de otros componentes inicializados en Awake()
         moveContext = GetComponent<EnemyMotionContext>();
-
         fsm = GetComponent<EnemyFSM>();
         vision = GetComponent<VisionSystem>();
         health = GetComponent<EnemyHealth>();
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
         perceptionHandler = GetComponent<EnemyPerceptionHandler>();
+
         animatorHandler = GetComponent<EnemyAnimationHandler>();
         lightHandler = GetComponent<EnemyLightHandler>();
-
+        perceptionFeedback = GetComponent<EnemyPerceptionFeedback>();
         patrol = GetComponent<PatrolState>();
         idle = GetComponent<IdleState>();
         chase = GetComponent<ChaseState>();
@@ -57,7 +58,7 @@ public class EnemyInitializer : MonoBehaviour
         idle.Initialize(fsm, commands, patrol, turnState, animatorHandler);
         chase.Initialize(fsm, commands, vision, animatorHandler);
         turnState.Initialize(fsm, commands, animatorHandler);
-        death.Initialize(fsm, commands, lightHandler);
+        death.Initialize(fsm, commands, lightHandler, vision, perceptionFeedback);
         stun.Initialize(fsm, commands, health, rb, agent, lightHandler);
         investigateSound.Initialize(fsm, commands, vision, perceptionHandler, moveContext, animatorHandler);
 

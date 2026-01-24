@@ -5,13 +5,11 @@ public class SimpleThrowableItem : MonoBehaviour
     #region Reefrences
     PickableBehaviour pickable;
     PlayerHand playerHand;
-    DataProvider dataProvider;
     #endregion
 
     private void Awake()
     {
         pickable = GetComponent<PickableBehaviour>();
-        dataProvider = GetComponent<DataProvider>();
 
         playerHand = FindAnyObjectByType<PlayerHand>();
         if (playerHand == null)

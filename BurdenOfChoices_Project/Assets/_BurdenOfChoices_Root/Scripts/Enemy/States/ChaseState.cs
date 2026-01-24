@@ -63,13 +63,13 @@ public class ChaseState : MonoBehaviour, IEnemyState
         movementCommands.SetMoveTarget(targetPos, enemyData.chaseSpeed, enemyData.destinationUpdateThreshold);
     }
 
-    public void Exit() 
+    public void Exit()
     {
         // Desactivamos la lógica de frenado
         movementCommands.EnableStopLogic(false);
 
-        // Aseguramos que el agente quede listo para el siguiente estado
-        movementCommands.ResumeMovement(enemyData.chaseSpeed, enemyData.normalAcceleration);
+        // Solo reanudamos si el agente está activo y sobre NavMesh
+        movementCommands.ResumeMovement(enemyData.patrolSpeed, enemyData.normalAcceleration);
     }
     #endregion
 }

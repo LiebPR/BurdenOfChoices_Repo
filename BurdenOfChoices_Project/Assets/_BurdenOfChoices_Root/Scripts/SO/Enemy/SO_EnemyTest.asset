@@ -19,12 +19,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   perceptionDelay: 1
-  visionDelay: 0.1
-  lostDelay: 3
+  visionDelay: 0.3
+  lostDelay: 4
   maxHearingRadius: 15
   noiseMemoryTime: 3
-  hearingDelayWalk: 2
-  hearingDelayRun: 1
+  hearingDelayWalk: 1
+  hearingDelayRun: 0.5
   soundReactionDelay: 0.1
   investigateSpeed: 1
   soundInspectTime: 0
@@ -41,7 +41,7 @@ MonoBehaviour:
   rotationStiffness: 35
   rotationDamping: 15
   stopStartDistance: 2
-  stopHardDistance: 0.8
+  stopHardDistance: 1.5
   normalAcceleration: 8
   breackAcceleration: 25
   idleTime: 1.5

@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// AnimatorManager
 /// Gestiona todos los estados de animación
-/// usando un único Animator con capas.
+/// y ahora responde a eventos de congelado/restaurado.
 /// </summary>
 public class AnimatorManager : MonoBehaviour
 {
@@ -115,6 +115,7 @@ public class AnimatorManager : MonoBehaviour
     {
         smAnimator.SetTrigger(IsDeathHash);
     }
+
     #endregion
 
     #region Core
@@ -123,20 +124,15 @@ public class AnimatorManager : MonoBehaviour
         // Solo aplicamos frame rate variable si estamos caminando
         if (velocity < 0.1f)
         {
-            // Idle o detenido ? animación normal
             smAnimator.speed = 1f;
             currentWalkFrameRate = walkBaseFrameRate;
             return;
         }
 
-        // Determinar frame rate objetivo según velocidad y si corre o está agachado
         float maxMultiplier = isCrouching ? 1.2f : 1.5f;
         float targetFrameRate = Mathf.Clamp(ratio * walkBaseFrameRate, walkBaseFrameRate * 0.8f, walkBaseFrameRate * maxMultiplier);
 
-        // Suavizado para transición fluida
         currentWalkFrameRate = Mathf.SmoothDamp(currentWalkFrameRate, targetFrameRate, ref walkFrameRateVelocity, 0.1f);
-
-        // Aplicamos solo a Walk
         smAnimator.speed = currentWalkFrameRate / walkBaseFrameRate;
     }
     #endregion

@@ -21,10 +21,6 @@ public class Key : MonoBehaviour, IInteractable, IPickListener
     DataProvider dataProvider;
     #endregion
 
-    #region Getters
-    EquipableData Data => dataProvider != null ? dataProvider.GetData<EquipableData>() : null;
-    #endregion
-
     #region Animator Params
     static readonly int IsCatchHash = Animator.StringToHash("IsCatch");
     static readonly int IsConsumeHash = Animator.StringToHash("IsConsume");

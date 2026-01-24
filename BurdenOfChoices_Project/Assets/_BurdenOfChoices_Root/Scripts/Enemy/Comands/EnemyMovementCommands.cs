@@ -245,7 +245,7 @@ public class EnemyMovementCommands
     /// </summary>
     public void PauseMovement()
     {
-        if(agent == null) return;
+        if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
 
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
@@ -256,7 +256,7 @@ public class EnemyMovementCommands
     /// </summary>
     public void ResumeMovement(float speed, float acceleration)
     {
-        if(agent == null) return;
+        if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
 
         agent.speed = speed;
         agent.acceleration = acceleration;
@@ -264,8 +264,20 @@ public class EnemyMovementCommands
 
         ResetInternalPath();
         ResetRotation();
-    }  
-    
+    }
+
+    /// <summary>
+    /// Limpia el path interno del agente.
+    /// </summary>
+    void ResetInternalPath()
+    {
+        lastSetDestination = Vector3.positiveInfinity;
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh && !agent.isStopped)
+        {
+            agent.ResetPath();
+        }
+    }
+
     /// <summary>
     /// Transición a modo físico (stun / knockback).
     /// </summary>
@@ -307,11 +319,10 @@ public class EnemyMovementCommands
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;
-            rb.constraints = RigidbodyConstraints.None;
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
         }
 
-        if (agent != null)
+        if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
             agent.enabled = true;
             agent.isStopped = false;
@@ -322,18 +333,6 @@ public class EnemyMovementCommands
 
         angularVelocity = Vector3.zero;
         lastSetDestination = Vector3.positiveInfinity;
-    }
-
-    /// <summary>
-    /// Limpia el path interno del agente.
-    /// </summary>
-    void ResetInternalPath()
-    {
-        lastSetDestination = Vector3.positiveInfinity;
-        if(agent != null && !agent.isStopped)
-        {
-            agent.ResetPath();
-        }
     }
     #endregion
 }

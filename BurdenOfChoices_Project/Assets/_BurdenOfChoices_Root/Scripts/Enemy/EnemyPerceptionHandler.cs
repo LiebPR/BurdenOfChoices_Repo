@@ -78,14 +78,9 @@ public class EnemyPerceptionHandler : MonoBehaviour
         if (target != null && IsPlayerDead(target)) return;
 
         lastTarget = target;
-        fsm.OnChase();
-        
-        // Informar al EnemyAttack del objetivo
-        EnemyAttack attack = GetComponent<EnemyAttack>();
-        if (attack != null)
-        {
-            attack.SetTarget(target);
-        }
+
+        // Iniciar coroutine para respetar visionDelay
+        StartCoroutine(DelayedChase(target, data.visionDelay));
     }
 
     void HandleLoseTarget(Transform target)
@@ -128,4 +123,22 @@ public class EnemyPerceptionHandler : MonoBehaviour
     }
 
     #endregion
+
+    System.Collections.IEnumerator DelayedChase(Transform target, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Verificar que todavía puede ver al jugador
+        if (visionSystem.CanSeeTarget())
+        {
+            fsm.OnChase();
+
+            // Actualizamos target para ataque, pero no ejecutamos golpe
+            EnemyAttack attack = GetComponent<EnemyAttack>();
+            if (attack != null)
+            {
+                attack.SetTarget(target); // solo para que la animación sepa a quién golpear
+            }
+        }
+    }
 }

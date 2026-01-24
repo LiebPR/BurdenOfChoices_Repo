@@ -1,124 +1,134 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
-/// PlayerController: Contiene las logicas de movimiento del jugador con suavizado de velocidad completo. 
-/// Acelera y desacelera suavemente en todas las transiciones. Aparte controla la logica de agacharse por animación.
+/// PlayerController: Contiene las lógicas de movimiento del jugador con suavizado completo.
+/// Separa movimiento por input y fuerzas externas. La rotación se mantiene intacta.
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
     #region Inspector Variables
     [Header("Movement Config")]
-    [SerializeField] float walkSpeed = 5f; //velocidad al caminar
-    [SerializeField] float runSpeed = 8f; //velocidad al correr
-    [SerializeField] float crouchSpeed = 2.5f; //velocidad agachado
-    [SerializeField] float accelerationTime = 0.2f; //timepo para acelerar
-    [SerializeField] float decelerationTime = 0.3f; //tiempo para desacelerar
+    [SerializeField] float walkSpeed = 5f;
+    [SerializeField] float runSpeed = 8f;
+    [SerializeField] float crouchSpeed = 2.5f;
+    [SerializeField] float accelerationTime = 0.2f;
+    [SerializeField] float decelerationTime = 0.3f;
 
     [Header("Rotation Config")]
-    [SerializeField] float rotationSpeed = 10f; //suavizado de rotación
-    [SerializeField] float minSpeedForRotation = 0.05f; //mínima velocidad para permitir rotación
-    [SerializeField] float inertiaFactor = 0.15f; //amortiguación del cambio de dirección
-    [SerializeField] float rotationNoise = 0.02f; //variación humana sutil
+    [SerializeField] float rotationSpeed = 10f;
+    [SerializeField] float minSpeedForRotation = 0.05f;
+    [SerializeField] float inertiaFactor = 0.15f;
+    [SerializeField] float rotationNoise = 0.02f;
 
-    [Header("FreeRotation")]
+    [Header("Free Rotation")]
     [SerializeField] float freeRotationSensitivity = 3f;
-    [SerializeField] float freeRotationDamping = 15f; //damping al usar mouse
 
     [Header("Weight Factor")]
-    [SerializeField] float weightSpeedSensitivity = 0.25f; //sensibilidad con la que el peso afecta a la velocidad
-    [SerializeField] float weightAccelerationSensitivity = 0.1f; //miltiplicador mínimo de velocidad por peso
+    [SerializeField] float weightSpeedSensitivity = 0.25f;
+    [SerializeField] float weightAccelerationSensitivity = 0.1f;
+
+    [Header("External Forces")]
+    [SerializeField] float externalDamping = 8f;
     #endregion
 
-    #region Internal States
-    //MOVIMIENTO:
-    Vector2 inputMovement; //entrada de movimiento
-    Vector3 currentVelocitySmooth; //usado para SmoothDamp
-    bool isRuning; //estado interno que indica que el player esta corriendo.
-    bool movementLocked; //bloquea el movimiento del jugador
+    #region Internal State
+    // INPUT
+    Vector2 inputMovement;
+    bool isRunning;
+    bool movementLocked;
 
-    public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-    
-    //AGACHARSE:
-    bool isCrouching; //estado interno que indica que el player esta agachado.
-    bool crouchLocked; 
+    // VELOCIDAD
+    Vector3 currentVelocitySmooth;
+    Vector3 externalVelocity;
 
-    //ROTACIÓN:
-    Vector3 lastMoveDirection; //ultima dirección válida de movimiento
+    // ROTACIÓN
+    Vector3 lastMoveDirection;
     bool rotationLocked;
     bool freeRotation;
 
-    //PESO: 
-    float currentEquipWeight = 1f; //peso actual del equipamiento
-    float currentWeightSpeedMultiplier = 1f; //multiplicador de velocidad por peso
+    // CROUCH
+    bool isCrouching;
+    bool crouchLocked;
 
-    //DRAG
-    Vector3 dragAxisLocked = Vector3.zero; //eje que se bloquea durante drag
-    #endregion
+    // PESO EQUIP
+    float currentEquipWeight = 1f;
+    float currentWeightSpeedMultiplier = 1f;
 
-    #region Getters
-    public bool IsCrouching => isCrouching;
+    // MODIFICADORES EXTERNOS (GENÉRICOS)
+    float movementSpeedMultiplier = 1f;
+    float accelerationMultiplier = 1f;
+
+    // GAME STOP
+    bool wasGamePaused;
     #endregion
 
     #region References
     public Rigidbody rb;
     AnimatorManager animatorManager;
+    DraggController draggController;
+    #endregion
+
+    #region Getters
+    public Vector2 InputMovement => inputMovement;
+    public float WeightSpeedMultiplier => currentWeightSpeedMultiplier;
+
+    public bool IsCrouching => isCrouching;
+    public bool isRunningPublic => isRunning;
+    public float WalkSpeedPublic => walkSpeed;
+    public float RunSpeedPublic => runSpeed;
+    public float CrouchSpeedPublic => crouchSpeed;
+
+    public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     #endregion
 
     private void Awake()
     {
-        //REFERENCES:
         rb = GetComponent<Rigidbody>();
         animatorManager = GetComponent<AnimatorManager>();
+        draggController = GetComponent<DraggController>();
     }
 
     private void Update()
     {
-        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
-            return;
+        bool isPaused = GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused;
+
+        if (isPaused && !wasGamePaused) PausePlayer();
+        else if (!isPaused && wasGamePaused) ResumePlayer();
+
+        wasGamePaused = isPaused;
+
+        if (isPaused) return;
 
         if (freeRotation)
-        {
-            Vector2 lookInput = InputManager.LookInput;
-
-            if (lookInput.sqrMagnitude > 0.001f)
-            {
-                // Convertimos input a dirección en el plano XZ
-                Vector3 inputDir = new Vector3(lookInput.x, 0f, lookInput.y).normalized;
-
-                // Guardamos como última dirección
-                lastMoveDirection = inputDir;
-
-                // Rotación suave y natural usando RotateTowards
-                Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-                transform.rotation = Quaternion.RotateTowards(
-                    transform.rotation,
-                    targetRot,
-                    freeRotationSensitivity * Time.deltaTime // multiplicador para ajustar velocidad
-                );
-            }
-        }
+            HandleFreeRotation();
         else
-        {
             HandleRotation();
-        }
     }
 
-    #region Input Event Subscriptions
+    private void FixedUpdate()
+    {
+        if (!movementLocked)
+            HandleMovementSpeed();
+        else
+            BreakToStop();
+
+        ApplyExternalVelocity();
+        UpdateAnimatorVelocity();
+    }
+
     private void OnEnable()
     {
-        //Subscripción a eventos del InputManager
         InputManager.OnMoveChanged += OnMoveChanged;
         InputManager.OnRunChanged += OnRunChanged;
         InputManager.OnCrouchChanged += OnCrouchChanged;
 
-        //Subcripción a eventos de peso (PickableBehaviour)
         PickableBehaviour.OnEquipped += OnPickableEquipped;
         PickableBehaviour.OnDropped += OnPickableDropped;
     }
 
     private void OnDisable()
     {
-        //Desubscripción
         InputManager.OnMoveChanged -= OnMoveChanged;
         InputManager.OnRunChanged -= OnRunChanged;
         InputManager.OnCrouchChanged -= OnCrouchChanged;
@@ -126,91 +136,190 @@ public class PlayerController : MonoBehaviour
         PickableBehaviour.OnEquipped -= OnPickableEquipped;
         PickableBehaviour.OnDropped -= OnPickableDropped;
     }
-    #endregion
 
-    private void FixedUpdate()
-    {
-        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
-            return;
-
-        HandleMovementSpeed();
-        UpdateAnimatorVelocity();
-    }
-
-    #region Movement Logic
+    #region Movement Core
     void HandleMovementSpeed()
     {
-        if (movementLocked)
-        {
-            // Mientras está pausado: velocidad planar a 0, pero inputMovement se sigue actualizando
-            currentVelocitySmooth = Vector3.zero;
-            return;
-        }
-
-        // Determinar velocidad objetivo
-        float targetSpeed = walkSpeed;
-        if (isCrouching) targetSpeed = crouchSpeed;
-        else if (isRuning) targetSpeed = runSpeed;
-
-        targetSpeed *= currentWeightSpeedMultiplier;
-
-        // Solo usamos inputMovement si su magnitud > 0
         Vector3 inputDir = new Vector3(inputMovement.x, 0f, inputMovement.y);
         if (inputDir.sqrMagnitude < 0.01f)
         {
-            // Si no hay input real, no nos movemos
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-            currentVelocitySmooth = Vector3.zero;
+            BreakToStop();
             return;
         }
-
         inputDir.Normalize();
+
+        float baseSpeed = isCrouching ? crouchSpeed : isRunning ? runSpeed : walkSpeed;
+
+        // Aplicamos multiplicadores: peso / drag / otros efectos externos
+        float targetSpeed = baseSpeed * currentWeightSpeedMultiplier * movementSpeedMultiplier;
+
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
-        // Bloqueo de ejes
-        if (dragAxisLocked != Vector3.zero)
-        {
-            if (Mathf.Abs(dragAxisLocked.x) > 0f) desiredVelocity.x = 0f;
-            if (Mathf.Abs(dragAxisLocked.z) > 0f) desiredVelocity.z = 0f;
-        }
+        float smoothTime = (desiredVelocity.magnitude > planarVelocity.magnitude) ?
+            accelerationTime * accelerationMultiplier :
+            decelerationTime * accelerationMultiplier;
 
-        // Suavizado
-        float smoothTime = (desiredVelocity.magnitude > new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude) ? accelerationTime : decelerationTime;
-        Vector3 smoothVelocity = Vector3.SmoothDamp(new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z), desiredVelocity, ref currentVelocitySmooth, smoothTime);
+        Vector3 smoothVelocity = Vector3.SmoothDamp(planarVelocity, desiredVelocity, ref currentVelocitySmooth, smoothTime);
 
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
     }
-    public void PausePlayer()
-    {
-        movementLocked = true;
-        rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-        // Bloquear Rigidbody completamente
-        rb.isKinematic = true;
 
-        // Reset SmoothDamp
+    void BreakToStop()
+    {
+        float brakeFactor = 10f;
+        Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        planar = Vector3.Lerp(planar, Vector3.zero, brakeFactor * Time.fixedDeltaTime);
+        rb.linearVelocity = new Vector3(planar.x, rb.linearVelocity.y, planar.z);
         currentVelocitySmooth = Vector3.zero;
-        inputMovement = Vector2.zero;
     }
 
-    public void ResumePlayer()
+    void ApplyExternalVelocity()
     {
-        movementLocked = false; // permite mover al jugador
-
-        // Desbloquear Rigidbody
-        rb.isKinematic = false;
+        if (externalVelocity.sqrMagnitude < 0.0001f) return;
+        rb.linearVelocity += new Vector3(externalVelocity.x, 0f, externalVelocity.z);
+        externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, externalDamping * Time.fixedDeltaTime);
     }
     #endregion
 
-    #region Drag Movement Lock
+    #region Movement Modifiers (GENÉRICOS) // CHANGED
+    public void SetMovementModifier(float speedMultiplier, float accelMultiplier = 1f)
+    {
+        movementSpeedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 1f);
+        accelerationMultiplier = Mathf.Max(0.01f, accelMultiplier);
+    }
+
+    public void ResetMovementModifier()
+    {
+        movementSpeedMultiplier = 1f;
+        accelerationMultiplier = 1f;
+    }
+
     public void LockMovementAxis(Vector3 axis)
     {
-        dragAxisLocked = axis;
+        if (axis == Vector3.right)
+            rb.constraints |= RigidbodyConstraints.FreezePositionX;
+        else if (axis == Vector3.forward)
+            rb.constraints |= RigidbodyConstraints.FreezePositionZ;
     }
 
     public void UnlockMovementAxis()
     {
-        dragAxisLocked = Vector3.zero;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
+    #endregion
+
+    #region Rotation
+    void HandleRotation()
+    {
+        if (rotationLocked) return;
+
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speed = planarVelocity.magnitude;
+
+        Vector3 inputDir = new Vector3(inputMovement.x, 0f, inputMovement.y);
+        bool hasInput = inputDir.sqrMagnitude > 0.0001f;
+        if (hasInput) inputDir.Normalize();
+
+        Vector3 desiredDir;
+        if (speed >= minSpeedForRotation) desiredDir = planarVelocity.normalized;
+        else if (hasInput) desiredDir = inputDir;
+        else return;
+
+        float dynamicInertia = Mathf.Lerp(inertiaFactor, inertiaFactor * 1.5f, 1f - Mathf.Clamp01(speed));
+        Vector3 inertialDir = Vector3.Slerp(lastMoveDirection, desiredDir, 1f - dynamicInertia);
+
+        if (speed > 0.5f || hasInput)
+        {
+            float noiseFactor = Mathf.Clamp01(speed / runSpeed);
+            inertialDir += new Vector3(Random.Range(-rotationNoise, rotationNoise), 0f, Random.Range(-rotationNoise, rotationNoise)) * (1f - noiseFactor);
+        }
+
+        if (inertialDir.sqrMagnitude <= 0.05f) return;
+        inertialDir.Normalize();
+        lastMoveDirection = inertialDir;
+
+        Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
+        float adjustedRotationSpeed = rotationSpeed * currentWeightSpeedMultiplier;
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, adjustedRotationSpeed * Time.deltaTime);
+    }
+
+    void HandleFreeRotation()
+    {
+        Vector2 lookInput = InputManager.LookInput;
+        if (lookInput.sqrMagnitude < 0.001f) return;
+
+        Vector3 inputDir = new Vector3(lookInput.x, 0f, lookInput.y).normalized;
+        lastMoveDirection = inputDir;
+
+        Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
+        float adjustedFreeRotationSpeed = freeRotationSensitivity * 100f * currentWeightSpeedMultiplier;
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, adjustedFreeRotationSpeed * Time.deltaTime);
+    }
+
+    public void LockRotation() => rotationLocked = true;
+    public void UnlockRotation() => rotationLocked = false;
+    public void EnableFreeRotation(bool value) => freeRotation = value;
+    #endregion
+
+    #region Weight (Equip)
+    void OnPickableEquipped(PickableBehaviour p)
+    {
+        currentEquipWeight = p != null ? Mathf.Max(1f, p.Weight) : 1f;
+        RecalculateWeightMultiplier();
+    }
+
+    void OnPickableDropped(PickableBehaviour p)
+    {
+        currentEquipWeight = 1f;
+        RecalculateWeightMultiplier();
+    }
+
+    void RecalculateWeightMultiplier()
+    {
+        if (currentEquipWeight <= 1f)
+        {
+            currentWeightSpeedMultiplier = 1f;
+            return;
+        }
+
+        float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
+        currentWeightSpeedMultiplier = Mathf.Clamp(
+            1f - penalty,
+            weightAccelerationSensitivity,
+            1f
+        );
+    }
+    #endregion
+
+    #region Pause
+    public void PausePlayer()
+    {
+        movementLocked = true;
+        inputMovement = Vector2.zero;
+        currentVelocitySmooth = Vector3.zero;
+    }
+
+    public void ResumePlayer()
+    {
+        movementLocked = false;
+    }
+    #endregion
+
+    #region Input
+    void OnMoveChanged(Vector2 input) => inputMovement = input;
+    void OnRunChanged(bool runState) => isRunning = runState;
+
+    void OnCrouchChanged(bool crouchState)
+    {
+        if (crouchLocked) return;
+        isCrouching = crouchState;
+        animatorManager?.SetCrouching(isCrouching);
+    }
+    #endregion
+
+    #region External Forces API
+    public void AddExternalImpulse(Vector3 impulse) => externalVelocity += impulse;
     #endregion
 
     #region Crouch Locks
@@ -218,155 +327,16 @@ public class PlayerController : MonoBehaviour
     public void UnlockCrouch() => crouchLocked = false;
     #endregion
 
-    #region Rotation Logic
-    void HandleRotation()
-    {
-        if(rotationLocked) return;
-
-        // Velocidad planar y magnitud
-        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        float speed = planarVelocity.magnitude;
-
-        // Dirección basada en input (si existe)
-        Vector3 inputDir = new Vector3(inputMovement.x, 0f, inputMovement.y);
-        bool hasInput = inputDir.sqrMagnitude > 0.0001f;
-        if (hasInput) inputDir.Normalize();
-
-        // Determinar la dirección objetivo para rotación:
-        // - si hay velocidad suficiente usamos la dirección de la velocidad
-        // - si la velocidad es baja pero hay input usamos la dirección del input
-        // - si no hay ninguna de las dos, no rotamos
-        Vector3 desiredDir;
-        if (speed >= minSpeedForRotation)
-        {
-            desiredDir = planarVelocity.normalized;
-        }
-        else if (hasInput)
-        {
-            desiredDir = inputDir;
-        }
-        else
-        {
-            return; // sin velocidad ni input => mantener orientación actual
-        }
-
-        // Aplicar inercia entre la última dirección y la nueva
-        float dynamicInertia = Mathf.Lerp(inertiaFactor, inertiaFactor * 1.5f, 1f - Mathf.Clamp01(speed));
-        Vector3 inertialDir = Vector3.Slerp(lastMoveDirection, desiredDir, 1f - dynamicInertia);
-
-        // Añadir micro-ruido humanoide si procede (si hay movimiento real o input)
-        if (speed > 0.5f || hasInput)
-        {
-            float noiseFactor = Mathf.Clamp01(speed / runSpeed);
-            inertialDir += new Vector3(Random.Range(-rotationNoise, rotationNoise), 0f, Random.Range(-rotationNoise, rotationNoise)) * (1f - noiseFactor);
-        }
-
-        // Normalizar y validar
-        if (inertialDir.sqrMagnitude <= 0.05f) return;
-        inertialDir.Normalize();
-
-        // Guardar última dirección válida
-        lastMoveDirection = inertialDir;
-
-        // Aplicar rotación suave hacia la dirección resultante
-        Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
-    }
-
-    public void EnableFreeRotation(bool value)
-    {
-        freeRotation = value;
-    }
-
-    public void LockRotation()
-    {
-        rotationLocked = true;
-    }
-
-    public void UnlockRotation()
-    {
-        rotationLocked = false;
-    }
-    #endregion
-
-    #region Ipunts Callbacks
-    void OnMoveChanged(Vector2 input)
-    {
-        inputMovement = input;
-    }
-    void OnRunChanged(bool runState) => isRuning = runState;
-    void OnCrouchChanged(bool crouchState)
-    {
-        if (crouchLocked) return;
-
-        isCrouching = crouchState;
-
-        if (animatorManager != null)
-            animatorManager.SetCrouching(isCrouching);
-    }
-    #endregion
-
-    #region Weight (Handler)
-    void OnPickableEquipped(PickableBehaviour p)
-    {
-        if (p == null) return;
-
-        var equippableWeight = p.GetComponent<EquipableItem>();
-        if(equippableWeight != null && equippableWeight.Data != null)
-        {
-            currentEquipWeight = Mathf.Max(1f, equippableWeight.Data.weight);
-        }
-        else
-        {
-            currentEquipWeight = 1f;
-        }
-
-        RecalculateWeightMultiplier();
-    }
-
-    void OnPickableDropped(PickableBehaviour p)
-    {
-        //Al soltar restauramos valores a neutro
-        currentEquipWeight = 1f;
-        RecalculateWeightMultiplier();
-    }
-
-    void RecalculateWeightMultiplier()
-    {
-        //Si el peso es 1 => sin efecto
-        if(currentEquipWeight <= 1f)
-        {
-            currentWeightSpeedMultiplier = 1f;
-            return;
-        }
-
-        float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
-        float multiplier = 1f - penalty;
-        currentWeightSpeedMultiplier = Mathf.Clamp(multiplier, weightAccelerationSensitivity, 1f);
-    }
-
-    public void SetDraggedWeight(float weight)
-    {
-        currentEquipWeight = weight;
-        RecalculateWeightMultiplier();
-    }
-    #endregion
-
-    #region Animations
+    #region Animator
     void UpdateAnimatorVelocity()
     {
         if (animatorManager == null) return;
 
-        // Velocidad planar
-        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        float speed = planarVelocity.magnitude;
+        Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speed = planar.magnitude;
 
-        // Enviar velocidad real para transiciones Walk/Idle
         animatorManager.SetVelocity(speed);
-
-        // Calcular ratio normalizado para ajustar velocidad de animación
-        float ratio = speed / walkSpeed;
-        animatorManager.SetMovementRatio(ratio);
+        animatorManager.SetMovementRatio(speed / walkSpeed);
     }
     #endregion
 }

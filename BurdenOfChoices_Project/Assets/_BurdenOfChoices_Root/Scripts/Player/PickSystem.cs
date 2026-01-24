@@ -48,22 +48,46 @@ public class PickSystem : MonoBehaviour
     #region PickLogic
     void HandlePickPressed()
     {
-        if (currentPickable != null) return;
         if (catcher == null) return;
 
-        if(!TryGetPickable(out PickableBehaviour pickable)) return;
+        // Si ya hay un pick activo, no hacemos nada
+        if (currentPickable != null) return;
 
-        //Solo ejecutar OnEquip si realmente se ejecuta
-        if(pickable != null)
+        if (!TryGetPickable(out PickableBehaviour pickable)) return;
+
+        //DRAGABLE
+        var draggable = pickable.GetComponent<DraggableObject>();
+        if (draggable != null)
         {
-            currentPickable = pickable;
-            currentPickable.OnEquip(catcher);
+            if (!draggable.ResolveGrabPoint(playerHand.transform.root))
+                return;
+
+            var dragController = playerHand.GetComponentInParent<DraggController>();
+            if (dragController != null)
+            {
+                dragController.StartDrag(draggable);
+                currentPickable = pickable;
+                return;
+            }
         }
+
+        // Fallback: equip normal
+        currentPickable = pickable;
+        currentPickable.OnEquip(catcher);
     }
 
     void HandlePickReleased()
     {
-        if(currentPickable == null) return;
+        if (currentPickable == null) return;
+
+        // Si es draggable, forzamos StopDrag
+        var draggable = currentPickable.GetComponent<DraggableObject>();
+        if (draggable != null && draggable.isBeingDragged)
+        {
+            var dragController = playerHand.GetComponentInParent<DraggController>();
+            if (dragController != null)
+                dragController.StopDrag();
+        }
 
         currentPickable.RequestDrop();
         currentPickable = null;

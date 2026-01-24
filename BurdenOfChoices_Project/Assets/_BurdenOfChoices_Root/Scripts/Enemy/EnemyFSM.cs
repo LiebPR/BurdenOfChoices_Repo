@@ -24,6 +24,7 @@ public class EnemyFSM : MonoBehaviour
 
     bool isChangingState;
     bool hasPendingStateRequest;
+    bool isDead;
     EnemyState pendingStateRequest;
 
     // Cache de nombres de estados para logs
@@ -35,7 +36,7 @@ public class EnemyFSM : MonoBehaviour
     #endregion
 
     #region Events
-    public event System.Action<EnemyState> OnStateChanged; 
+    public event System.Action<EnemyState> OnStateChanged;
     #endregion
 
     private void Awake()
@@ -46,6 +47,8 @@ public class EnemyFSM : MonoBehaviour
 
     private void Update()
     {
+        if (isDead) return;
+
         if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
             return;
 
@@ -101,8 +104,17 @@ public class EnemyFSM : MonoBehaviour
         // Actualizamos estado
         CurrentState = newState;
 
-        // Evento
-        try { OnStateChanged?.Invoke(CurrentState); } catch { }
+        if (newState == EnemyState.Death)
+        {
+            isDead = true;
+            isChangingState = false;
+            hasPendingStateRequest = false;
+        }
+
+        if (!isDead)
+        {
+            try { OnStateChanged?.Invoke(CurrentState); } catch { }
+        }
 
         // Obtener la instancia del nuevo estado
         if (!stateInstances.TryGetValue(newState, out currentStateInstance) || currentStateInstance == null)
@@ -152,13 +164,15 @@ public class EnemyFSM : MonoBehaviour
     #endregion
 
     #region Handlers Públicos
-    public void OnPatrol() => ChangeState(EnemyState.Patrol);
-    public void OnIdle() => ChangeState(EnemyState.Idle);
-    public void OnChase() => ChangeState(EnemyState.Chase);
-    public void OnStun() => ChangeState(EnemyState.Stun);
-    public void OnDeath() => ChangeState(EnemyState.Death);
+    public void OnPatrol() { if (isDead) return; ChangeState(EnemyState.Patrol); }
+    public void OnIdle() { if (isDead) return; ChangeState(EnemyState.Idle); }
+    public void OnChase() { if (isDead) return; ChangeState(EnemyState.Chase); }
+    public void OnStun() { if (isDead) return; ChangeState(EnemyState.Stun); }
+    public void OnDeath() { if (isDead) return; ChangeState(EnemyState.Death); }
     public void OnTurnToTarget(Transform target)
     {
+        if(isDead) return;
+
         if (stateInstances.TryGetValue(EnemyState.TurnToTarget, out IEnemyState state))
         {
             if (state is TurnToTargetState turnState)
@@ -168,12 +182,14 @@ public class EnemyFSM : MonoBehaviour
         }
         ChangeState(EnemyState.TurnToTarget);
     }
-    public void OnInvestigateSound() => ChangeState(EnemyState.InvestigateSound);
+    public void OnInvestigateSound() { if (isDead) return; ChangeState(EnemyState.InvestigateSound); }
     #endregion
 
     #region Reseteo Forzado
     public void ForceResetToPatrol()
     {
+        if(isDead) return;
+
         isChangingState = false;
         hasPendingStateRequest = false;
 

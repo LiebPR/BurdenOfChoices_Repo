@@ -10,14 +10,20 @@ public class EnemyAnimationHandler : MonoBehaviour
 
     #region Animator Parameters
     static readonly int VelocityHash = Animator.StringToHash("Velocity");
+
     static readonly int IsRunningHash = Animator.StringToHash("IsRunning");
+
     static readonly int IsStunnedHash = Animator.StringToHash("IsStunned");
     static readonly int IStunHash = Animator.StringToHash("IStun");
+
     static readonly int IsDeathAfterStunHash = Animator.StringToHash("DeathAfterDelay");
     static readonly int IDeathHash = Animator.StringToHash("IDeath"); 
+
     static readonly int IsTurnningHash = Animator.StringToHash("IsTurnning");
     static readonly int TurnDirectionHash = Animator.StringToHash("Angular");
+
     static readonly int IHearHash = Animator.StringToHash("IHear");
+
     static readonly int IAttackingHash = Animator.StringToHash("IAttacking");
     #endregion
 

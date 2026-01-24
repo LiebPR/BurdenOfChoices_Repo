@@ -1,7 +1,6 @@
 using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -11,7 +10,9 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Respawn System")]
     [SerializeField] Transform firstDeathRespawnPoint; // punto donde reaparece en la primera muerte
-    [SerializeField] float respawnDelay = 1.2f; // tiempo en pantalla negra
+
+    [Header("Fade Settings")]
+    [SerializeField] float fadeInDelay = 0.7f; // tiempo configurable antes de permitir fade
 
     [Header("Cinemachine Cameras")]
     [SerializeField] CinemachineCamera deathCamera;
@@ -50,9 +51,21 @@ public class PlayerHealth : MonoBehaviour
     {
         if (!isAlive) return;
 
-        isAlive = false; // jugador muere al primer golpe
+        isAlive = false;
         lastHitDirection = hitDirection;
+
+        //1. Pusar juego (estado global)
+        GameStopManager.Instance.PauseGame();
+
+        //2.Bloquear input del player (estado local)
+        var controller = GetComponent<PlayerController>();
+        if(controller != null)
+            controller.PausePlayer();
+
+        // Aplicar knockback inmediatamente
         ApplyKnockback(hitDirection);
+
+        // Manejar muerte (animación y lógica)
         HandleDeath();
     }
 
@@ -65,8 +78,6 @@ public class PlayerHealth : MonoBehaviour
         {
             if(firstDeathRespawnPoint != null)
                 StartCoroutine(RespawnRoutine(firstDeathRespawnPoint));
-            else
-                ResetPlayerState();
         }
         else
         {
@@ -80,7 +91,14 @@ public class PlayerHealth : MonoBehaviour
     void ApplyKnockback(Vector3 hitDirection)
     {
         Vector3 planDir = new Vector3(hitDirection.x, 0f, hitDirection.z).normalized;
-        rb.AddForce(planDir * knockbackForce, ForceMode.Impulse);
+        float knockbackStrength = knockbackForce;
+
+        // Enviar el knockback al PlayerController
+        var controller = GetComponent<PlayerController>();
+        if (controller != null)
+        {
+            controller.AddExternalImpulse(planDir * knockbackForce);
+        }
     }
 
     void HandleDeath()
@@ -89,10 +107,6 @@ public class PlayerHealth : MonoBehaviour
         RotateAwayFromHit();
 
         animatorManager.DeathAnim();
-
-        //Deshabilitar el controlador para que no se mueva más 
-        var controller = GetComponent<PlayerController>();
-        if (controller != null) controller.enabled = false;
 
         var vision = FindAnyObjectByType<VisionSystem>();
         if (vision != null) vision.ResetVisionToDefault();
@@ -111,25 +125,8 @@ public class PlayerHealth : MonoBehaviour
             return;
         }
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
         transform.position = respawnPoint.position;
         transform.rotation = respawnPoint.rotation;
-
-        var controller = GetComponent<PlayerController>();
-        if (controller != null) controller.enabled = true;
-
-        isAlive = true;
-    }
-
-    void ResetPlayerState()
-    {
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        var controller = GetComponent<PlayerController>();
-        if (controller != null) controller.enabled = true;
 
         isAlive = true;
     }
@@ -154,13 +151,21 @@ public class PlayerHealth : MonoBehaviour
     #region Routine
     IEnumerator RespawnRoutine(Transform respawnPoint)
     {
-        if (fadeController != null) yield return fadeController.FadeOut();
-        yield return new WaitForSeconds(respawnDelay);
+        if (fadeController != null)
+            yield return fadeController.FadeOut();
+
         ReappearAtPoint(respawnPoint);
 
         if (deathCamera != null)
             CameraManager.Instance.ActivateCamera(deathCamera, cameraHighPriority);
-        if (fadeController != null) yield return fadeController.FadeIn();
+        
+        
+        yield return new WaitForSeconds(fadeInDelay);
+        // 5. Fade in
+        if (fadeController != null)
+            yield return fadeController.FadeIn();
+        GameStopManager.Instance.ResumeGame();
     }
+
     #endregion
 }
