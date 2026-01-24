@@ -1147,6 +1147,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 263662267687157302}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3849166497626944068
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6606567005623497066}
+  m_Layer: 7
+  m_Name: dragPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 3306451490063965843, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6606567005623497066
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3849166497626944068}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.038, z: 0.232}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3841418951028365759}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3956109904750699108
 GameObject:
   m_ObjectHideFlags: 0
@@ -1644,6 +1675,7 @@ Transform:
   - {fileID: 6858755273236899103}
   - {fileID: 7294122243911310253}
   - {fileID: 8247238387353189349}
+  - {fileID: 6606567005623497066}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &1814846040561682962
@@ -1905,6 +1937,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f56fa022ad5bad4499e04035f3e4764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debug: 1
+  dragAnchor: {fileID: 6606567005623497066}
+  followDamp: 0.05
 --- !u!114 &3246851960515059402
 MonoBehaviour:
   m_ObjectHideFlags: 0

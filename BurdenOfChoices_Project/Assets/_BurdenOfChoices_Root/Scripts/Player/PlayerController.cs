@@ -30,9 +30,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("External Forces")]
     [SerializeField] float externalDamping = 8f;
-
-    [Header("Drag Factor")]
-    [SerializeField] float dragWeightFactor = 0.3f; // cuanto reduce la velocidad al arrastrar
     #endregion
 
     #region Internal State
@@ -54,16 +51,13 @@ public class PlayerController : MonoBehaviour
     bool isCrouching;
     bool crouchLocked;
 
-    // PESO
+    // PESO EQUIP
     float currentEquipWeight = 1f;
     float currentWeightSpeedMultiplier = 1f;
 
-    // DRAG
-    Vector3 dragAxisLocked = Vector3.zero;
-    bool isBlockedByDrag;
-    float currentDragResistance = 1f;  // 1 = sin efecto, <1 = lento por drag
-    bool isDragging = false; // NUEVO: el jugador está arrastrando un objeto
-    float draggedWeight = 1f; // NUEVO: peso del objeto que arrastra
+    // MODIFICADORES EXTERNOS (GENÉRICOS)
+    float movementSpeedMultiplier = 1f;
+    float accelerationMultiplier = 1f;
 
     // GAME STOP
     bool wasGamePaused;
@@ -72,42 +66,39 @@ public class PlayerController : MonoBehaviour
     #region References
     public Rigidbody rb;
     AnimatorManager animatorManager;
+    DraggController draggController;
     #endregion
 
     #region Getters
-    public bool IsCrouching => isCrouching;
-    public bool IsRunning => isRunning;
-    public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     public Vector2 InputMovement => inputMovement;
-
     public float WeightSpeedMultiplier => currentWeightSpeedMultiplier;
 
-    public float WalkSpeed => walkSpeed;
-    public float RunSpeed => runSpeed;
-    public float CrouchSpeed => crouchSpeed;
+    public bool IsCrouching => isCrouching;
+    public bool isRunningPublic => isRunning;
+    public float WalkSpeedPublic => walkSpeed;
+    public float RunSpeedPublic => runSpeed;
+    public float CrouchSpeedPublic => crouchSpeed;
+
+    public Vector3 PlanarVelocity => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     #endregion
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         animatorManager = GetComponent<AnimatorManager>();
+        draggController = GetComponent<DraggController>();
     }
 
     private void Update()
     {
         bool isPaused = GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused;
 
-        // Transición: Playing → Paused
-        if (isPaused && !wasGamePaused)
-            PausePlayer();
-        // Transición: Paused → Playing
-        else if (!isPaused && wasGamePaused)
-            ResumePlayer();
+        if (isPaused && !wasGamePaused) PausePlayer();
+        else if (!isPaused && wasGamePaused) ResumePlayer();
 
         wasGamePaused = isPaused;
 
-        if (isPaused)
-            return;
+        if (isPaused) return;
 
         if (freeRotation)
             HandleFreeRotation();
@@ -117,22 +108,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!movementLocked || isDragging)
-        {
+        if (!movementLocked)
             HandleMovementSpeed();
-        }
         else
-        {
-            // Frenado rápido cuando se pausa
-            float pauseBrakeFactor = 15f; // más alto → frena más rápido
-            Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-            planar = Vector3.Lerp(planar, Vector3.zero, pauseBrakeFactor * Time.fixedDeltaTime);
-            rb.linearVelocity = new Vector3(planar.x, rb.linearVelocity.y, planar.z);
+            BreakToStop();
 
-            currentVelocitySmooth = Vector3.zero; // reset de SmoothDamp
-        }
-
-        ApplyExternalVelocity(); // externalVelocity siempre intacta
+        ApplyExternalVelocity();
         UpdateAnimatorVelocity();
     }
 
@@ -159,138 +140,73 @@ public class PlayerController : MonoBehaviour
     #region Movement Core
     void HandleMovementSpeed()
     {
-        // Determinar velocidad objetivo
-        float targetSpeed = (isCrouching ? crouchSpeed : isRunning ? runSpeed : walkSpeed) * currentWeightSpeedMultiplier;
-        if (isCrouching) targetSpeed = crouchSpeed;
-        else if (isRunning) targetSpeed = runSpeed;
-
-        targetSpeed *= currentWeightSpeedMultiplier;
-
         Vector3 inputDir = new Vector3(inputMovement.x, 0f, inputMovement.y);
-
-        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
-        // Si no hay input o movimiento bloqueado → frenar rápido
-        if (inputDir.sqrMagnitude < 0.01f || (movementLocked && !isDragging))
+        if (inputDir.sqrMagnitude < 0.01f)
         {
-            // Factor de frenado extra
-            float brakeFactor = 10f;
-            Vector3 targetVelocity = Vector3.zero;
-
-            planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-            planarVelocity = Vector3.Lerp(planarVelocity, targetVelocity, brakeFactor * Time.fixedDeltaTime);
-            rb.linearVelocity = new Vector3(planarVelocity.x, rb.linearVelocity.y, planarVelocity.z);
-
-            currentVelocitySmooth = Vector3.zero;
+            BreakToStop();
             return;
         }
-
         inputDir.Normalize();
+
+        float baseSpeed = isCrouching ? crouchSpeed : isRunning ? runSpeed : walkSpeed;
+
+        // Aplicamos multiplicadores: peso / drag / otros efectos externos
+        float targetSpeed = baseSpeed * currentWeightSpeedMultiplier * movementSpeedMultiplier;
+
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         Vector3 desiredVelocity = inputDir * targetSpeed;
 
-        // Aplicar resistencia por drag SOLO si está arrastrando
-        if (isDragging)
-            desiredVelocity *= currentDragResistance;
+        float smoothTime = (desiredVelocity.magnitude > planarVelocity.magnitude) ?
+            accelerationTime * accelerationMultiplier :
+            decelerationTime * accelerationMultiplier;
 
-        // Bloqueo de ejes (drag)
-        if (dragAxisLocked != Vector3.zero)
-        {
-            if (Mathf.Abs(dragAxisLocked.x) > 0f) desiredVelocity.x = 0f;
-            if (Mathf.Abs(dragAxisLocked.z) > 0f) desiredVelocity.z = 0f;
-        }
-
-        // Bloqueo de movimiento fuera de la línea
-        if (isBlockedByDrag && !isDragging)
-        {
-            desiredVelocity = Vector3.zero;
-        }
-
-        // Aplicar suavizado entre velocidad actual y deseada
-        float smoothTime = (desiredVelocity.magnitude > planarVelocity.magnitude) ? accelerationTime : decelerationTime;
         Vector3 smoothVelocity = Vector3.SmoothDamp(planarVelocity, desiredVelocity, ref currentVelocitySmooth, smoothTime);
 
-        // Asignar al Rigidbody
         rb.linearVelocity = new Vector3(smoothVelocity.x, rb.linearVelocity.y, smoothVelocity.z);
+    }
+
+    void BreakToStop()
+    {
+        float brakeFactor = 10f;
+        Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        planar = Vector3.Lerp(planar, Vector3.zero, brakeFactor * Time.fixedDeltaTime);
+        rb.linearVelocity = new Vector3(planar.x, rb.linearVelocity.y, planar.z);
+        currentVelocitySmooth = Vector3.zero;
     }
 
     void ApplyExternalVelocity()
     {
         if (externalVelocity.sqrMagnitude < 0.0001f) return;
-
-        // Sumamos el externalVelocity a la velocidad actual del Rigidbody
         rb.linearVelocity += new Vector3(externalVelocity.x, 0f, externalVelocity.z);
-
-        // Reducimos gradualmente el externalVelocity
         externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, externalDamping * Time.fixedDeltaTime);
     }
     #endregion
 
-    #region Pause / Resume
-    public void PausePlayer()
+    #region Movement Modifiers (GENÉRICOS) // CHANGED
+    public void SetMovementModifier(float speedMultiplier, float accelMultiplier = 1f)
     {
-        movementLocked = true;
-
-        // Limpiar solo input, NO fuerzas externas
-        inputMovement = Vector2.zero;
-        currentVelocitySmooth = Vector3.zero;
+        movementSpeedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 1f);
+        accelerationMultiplier = Mathf.Max(0.01f, accelMultiplier);
     }
 
-    public void ResumePlayer()
+    public void ResetMovementModifier()
     {
-        movementLocked = false;
-    }
-    #endregion
-
-    #region Drag Movement Lock
-    public void LockMovementAxis(Vector3 axis) => dragAxisLocked = axis;
-    public void UnlockMovementAxis() => dragAxisLocked = Vector3.zero;
-
-    public void BlockMovement() => isBlockedByDrag = true;
-    public void AllowMovement() => isBlockedByDrag = false;
-
-    public void SetDraggedWeight(float weight)
-    {
-        draggedWeight = weight;               // NUEVO
-        isDragging = true;                    // NUEVO: activamos el modo drag
-        currentEquipWeight = weight;
-        RecalculateWeightMultiplier();
-
-        // Reducimos la velocidad proporcional al peso del objeto
-        currentDragResistance = Mathf.Clamp(1f - (weight - 1f) * dragWeightFactor, 0.3f, 1f);
-    }
-    public void SnapRotationToDraggedObject(DraggableObject draggedObject)
-    {
-        if (draggedObject == null) return;
-
-        Vector3 axis = draggedObject.dragAxis.normalized;
-
-        // Snap a la dirección opuesta del eje dominante
-        Vector3 lookDir = Vector3.zero;
-        if (Mathf.Abs(axis.x) > 0.1f)
-            lookDir = -Mathf.Sign(axis.x) * Vector3.right;  // contrario X
-        else if (Mathf.Abs(axis.z) > 0.1f)
-            lookDir = -Mathf.Sign(axis.z) * Vector3.forward; // contrario Z
-
-        if (lookDir != Vector3.zero)
-            transform.rotation = Quaternion.LookRotation(lookDir);
+        movementSpeedMultiplier = 1f;
+        accelerationMultiplier = 1f;
     }
 
-    public void StopDragging()
+    public void LockMovementAxis(Vector3 axis)
     {
-        isDragging = false;                   // NUEVO: dejamos de arrastrar
-        currentDragResistance = 1f;           // NUEVO: restauramos resistencia normal
-        draggedWeight = 1f;                   // NUEVO
+        if (axis == Vector3.right)
+            rb.constraints |= RigidbodyConstraints.FreezePositionX;
+        else if (axis == Vector3.forward)
+            rb.constraints |= RigidbodyConstraints.FreezePositionZ;
     }
 
-    public void ResetDraggedWeight()
+    public void UnlockMovementAxis()
     {
-        currentDragResistance = 1f;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
-    #endregion
-
-    #region Crouch Locks
-    public void LockCrouch() => crouchLocked = true;
-    public void UnlockCrouch() => crouchLocked = false;
     #endregion
 
     #region Rotation
@@ -324,8 +240,6 @@ public class PlayerController : MonoBehaviour
         lastMoveDirection = inertialDir;
 
         Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-
-        // Aplicamos WeightFactor para hacer rotación más lenta si el objeto pesa más
         float adjustedRotationSpeed = rotationSpeed * currentWeightSpeedMultiplier;
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, adjustedRotationSpeed * Time.deltaTime);
     }
@@ -339,42 +253,19 @@ public class PlayerController : MonoBehaviour
         lastMoveDirection = inputDir;
 
         Quaternion targetRot = Quaternion.LookRotation(lastMoveDirection);
-
-        // También afectamos free rotation con peso
         float adjustedFreeRotationSpeed = freeRotationSensitivity * 100f * currentWeightSpeedMultiplier;
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, adjustedFreeRotationSpeed * Time.deltaTime);
     }
-
-
 
     public void LockRotation() => rotationLocked = true;
     public void UnlockRotation() => rotationLocked = false;
     public void EnableFreeRotation(bool value) => freeRotation = value;
     #endregion
 
-    #region Input Callbacks
-    void OnMoveChanged(Vector2 input) => inputMovement = input;
-    void OnRunChanged(bool runState) => isRunning = runState;
-    void OnCrouchChanged(bool crouchState)
-    {
-        if (crouchLocked) return;
-        isCrouching = crouchState;
-        animatorManager?.SetCrouching(isCrouching);
-    }
-    #endregion
-
-    #region Weight Handling
+    #region Weight (Equip)
     void OnPickableEquipped(PickableBehaviour p)
     {
-        if (p == null)
-        {
-            currentEquipWeight = 1f;
-            RecalculateWeightMultiplier();
-            return;
-        }
-
-        // Obtenemos el peso directamente del Pickable
-        currentEquipWeight = Mathf.Max(1f, p.Weight);
+        currentEquipWeight = p != null ? Mathf.Max(1f, p.Weight) : 1f;
         RecalculateWeightMultiplier();
     }
 
@@ -392,17 +283,48 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Penalización proporcional al peso
         float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
-        currentWeightSpeedMultiplier = Mathf.Clamp(1f - penalty, weightAccelerationSensitivity, 1f);
+        currentWeightSpeedMultiplier = Mathf.Clamp(
+            1f - penalty,
+            weightAccelerationSensitivity,
+            1f
+        );
+    }
+    #endregion
+
+    #region Pause
+    public void PausePlayer()
+    {
+        movementLocked = true;
+        inputMovement = Vector2.zero;
+        currentVelocitySmooth = Vector3.zero;
+    }
+
+    public void ResumePlayer()
+    {
+        movementLocked = false;
+    }
+    #endregion
+
+    #region Input
+    void OnMoveChanged(Vector2 input) => inputMovement = input;
+    void OnRunChanged(bool runState) => isRunning = runState;
+
+    void OnCrouchChanged(bool crouchState)
+    {
+        if (crouchLocked) return;
+        isCrouching = crouchState;
+        animatorManager?.SetCrouching(isCrouching);
     }
     #endregion
 
     #region External Forces API
-    public void AddExternalImpulse(Vector3 impulse)
-    {
-        externalVelocity += impulse;
-    }
+    public void AddExternalImpulse(Vector3 impulse) => externalVelocity += impulse;
+    #endregion
+
+    #region Crouch Locks
+    public void LockCrouch() => crouchLocked = true;
+    public void UnlockCrouch() => crouchLocked = false;
     #endregion
 
     #region Animator
@@ -410,8 +332,8 @@ public class PlayerController : MonoBehaviour
     {
         if (animatorManager == null) return;
 
-        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        float speed = planarVelocity.magnitude;
+        Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speed = planar.magnitude;
 
         animatorManager.SetVelocity(speed);
         animatorManager.SetMovementRatio(speed / walkSpeed);

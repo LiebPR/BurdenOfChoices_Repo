@@ -1,140 +1,89 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class DraggableObject : MonoBehaviour
 {
+    #region Grab Definition
+    public enum GrabSide { PosX, NegX, PosZ, NegZ }
+
+    [System.Serializable]
+    public struct GrabDefinition
+    {
+        public GrabSide side;
+        public Transform grabPoint;
+        public Vector3 lookDirection;
+    }
+
     [Header("Grab Points")]
-    public Collider[] grabPoints;
+    [SerializeField] GrabDefinition[] grabPoints;
+    #endregion
 
-    [Header("Drag Settings")]
-    public Vector3 dragAxis = Vector3.right; // X o Z
-    public Transform pointA;
-    public Transform pointB;
-    public float maxDragSpeed = 2.5f;
-    public float dragDamping = 8f;
-
-    [Header("Weight")]
-    [SerializeField] private float weight = 1f;
-    public float Weight => weight;
-
+    #region Drag State
+    [HideInInspector] public Transform activeGrabPoint;
+    [HideInInspector] public Vector3 grabFaceLocal;
     [HideInInspector] public bool isBeingDragged;
     [HideInInspector] public Transform currentPlayer;
+    #endregion
 
-    // 👉 NUEVO: cara del objeto desde donde se agarra (en espacio LOCAL)
-    [HideInInspector] public Vector3 grabFaceLocal;
+    #region Drag Config
+    public Transform carrilA;
+    public Transform carrilB;
+    [SerializeField] float weight = 1f;
+    public float Weight => weight;
+    #endregion
 
-    private Rigidbody rb;
-
-    [Header("Physics Settings")]
-    public float dragForceMultiplier = 50f;
-
-    private void Awake()
+    #region Grab Resolution
+    public bool ResolveGrabPoint(Transform player)
     {
-        rb = GetComponent<Rigidbody>();
-        rb.isKinematic = false;
-        rb.useGravity = true;
-        rb.linearDamping = 5f;
-    }
+        if (player == null) return false;
 
-    public bool CanBeGrabbedBy(Transform player)
-    {
-        foreach (var col in grabPoints)
-            if (col.bounds.Contains(player.position))
-                return true;
-        return false;
-    }
-
-    public void StartDragging(Transform player)
-    {
-        isBeingDragged = true;
         currentPlayer = player;
-
-        // 🔹 Posición del jugador en espacio LOCAL del objeto
         Vector3 localPlayerPos = transform.InverseTransformPoint(player.position);
 
-        // 🔹 Determinar cara exacta según eje de drag
-        if (Mathf.Abs(dragAxis.x) > Mathf.Abs(dragAxis.z))
+        float absX = Mathf.Abs(localPlayerPos.x);
+        float absZ = Mathf.Abs(localPlayerPos.z);
+
+        GrabSide side = absX > absZ
+            ? (localPlayerPos.x > 0f ? GrabSide.PosX : GrabSide.NegX)
+            : (localPlayerPos.z > 0f ? GrabSide.PosZ : GrabSide.NegZ);
+
+        foreach (var gp in grabPoints)
         {
-            grabFaceLocal = localPlayerPos.x >= 0f ? Vector3.right : Vector3.left;
+            if (gp.side == side)
+            {
+                activeGrabPoint = gp.grabPoint;
+                grabFaceLocal = gp.lookDirection;
+                return true;
+            }
         }
-        else
-        {
-            grabFaceLocal = localPlayerPos.z >= 0f ? Vector3.forward : Vector3.back;
-        }
+        return false;
+    }
+    #endregion
+
+    #region Drag Control
+    public void StartDragging()
+    {
+        if (activeGrabPoint == null) return;
+        isBeingDragged = true;
     }
 
     public void StopDragging()
     {
         isBeingDragged = false;
-        currentPlayer = null;
+        activeGrabPoint = null;
         grabFaceLocal = Vector3.zero;
+        currentPlayer = null;
     }
+    #endregion
 
-    public void ApplyForce(Vector3 playerInput, float playerWeightFactor)
+    #region Carril Projection
+    public Vector3 ProjectedPosition(Vector3 targetPos)
     {
-        if (!isBeingDragged) return;
+        if (carrilA == null || carrilB == null) return targetPos;
 
-        Vector3 axis = dragAxis.normalized;
-
-        // 🔹 Input proyectado SOLO en el eje permitido
-        Vector3 inputProjected = Vector3.Project(playerInput, axis);
-
-        // 🔹 Aceleración controlada (no acumulativa salvaje)
-        float accel = dragForceMultiplier * playerWeightFactor / Mathf.Max(Weight, 0.1f);
-        rb.AddForce(inputProjected * accel, ForceMode.Acceleration);
-
-        // 🔹 Limitar velocidad SOLO en eje de drag
-        Vector3 velocity = rb.linearVelocity;
-        float axisSpeed = Vector3.Dot(velocity, axis);
-        axisSpeed = Mathf.Clamp(axisSpeed, -maxDragSpeed, maxDragSpeed);
-
-        Vector3 clampedVelocity = axis * axisSpeed;
-        rb.linearVelocity = new Vector3(
-            clampedVelocity.x,
-            rb.linearVelocity.y,
-            clampedVelocity.z
-        );
-
-        // 🔹 Frenado cuando no hay input
-        if (inputProjected.sqrMagnitude < 0.001f)
-        {
-            rb.linearVelocity = Vector3.Lerp(
-                rb.linearVelocity,
-                new Vector3(0f, rb.linearVelocity.y, 0f),
-                dragDamping * Time.fixedDeltaTime
-            );
-        }
-
-        // 🔹 Clamp SUAVE por límites (sin teletransporte)
-        if (pointA != null && pointB != null)
-        {
-            float min, max, pos;
-
-            if (Mathf.Abs(axis.x) > 0.1f)
-            {
-                min = Mathf.Min(pointA.position.x, pointB.position.x);
-                max = Mathf.Max(pointA.position.x, pointB.position.x);
-                pos = Mathf.Clamp(rb.position.x, min, max);
-                rb.MovePosition(new Vector3(pos, rb.position.y, rb.position.z));
-            }
-            else
-            {
-                min = Mathf.Min(pointA.position.z, pointB.position.z);
-                max = Mathf.Max(pointA.position.z, pointB.position.z);
-                pos = Mathf.Clamp(rb.position.z, min, max);
-                rb.MovePosition(new Vector3(rb.position.x, rb.position.y, pos));
-            }
-        }
+        Vector3 direction = (carrilB.position - carrilA.position).normalized;
+        float t = Vector3.Dot(targetPos - carrilA.position, direction) / Vector3.Distance(carrilA.position, carrilB.position);
+        t = Mathf.Clamp01(t);
+        return carrilA.position + direction * Vector3.Distance(carrilA.position, carrilB.position) * t;
     }
-
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
-    {
-        if (!isBeingDragged) return;
-
-        Gizmos.color = Color.green;
-        Vector3 worldDir = transform.TransformDirection(grabFaceLocal);
-        Gizmos.DrawLine(transform.position, transform.position + worldDir);
-    }
-#endif
+    #endregion
 }

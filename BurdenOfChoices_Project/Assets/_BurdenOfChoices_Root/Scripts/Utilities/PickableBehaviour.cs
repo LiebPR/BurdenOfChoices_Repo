@@ -133,29 +133,15 @@ public class PickableBehaviour : MonoBehaviour
             return;
         }
 
-        // Comprobamos si es un objeto arrastrable
         var draggable = GetComponent<DraggableObject>();
         if (draggable != null)
         {
-            // Es arrastrable → usar DragController del jugador
-            var playerRoot = catcher.GetCatchPoint().root;
-            var dragController = playerRoot.GetComponent<DragController>();
-            if (dragController != null)
-            {
-                dragController.TryStartDrag(draggable); // SOLO un argumento
-                draggable.currentPlayer = playerRoot;   // Guardamos referencia al jugador
-            }
-
             isCatched = true;
-            catchPoint = null;
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            coll.isTrigger = false;
-
             OnEquipped?.Invoke(this);
             NotifyEquipListeners(catcher);
             return;
         }
+
 
         // Si no es arrastrable, equip normal
         if (!AllowEquip)
@@ -200,13 +186,13 @@ public class PickableBehaviour : MonoBehaviour
             // Si está siendo arrastrado, avisamos al DragController
             if (draggable.currentPlayer != null)
             {
-                var dragController = draggable.currentPlayer.GetComponent<DragController>();
+                var dragController = draggable.currentPlayer.GetComponent<DraggController>();
                 if (dragController != null)
                     dragController.StopDrag();
 
                 draggable.currentPlayer = null; // Limpiamos referencia
             }
-
+            transform.SetParent(null);
             isCatched = false;
             rb.isKinematic = true;
             rb.useGravity = false;
