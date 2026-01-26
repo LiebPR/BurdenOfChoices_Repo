@@ -11,16 +11,25 @@ public class FlowManager : MonoBehaviour
         PlantSelectedLocked
     }
 
-    public FlowState CurrentState { get; private set; } = FlowState.WaitingForStartButton;
+    public FlowState CurrentState { get; private set; }
+
+    [Header("UI")]
+    [SerializeField] GameObject levelInfoPanel;
 
     private MeshButtonSelectable lockedPlant;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
+        }
         else
             Instance = this;
+
+        CurrentState = FlowState.WaitingForStartButton;
+        if(levelInfoPanel != null)
+            levelInfoPanel.SetActive(false);
     }
 
     // Llamar desde botón Start UI
@@ -48,6 +57,9 @@ public class FlowManager : MonoBehaviour
             if (p != plant)
                 p.SetSelectable(false);
         }
+
+        //Mostrar panel
+        levelInfoPanel?.SetActive(true);
     }
 
     // Llamar desde Escape o botón UI de volver atrás
@@ -64,14 +76,8 @@ public class FlowManager : MonoBehaviour
         }
 
         lockedPlant = null;
+        levelInfoPanel?.SetActive(false);
     }
 
-    // Bloquea toda la interacción (antes de pulsar Start)
-    public void LockAllPlants()
-    {
-        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-        {
-            plant.SetSelectable(false);
-        }
-    }
+    public MeshButtonSelectable GetLockedPlant() => lockedPlant;
 }

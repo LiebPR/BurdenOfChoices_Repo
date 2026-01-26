@@ -30,22 +30,29 @@ public class MeshButtonHighlight : MonoBehaviour
     {
         if (mainCamera == null || Mouse.current == null) return;
 
-        // Bloqueo antes de Start
-        if (FlowManager.Instance != null &&
-            FlowManager.Instance.CurrentState == FlowManager.FlowState.WaitingForStartButton)
+        //Si hay un nivel bloqueado
+        if(FlowManager.Instance != null && FlowManager.Instance.CurrentState == FlowManager.FlowState.PlantSelectedLocked)
+        {
+            if (meshButton.IsSelected())
+            {
+                targetMesh.material = meshButton.GetSelectedMaterial() ?? originalMaterial;
+            }
+
+            else
+            {
+                targetMesh.material = originalMaterial;
+            }
+            return;
+        }
+
+        //Antes de Start
+        if(FlowManager.Instance != null && FlowManager.Instance.CurrentState == FlowManager.FlowState.WaitingForStartButton)
         {
             targetMesh.material = originalMaterial;
             return;
         }
 
-        // Mantener material de selección si está seleccionado
-        if (meshButton != null && meshButton.IsSelected())
-        {
-            targetMesh.material = meshButton.GetSelectedMaterial() ?? originalMaterial;
-            return;
-        }
-
-        // Hover
+        //Hover normal
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = mainCamera.ScreenPointToRay(mousePos);
 

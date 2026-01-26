@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Collider))]
 public class MeshButtonSelectable : MonoBehaviour
@@ -54,20 +52,14 @@ public class MeshButtonSelectable : MonoBehaviour
     {
         if (!isSelectable) return;
 
-        if (!iSelected)
-        {
-            iSelected = true;
-            targetMesh.material = selectedMaterial != null ? selectedMaterial : originalMaterial;
-            cameraPriorityButton?.OnButtonCameraPressed();
+        if (iSelected) return;
 
-            if (FlowManager.Instance != null)
-                FlowManager.Instance.OnPlantSelected(this);
-        }
-        else
-        {
-            if (!string.IsNullOrEmpty(sceneToLoad))
-                SceneController.Instance.LoadScene(sceneToLoad);
-        }
+        iSelected = true;
+        targetMesh.material = selectedMaterial != null ? selectedMaterial : originalMaterial;
+
+        cameraPriorityButton?.OnButtonCameraPressed();
+
+        FlowManager.Instance?.OnPlantSelected(this);
     }
 
     public void Deselect()
