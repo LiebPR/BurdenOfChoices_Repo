@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 208181648426144217}
   - component: {fileID: 5731309641744915046}
   - component: {fileID: 4011034528896613714}
+  - component: {fileID: 2603719803365615342}
   m_Layer: 0
   m_Name: PF_Plank_Weapon
   m_TagString: Untagged
@@ -90,8 +91,10 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 1350393645420021345}
-  coll: {fileID: 6939428583751408283}
+  coll: {fileID: 2603719803365615342}
   rb: {fileID: 4011034528896613714}
 --- !u!114 &208181648426144217
 MonoBehaviour:
@@ -148,6 +151,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!65 &2603719803365615342
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3335363119273737271}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.19153756, y: 0.51889133, z: 0.10838263}
+  m_Center: {x: -0.002895683, y: 0.3139367, z: 0.029876774}
 --- !u!1001 &2766052605083106660
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -211,9 +235,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 25e85635f3500db458c87d2470ce67d7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2651672903773378501}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 25e85635f3500db458c87d2470ce67d7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6939428583751408283}
   m_SourcePrefab: {fileID: 100100000, guid: 25e85635f3500db458c87d2470ce67d7, type: 3}
 --- !u!4 &2443281194200652431 stripped
 Transform:
@@ -247,24 +268,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &6939428583751408283
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3072466365702504501}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.19153756, y: 0.51889133, z: 0.10838263}
-  m_Center: {x: -0.002895683, y: 0.3139367, z: 0.029876774}

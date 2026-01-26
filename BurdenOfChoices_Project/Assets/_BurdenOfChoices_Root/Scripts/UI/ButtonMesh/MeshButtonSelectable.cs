@@ -66,7 +66,7 @@ public class MeshButtonSelectable : MonoBehaviour
         else
         {
             if (!string.IsNullOrEmpty(sceneToLoad))
-                SceneManager.LoadScene(sceneToLoad);
+                SceneController.Instance.LoadScene(sceneToLoad);
         }
     }
 

@@ -61,6 +61,9 @@ public class PlayerController : MonoBehaviour
 
     // GAME STOP
     bool wasGamePaused;
+
+    Vector3 wallNormal;
+    bool isTouchingWall;
     #endregion
 
     #region References
@@ -137,6 +140,26 @@ public class PlayerController : MonoBehaviour
         PickableBehaviour.OnDropped -= OnPickableDropped;
     }
 
+    #region Collisions
+    private void OnCollisionStay(Collision collision)
+    {
+        foreach(ContactPoint contact in collision.contacts)
+        {
+            if (Vector3.Dot(contact.normal, Vector3.up) > 0.5f)
+            {
+                wallNormal = contact.normal;
+                isTouchingWall = true;
+                return;
+            }
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        isTouchingWall = false;
+    }
+    #endregion 
+
     #region Movement Core
     void HandleMovementSpeed()
     {
@@ -155,6 +178,11 @@ public class PlayerController : MonoBehaviour
 
         Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         Vector3 desiredVelocity = inputDir * targetSpeed;
+
+        if (isTouchingWall)
+        {
+            desiredVelocity = Vector3.ProjectOnPlane(desiredVelocity, wallNormal);
+        }
 
         float smoothTime = (desiredVelocity.magnitude > planarVelocity.magnitude) ?
             accelerationTime * accelerationMultiplier :
