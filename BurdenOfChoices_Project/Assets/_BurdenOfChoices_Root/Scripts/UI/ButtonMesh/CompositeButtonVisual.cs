@@ -10,9 +10,10 @@ public class NewMonoBehaviourScript : MonoBehaviour, IButtonVisual
     }
 
     public void SetNormal() => ForEach(v => v.SetNormal());
-    public void SetHover() => ForEach(v => v.SetHover());
     public void SetSelected() => ForEach(v => v.SetSelected());
     public void SetDisabled() => ForEach(v => v.SetDisabled());
+    public void SetHover() => ForEach(v => v.SetHover());
+    public void OnHoverEnter() => ForEach(v => v.SetHover());
 
     void ForEach(System.Action<IButtonVisual> action)
     {

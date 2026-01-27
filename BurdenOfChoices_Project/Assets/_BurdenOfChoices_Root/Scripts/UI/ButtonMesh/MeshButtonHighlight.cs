@@ -8,6 +8,8 @@ public class MeshButtonHighlight : MonoBehaviour
     IButtonVisual visual;
     Camera mainCamera;
 
+    bool wasHovering = false;
+
     void Awake()
     {
         button = GetComponent<MeshButtonSelectable>();
@@ -31,6 +33,7 @@ public class MeshButtonHighlight : MonoBehaviour
         if (flow == FlowManager.FlowState.WaitingForStartButton)
         {
             visual.SetDisabled();
+            wasHovering = false;
             return;
         }
 
@@ -41,23 +44,32 @@ public class MeshButtonHighlight : MonoBehaviour
             else
                 visual.SetDisabled();
 
+            wasHovering = false;
             return;
         }
 
-        // Hover normal
         if (!button.IsSelectable())
         {
             visual.SetDisabled();
+            wasHovering = false;
             return;
         }
 
-        visual.SetNormal();
+        bool isHovering = IsHovering();
 
-        if (IsHovering())
-            visual.SetHover();
+        // Entrada
+        if (isHovering && !wasHovering)
+        {
+            visual.OnHoverEnter();
+        }
 
+        // Estado base
         if (button.IsSelected())
             visual.SetSelected();
+        else
+            visual.SetNormal();
+
+        wasHovering = isHovering;
     }
 
     bool IsHovering()

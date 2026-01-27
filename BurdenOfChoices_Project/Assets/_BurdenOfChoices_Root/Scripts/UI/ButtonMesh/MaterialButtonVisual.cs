@@ -1,14 +1,31 @@
 using UnityEngine;
+using System.Collections;
 
 public class MaterialMesh : MonoBehaviour, IButtonVisual
 {
+    [Header("Materials")]
+    [Tooltip("MeshRenderer que cambiará de material según el estado del botón")]
     [SerializeField] MeshRenderer targetMesh;
+
+    [Tooltip("Material por defecto cuando el botón está en estado normal (sin hover ni selección)")]
     [SerializeField] Material normal;
+
+    [Tooltip("Material que se usa cuando el cursor está encima del botón")]
     [SerializeField] Material hover;
+
+    [Tooltip("Material que se aplica cuando el botón ha sido seleccionado")]
     [SerializeField] Material selected;
+
+    [Tooltip("Material usado cuando el botón está deshabilitado o bloqueado por el flujo")]
     [SerializeField] Material disabled;
 
+
+    [Header("Hover Flash Settings")]
+    [Tooltip("Duración de efecto de hover de entrada")]
+    [SerializeField] float hoverFlashDuration = 0.15f;
+
     Material current;
+    Coroutine hoverRoutine;
 
     private void Awake()
     {
@@ -22,14 +39,36 @@ public class MaterialMesh : MonoBehaviour, IButtonVisual
         if (normal == null)
             normal = targetMesh.material;
 
-        current = normal;
-        targetMesh.material = normal;
+        Set(normal);
     }
 
     public void SetNormal() => Set(normal);
-    public void SetHover() => Set(hover ?? normal);
     public void SetSelected() => Set(selected ?? normal);
     public void SetDisabled() => Set(disabled ?? normal);
+
+
+    public void SetHover() => Set(hover ?? normal);
+
+    public void OnHoverEnter()
+    {
+        if (hover == null)
+            return;
+
+        if (hoverRoutine != null)
+            StopCoroutine(hoverRoutine);
+
+        hoverRoutine = StartCoroutine(HoverFlash());
+    }
+
+    IEnumerator HoverFlash()
+    {
+        Set(hover);
+        yield return new WaitForSeconds(hoverFlashDuration);
+
+        // Volvemos al estado base
+        Set(normal);
+        hoverRoutine = null;
+    }
 
     void Set(Material mat)
     {
