@@ -46,7 +46,7 @@ public class PickableBehaviour : MonoBehaviour
     Quaternion originalRotation;
     Vector3 originalScale;
 
-    float restoreTimer;
+    float restoreEndTime;
     float groundedStableTimer;
     #endregion
 
@@ -57,6 +57,7 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Getters
     public bool IsCatched => isCatched;
+    public bool IsRestoreRunning => restoreRunning;
     #endregion
 
     #region Eventos
@@ -123,6 +124,12 @@ public class PickableBehaviour : MonoBehaviour
                 OnDrop();
             }
         }
+
+        if (restoreRunning && Time.time >= restoreEndTime)
+        {
+            restoreRunning = false;
+            RestoreInternal();
+        }
     }
 
     #region Equip
@@ -130,8 +137,6 @@ public class PickableBehaviour : MonoBehaviour
     public void OnEquip(ICatcher catcher)
     {
         CancelInvoke(nameof(RestoreInternal));
-        CancelInvoke(nameof(UpdateRestoreTimer));
-        restoreRunning = false;
 
         if (catcher == null)
         {
@@ -246,11 +251,8 @@ public class PickableBehaviour : MonoBehaviour
 
         if (isRestoreWithTime)
         {
-            restoreTimer = restoreDelay;
             restoreRunning = true;
-
-            InvokeRepeating(nameof(UpdateRestoreTimer), 0f, Time.deltaTime);
-            Invoke(nameof(RestoreInternal), restoreDelay);
+            restoreEndTime = Time.time + restoreDelay;
         }
     }
 
@@ -269,7 +271,6 @@ public class PickableBehaviour : MonoBehaviour
         OnDropped?.Invoke(this);
         NotifyDropListeners();
         restoreRunning = false;
-        CancelInvoke(nameof(UpdateRestoreTimer));
         CancelInvoke(nameof(RestoreInternal));
     }
 
@@ -291,7 +292,8 @@ public class PickableBehaviour : MonoBehaviour
     public void OnRestoreWithTime(float delay)
     {
         OnDrop(true);
-        Invoke(nameof(RestoreInternal), delay);
+        restoreRunning = true;
+        restoreEndTime = Time.time + delay;
     }
 
     //Suelta y restaura inmediatamente
@@ -303,24 +305,20 @@ public class PickableBehaviour : MonoBehaviour
 
     public void OnDeathZoneImpact()
     {
-        Debug.Log($"[DeathZone] Impacto en {name}");
 
         if (restoreOnDeathZone)
         {
-            Debug.Log($"[DeathZone] Restore en {deathZoneRestoreDelay}s");
             OnRestoreWithTime(deathZoneRestoreDelay);
         }
         else
         {
-            Debug.Log($"[DeathZone] Destruido");
             Destroy(gameObject);
         }
     }
 
     void RestoreInternal()
     {
-        Debug.Log($"[Restore] Restaurando {name}");
-        CancelInvoke();
+        restoreRunning = false;
 
         transform.SetParent(null);
 
@@ -409,20 +407,10 @@ public class PickableBehaviour : MonoBehaviour
     }
 
     #region Timer Visuals
-    void UpdateRestoreTimer()
+    public float GetRestoreRemainingTime()
     {
-        restoreTimer -= Time.deltaTime;
-
-        if (restoreTimer <= 0f)
-        {
-            restoreTimer = 0f;
-            CancelInvoke(nameof(UpdateRestoreTimer));
-        }
-    }
-
-    public float GetRestoreRmainingTime()
-    {
-        return restoreRunning ? restoreTimer : 0f;
+        if (!restoreRunning) return 0f;
+        return Mathf.Max(0f, restoreEndTime - Time.time);
     }
 
     public float GetRestoreTotalTime()
