@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PickSystem : MonoBehaviour
@@ -15,6 +16,11 @@ public class PickSystem : MonoBehaviour
     #region Internal States
     PickableBehaviour currentPickable;
     ICatcher catcher;
+    #endregion
+
+    #region Eventos
+    public static event Action<PickableBehaviour> OnPickStarted;
+    public static event Action<PickableBehaviour> OnPickEnded;
     #endregion
 
     private void Awake()
@@ -49,13 +55,10 @@ public class PickSystem : MonoBehaviour
     void HandlePickPressed()
     {
         if (catcher == null) return;
-
-        // Si ya hay un pick activo, no hacemos nada
         if (currentPickable != null) return;
-
         if (!TryGetPickable(out PickableBehaviour pickable)) return;
 
-        //DRAGABLE
+        // DRAGABLE
         var draggable = pickable.GetComponent<DraggableObject>();
         if (draggable != null)
         {
@@ -64,23 +67,27 @@ public class PickSystem : MonoBehaviour
 
             var dragController = playerHand.GetComponentInParent<DraggController>();
             if (dragController != null)
-            {
                 dragController.StartDrag(draggable);
-                currentPickable = pickable;
-                return;
-            }
+
+            currentPickable = pickable;
+
+            // Evento centralizado
+            OnPickStarted?.Invoke(pickable);
+            return;
         }
 
-        // Fallback: equip normal
+        // EQUIP NORMAL
         currentPickable = pickable;
         currentPickable.OnEquip(catcher);
+
+        // Evento centralizado
+        OnPickStarted?.Invoke(pickable);
     }
 
     void HandlePickReleased()
     {
         if (currentPickable == null) return;
 
-        // Si es draggable, forzamos StopDrag
         var draggable = currentPickable.GetComponent<DraggableObject>();
         if (draggable != null && draggable.isBeingDragged)
         {
@@ -90,6 +97,10 @@ public class PickSystem : MonoBehaviour
         }
 
         currentPickable.RequestDrop();
+
+        // Evento centralizado
+        OnPickEnded?.Invoke(currentPickable);
+
         currentPickable = null;
     }
     #endregion

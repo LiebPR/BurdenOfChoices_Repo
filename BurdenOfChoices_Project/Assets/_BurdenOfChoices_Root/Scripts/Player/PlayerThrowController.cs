@@ -2,13 +2,12 @@
 using System.Collections;
 
 /// <summary>
-/// PlayerThrowController: Gestiona el input, carga y lanzamiento de objetos.
-/// Toda la lógica de gameplay vive aquí. El Animator es solo visual.
+/// PlayerThrowController: Gestiona input, carga y lanzamiento de objetos.
+/// Ahora el peso del objeto se maneja centralmente en PlayerController.
 /// </summary>
 public class PlayerThrowController : MonoBehaviour
 {
     #region Inspector Variables
-
     [Header("Refs")]
     [SerializeField] Transform throwDirectionSource;
     [SerializeField] Transform throwPreview;
@@ -26,53 +25,36 @@ public class PlayerThrowController : MonoBehaviour
     [SerializeField] float simulationAirResistance = 0.1f;
     [SerializeField] float previewHeightOffset = 0.05f;
     [SerializeField] float throwFollowSpeed = 8f;
-
     #endregion
 
     #region Internal State
-
     float holdTime;
     bool isHolding;
 
-    // Valores efectivos según peso
-    float currentWeight = 1f;
-    float weightFactor = 1f;
-    float effectiveHoldSpeed;
-    float effectiveMinThrowDistance;
-    float effectiveMaxThrowDistance;
-    float effectiveVerticalThrowForce;
-
-    // Dirección suavizada durante el hold
     Vector3 throwDirectionSmoothed;
-
-    // 🔒 Valores congelados al soltar
     Vector3 cachedThrowDirection;
     float cachedThrowDistance;
 
     Coroutine throwCoroutine;
-
     #endregion
 
     #region References
-
     PickableBehaviour pickable;
     ThrowableBehaviour throwable;
     AnimatorManager animatorManager;
-
+    PlayerController player;
     #endregion
 
-    #region Unity Lifecycle
     void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
+        player = GetComponent<PlayerController>();
     }
 
     void Start()
     {
         if (throwPreview != null)
             throwPreview.gameObject.SetActive(false);
-
-        ResetEffectiveValues();
     }
 
     void Update()
@@ -85,12 +67,11 @@ public class PlayerThrowController : MonoBehaviour
             return;
         }
 
-        holdTime += Time.deltaTime * effectiveHoldSpeed;
+        holdTime += Time.deltaTime * holdSpeed;
         holdTime = Mathf.Clamp01(holdTime);
 
         UpdateThrowPreview();
     }
-    #endregion
 
     #region Input Subscriptions
     void OnEnable()
@@ -113,21 +94,14 @@ public class PlayerThrowController : MonoBehaviour
     #endregion
 
     #region Pickable Handling
-
     void SetCurrentPickable(PickableBehaviour p)
     {
         pickable = p;
         throwable = p.GetComponent<ThrowableBehaviour>();
 
-        //Cogemos el peso de PickableBehaviour directamente 
-        currentWeight = pickable != null ? pickable.Weight : 1f;
-
-        weightFactor = Mathf.Clamp(1f / Mathf.Max(currentWeight, 0.1f), 0.15f, 1f);
-
-        effectiveHoldSpeed = holdSpeed * weightFactor;
-        effectiveMinThrowDistance = minThrowDistance * weightFactor;
-        effectiveMaxThrowDistance = maxThrowDistance * weightFactor;
-        effectiveVerticalThrowForce = verticalThrowForce * weightFactor;
+        // Aplicamos el peso centralizado al jugador
+        if (player != null)
+            player.SetWeight(pickable != null ? pickable.Weight : 1f);
     }
 
     void ClearCurrentPickable(PickableBehaviour p)
@@ -137,19 +111,19 @@ public class PlayerThrowController : MonoBehaviour
         CancelHold();
         pickable = null;
         throwable = null;
-        ResetEffectiveValues();
+
+        // Restauramos peso base del jugador
+        if (player != null)
+            player.SetWeight(1f);
 
         if (throwPreview != null)
             throwPreview.gameObject.SetActive(false);
     }
-
     #endregion
 
     #region Hold / Release Logic
     void StartHold()
     {
-        var player = GetComponent<PlayerController>();
-
         if (player != null && player.IsCrouching) return;
         if (pickable == null || throwable == null || !pickable.IsCatched) return;
 
@@ -181,20 +155,14 @@ public class PlayerThrowController : MonoBehaviour
 
         isHolding = false;
 
-        // Congelamos datos definitivos
         cachedThrowDirection = throwDirectionSmoothed;
-        cachedThrowDistance = Mathf.Lerp(
-            effectiveMinThrowDistance,
-            effectiveMaxThrowDistance,
-            holdTime
-        );
+        cachedThrowDistance = Mathf.Lerp(minThrowDistance, maxThrowDistance, holdTime);
 
         animatorManager.TriggerThrow();
 
         if (throwPreview != null)
             throwPreview.gameObject.SetActive(false);
 
-        var player = GetComponent<PlayerController>();
         if (player != null)
         {
             player.ResumePlayer();
@@ -219,7 +187,6 @@ public class PlayerThrowController : MonoBehaviour
         if (pickable == null || throwable == null)
             yield break;
 
-        // Liberación física
         pickable.transform.parent = null;
 
         Rigidbody rb = pickable.rb;
@@ -230,15 +197,10 @@ public class PlayerThrowController : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         rb.WakeUp();
 
-        // Esperamos a que el solver registre el cuerpo
         yield return new WaitForFixedUpdate();
 
         // Lanzamiento REAL
-        throwable.OnThrow(
-            cachedThrowDirection,
-            cachedThrowDistance,
-            effectiveVerticalThrowForce
-        );
+        throwable.OnThrow(cachedThrowDirection, cachedThrowDistance, verticalThrowForce);
     }
 
     void CancelHold()
@@ -251,7 +213,6 @@ public class PlayerThrowController : MonoBehaviour
 
         animatorManager.EndHold();
 
-        var player = GetComponent<PlayerController>();
         if (player != null)
         {
             player.ResumePlayer();
@@ -272,17 +233,21 @@ public class PlayerThrowController : MonoBehaviour
             throwFollowSpeed * Time.deltaTime
         );
 
-        float force = Mathf.Lerp(
-            effectiveMinThrowDistance,
-            effectiveMaxThrowDistance,
-            holdTime
-        );
+        if (pickable == null)
+            return;
+
+        // Factor según peso (igual que en el lanzamiento real)
+        float weightFactor = 1f / Mathf.Max(pickable.Weight, 0.1f);
+        weightFactor = Mathf.Clamp(weightFactor, 0.15f, 1f);
+
+        float force = Mathf.Lerp(minThrowDistance, maxThrowDistance, holdTime) * weightFactor;
+        float vertical = verticalThrowForce * weightFactor;
 
         Vector3 predicted = PredictLandingPoint(
             throwDirectionSource.position,
             throwDirectionSmoothed,
             force,
-            effectiveVerticalThrowForce
+            vertical
         );
 
         throwPreview.position = predicted;
@@ -291,18 +256,14 @@ public class PlayerThrowController : MonoBehaviour
     Vector3 PredictLandingPoint(Vector3 origin, Vector3 direction, float forceImpulse, float verticalImpulse)
     {
         Vector3 dir = direction.normalized;
-
-        float mass = (pickable != null && pickable.rb != null)
-            ? Mathf.Max(0.0001f, pickable.rb.mass)
-            : 1f;
-
+        float mass = (pickable != null && pickable.rb != null) ? Mathf.Max(0.0001f, pickable.rb.mass) : 1f;
         Vector3 velocity = (dir * forceImpulse + Vector3.up * verticalImpulse) / mass;
         Vector3 pos = origin;
 
         float dt = 0.02f;
         float maxTime = 5f;
 
-        for (float t = 0f; t < maxTime; t += dt)
+        for (float t = 0; t < maxTime; t += dt)
         {
             velocity += Physics.gravity * dt;
             velocity *= Mathf.Exp(-simulationAirResistance * dt);
@@ -316,18 +277,6 @@ public class PlayerThrowController : MonoBehaviour
         }
 
         return pos;
-    }
-    #endregion
-
-    #region Utils
-    void ResetEffectiveValues()
-    {
-        currentWeight = 1f;
-        weightFactor = 1f;
-        effectiveHoldSpeed = holdSpeed;
-        effectiveMinThrowDistance = minThrowDistance;
-        effectiveMaxThrowDistance = maxThrowDistance;
-        effectiveVerticalThrowForce = verticalThrowForce;
     }
     #endregion
 }

@@ -67,14 +67,13 @@ public class DraggController : MonoBehaviour
         ApplyInputClamp();
 
         // --- Aplicamos peso del objeto arrastrable ---
-        float dragWeightFactor = Mathf.Clamp01(1f - currentDrag.Weight * 0.15f); // 0 = pesado, 1 = sin peso
+        var pickable = currentDrag.GetComponent<PickableBehaviour>();
+        float objectWeight = pickable != null ? pickable.Weight : 1f;
+        float dragWeightFactor = Mathf.Clamp01(1f - objectWeight * 0.15f);
         player.SetMovementModifier(dragWeightFactor, 1f);
 
         // Resistencia inicial temporal
         StartCoroutine(TemporaryResistance(player, dragWeightFactor * initialResistance, resistanceDuration));
-
-        if (debug)
-            Debug.Log("[Drag] Started dragging object: " + draggable.name + " Weight: " + draggable.Weight);
     }
 
     public void StopDrag()

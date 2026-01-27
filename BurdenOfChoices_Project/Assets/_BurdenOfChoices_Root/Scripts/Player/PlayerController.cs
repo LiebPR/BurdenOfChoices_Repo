@@ -1,9 +1,8 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
-/// PlayerController: Contiene las lógicas de movimiento del jugador con suavizado completo.
-/// Separa movimiento por input y fuerzas externas. La rotación se mantiene intacta.
+/// PlayerController: Controla el movimiento del jugador y reacciona al peso de objetos equipados.
+/// Separación clara entre input, fuerzas externas y penalización por peso.
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -52,10 +51,10 @@ public class PlayerController : MonoBehaviour
     bool crouchLocked;
 
     // PESO EQUIP
-    float currentEquipWeight = 1f;
-    float currentWeightSpeedMultiplier = 1f;
+    float currentEquipWeight = 1f;             // Peso actual del objeto
+    float currentWeightSpeedMultiplier = 1f;   // Penalización aplicada a la velocidad
 
-    // MODIFICADORES EXTERNOS (GENÉRICOS)
+    // MODIFICADORES EXTERNOS
     float movementSpeedMultiplier = 1f;
     float accelerationMultiplier = 1f;
 
@@ -125,9 +124,6 @@ public class PlayerController : MonoBehaviour
         InputManager.OnMoveChanged += OnMoveChanged;
         InputManager.OnRunChanged += OnRunChanged;
         InputManager.OnCrouchChanged += OnCrouchChanged;
-
-        PickableBehaviour.OnEquipped += OnPickableEquipped;
-        PickableBehaviour.OnDropped += OnPickableDropped;
     }
 
     private void OnDisable()
@@ -135,30 +131,7 @@ public class PlayerController : MonoBehaviour
         InputManager.OnMoveChanged -= OnMoveChanged;
         InputManager.OnRunChanged -= OnRunChanged;
         InputManager.OnCrouchChanged -= OnCrouchChanged;
-
-        PickableBehaviour.OnEquipped -= OnPickableEquipped;
-        PickableBehaviour.OnDropped -= OnPickableDropped;
     }
-
-    #region Collisions
-    private void OnCollisionStay(Collision collision)
-    {
-        foreach(ContactPoint contact in collision.contacts)
-        {
-            if (Vector3.Dot(contact.normal, Vector3.up) > 0.5f)
-            {
-                wallNormal = contact.normal;
-                isTouchingWall = true;
-                return;
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        isTouchingWall = false;
-    }
-    #endregion 
 
     #region Movement Core
     void HandleMovementSpeed()
@@ -210,7 +183,7 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Movement Modifiers (GENÉRICOS) // CHANGED
+    #region Movement Modifiers
     public void SetMovementModifier(float speedMultiplier, float accelMultiplier = 1f)
     {
         movementSpeedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 1f);
@@ -290,16 +263,13 @@ public class PlayerController : MonoBehaviour
     public void EnableFreeRotation(bool value) => freeRotation = value;
     #endregion
 
-    #region Weight (Equip)
-    void OnPickableEquipped(PickableBehaviour p)
+    #region Weight API
+    /// <summary>
+    /// Aplica el peso de un objeto al jugador.
+    /// </summary>
+    public void SetWeight(float weight)
     {
-        currentEquipWeight = p != null ? Mathf.Max(1f, p.Weight) : 1f;
-        RecalculateWeightMultiplier();
-    }
-
-    void OnPickableDropped(PickableBehaviour p)
-    {
-        currentEquipWeight = 1f;
+        currentEquipWeight = Mathf.Max(1f, weight);
         RecalculateWeightMultiplier();
     }
 
