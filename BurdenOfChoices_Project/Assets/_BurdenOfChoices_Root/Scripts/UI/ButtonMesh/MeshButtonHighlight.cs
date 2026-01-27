@@ -1,63 +1,68 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(MeshButtonSelectable))]
 public class MeshButtonHighlight : MonoBehaviour
 {
-    [Header("Highlight Settings")]
-    [SerializeField] MeshRenderer targetMesh;
-    [SerializeField] Material highlightMaterial;
+    MeshButtonSelectable button;
+    IButtonVisual visual;
+    Camera mainCamera;
 
-    private Material originalMaterial;
-    private MeshButtonSelectable meshButton;
-    private Camera mainCamera;
-
-    private void Awake()
+    void Awake()
     {
-        if (targetMesh == null)
-        {
-            Debug.LogError("Asignar targetMesh en " + name);
-            return;
-        }
-
-        meshButton = GetComponent<MeshButtonSelectable>();
+        button = GetComponent<MeshButtonSelectable>();
+        visual = GetComponent<IButtonVisual>();
         mainCamera = Camera.main;
 
-        originalMaterial = targetMesh.material;
+        if (visual == null)
+        {
+            Debug.LogError("No hay IButtonVisual en " + name);
+            enabled = false;
+        }
     }
 
-    private void Update()
+    void Update()
     {
-        if (mainCamera == null || Mouse.current == null) return;
+        if (mainCamera == null || Mouse.current == null)
+            return;
 
-        //Si hay un nivel bloqueado
-        if(FlowManager.Instance != null && FlowManager.Instance.CurrentState == FlowManager.FlowState.PlantSelectedLocked)
+        var flow = FlowManager.Instance?.CurrentState;
+
+        if (flow == FlowManager.FlowState.WaitingForStartButton)
         {
-            if (meshButton.IsSelected())
-            {
-                targetMesh.material = meshButton.GetSelectedMaterial() ?? originalMaterial;
-            }
+            visual.SetDisabled();
+            return;
+        }
 
+        if (flow == FlowManager.FlowState.PlantSelectedLocked)
+        {
+            if (button.IsSelected())
+                visual.SetSelected();
             else
-            {
-                targetMesh.material = originalMaterial;
-            }
+                visual.SetDisabled();
+
             return;
         }
 
-        //Antes de Start
-        if(FlowManager.Instance != null && FlowManager.Instance.CurrentState == FlowManager.FlowState.WaitingForStartButton)
+        // Hover normal
+        if (!button.IsSelectable())
         {
-            targetMesh.material = originalMaterial;
+            visual.SetDisabled();
             return;
         }
 
-        //Hover normal
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = mainCamera.ScreenPointToRay(mousePos);
+        visual.SetNormal();
 
-        bool isHovering = Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform;
+        if (IsHovering())
+            visual.SetHover();
 
-        targetMesh.material = isHovering ? highlightMaterial : originalMaterial;
+        if (button.IsSelected())
+            visual.SetSelected();
+    }
+
+    bool IsHovering()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        return Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform;
     }
 }
