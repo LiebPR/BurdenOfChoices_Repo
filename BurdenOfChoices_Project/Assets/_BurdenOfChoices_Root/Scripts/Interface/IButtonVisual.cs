@@ -1,8 +1,8 @@
 public interface IButtonVisual
 {
     void SetNormal();
-    void SetHover();          // hover continuo (opcional)
-    void OnHoverEnter();      // ?? nuevo
+    void SetHover(); //estado de Hover persistente
+    void OnHoverEnter(); //efecto puntual (flash / trigger)
     void SetSelected();
     void SetDisabled();
 }
