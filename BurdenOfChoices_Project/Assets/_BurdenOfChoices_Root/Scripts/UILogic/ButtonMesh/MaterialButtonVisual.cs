@@ -61,17 +61,31 @@ public class MaterialMesh : MonoBehaviour, IButtonVisual
 
     public void OnHoverEnter()
     {
-        if(!hoverFlashing || hover == null)
+        if (hover == null)
             return;
-        if(hoverRoutine != null)
-            StopCoroutine(hoverRoutine);
-        hoverRoutine = StartCoroutine(HoverFlash());
+
+        if (hoverFlashing)
+        {
+            if (hoverRoutine != null)
+                StopCoroutine(hoverRoutine);
+
+            hoverRoutine = StartCoroutine(HoverFlash());
+        }
+        else
+        {
+            Set(hover);
+        }
     }
 
     IEnumerator HoverFlash()
     {
+        // Flash rápido
         Set(hover);
         yield return new WaitForSeconds(hoverFlashDuration);
+
+        // Hover normal después del flash
+        Set(hover);
+
         hoverRoutine = null;
     }
 
