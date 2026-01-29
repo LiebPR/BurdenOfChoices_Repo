@@ -89,9 +89,8 @@ public class PickableBehaviour : MonoBehaviour
     {
         if (rb == null)
             rb = GetComponent<Rigidbody>();
-
-        if (coll == null)
-            Debug.LogError("PickableBehaviour requiere un Collider asignado en el inspector.");
+        if(coll == null)
+            coll = GetComponent<Collider>();    
 
         dataProvider = GetComponent<DataProvider>();
 

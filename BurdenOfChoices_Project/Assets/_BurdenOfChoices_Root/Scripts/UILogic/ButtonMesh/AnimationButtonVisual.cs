@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimationButtonVisual : MonoBehaviour, IButtonVisual
+public class AnimationButtonVisual : MonoBehaviour
 {
     [SerializeField] Animator animator1;
     [SerializeField] Animator animator2;

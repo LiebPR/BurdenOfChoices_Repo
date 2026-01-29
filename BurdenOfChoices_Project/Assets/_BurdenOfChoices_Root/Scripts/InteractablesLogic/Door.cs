@@ -34,16 +34,11 @@ public class Door : MonoBehaviour, IInteractable
     #endregion
 
     #region References
-    FadeController fadeController;
     AnimatorManager animatorManager;
     #endregion
 
     private void Awake()
     {
-        if (fadeController == null)
-        {
-            fadeController = FindAnyObjectByType<FadeController>();
-        }
         animatorManager = FindAnyObjectByType<AnimatorManager>();
     }
 
@@ -119,8 +114,8 @@ public class Door : MonoBehaviour, IInteractable
         exitDoorAnimator.SetTrigger(idleTrigger);
 
         // Fade out
-        if (fadeController != null)
-            yield return fadeController.FadeOut();
+        if (FadeController.Instance != null)
+            yield return FadeController.Instance.FadeOut();
 
         // Teletransportar jugador
         Transform player = FindAnyObjectByType<PlayerController>().transform;
@@ -136,8 +131,8 @@ public class Door : MonoBehaviour, IInteractable
             entryDoorAnimator.SetTrigger(closeEntryTrigger);
 
         // Fade in
-        if (fadeController != null)
-            yield return fadeController.FadeIn();
+        if (FadeController.Instance != null)
+            yield return FadeController.Instance.FadeIn();
 
         // Restaurar estado del juego
         GameDirector.Instance.SetPhase(GamePhase.Playing);

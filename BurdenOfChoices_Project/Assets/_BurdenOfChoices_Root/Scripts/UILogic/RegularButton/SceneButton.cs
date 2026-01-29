@@ -5,12 +5,11 @@ public class SceneButton : MonoBehaviour
     [Header("Scene Settings")]
     [Tooltip("Nombre de la escena a cargar")]
     [SerializeField] string sceneName;
-    [SerializeField] float delay = 0.1f;
-    [SerializeField] float fadeDelay = 0.5f;
-    [SerializeField] float fadeOutDuration = 0.5f;
-    [SerializeField] float fadeInDuration = 0.5f;
 
-    public void LoadScene()
+    [Tooltip("Delay antes de iniciar la carga de escena")]
+    [SerializeField] float delaySeconds = 0f;
+
+    public void LoadSceneDelay()
     {
         if (string.IsNullOrEmpty(sceneName))
         {
@@ -18,10 +17,9 @@ public class SceneButton : MonoBehaviour
             return;
         }
 
-        // Llama al SceneController existente, usando su delay por defecto
         if (SceneController.Instance != null)
         {
-            SceneController.Instance.LoadScene(sceneName, delay, fadeDelay, fadeOutDuration, fadeInDuration);
+            SceneController.Instance.LoadScene(sceneName, delaySeconds);
         }
         else
         {
@@ -31,6 +29,7 @@ public class SceneButton : MonoBehaviour
 
     public void QuitGame()
     {
-        SceneController.Instance.QuitGame();
+        if (SceneController.Instance != null)
+            SceneController.Instance.QuitGame();
     }
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MaterialMesh : MonoBehaviour, IButtonVisual
+public class MaterialButtonVisual : MonoBehaviour
 {
     [Header("Materials")]
     [Tooltip("MeshRenderer que cambiará de material según el estado del botón")]

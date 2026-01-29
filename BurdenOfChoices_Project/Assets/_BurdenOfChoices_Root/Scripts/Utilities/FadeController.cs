@@ -1,170 +1,64 @@
-using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections;
 
 public class FadeController : MonoBehaviour
 {
     public static FadeController Instance;
 
-    #region Inspector
-    [Header("UI References")]
-    [SerializeField] Image fadeImage;
+    public Image fadeImage;
+    public float fadeDuration = 1f;
+    public CanvasGroup fadeCanvasGroup; // <- Nuevo
 
-    [Header("Fade Settings")]
-    [SerializeField] float defaultFadeTime = 0.5f;
-    #endregion
+    public bool IsFaded { get; private set; } = true;
 
-    #region Internal
-    Canvas fadeCanvas;
-    GraphicRaycaster raycaster;
-    Coroutine fadeRoutine;
-    #endregion
-
-    #region Getters
-    public bool IsFading => fadeRoutine != null;
-    #endregion
-
-    #region Unity Lifecycle
     void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Instance == null)
         {
-            Destroy(gameObject);
-            return;
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        SetupCanvas();
-        TryFindFadeImage();
-        SetAlpha(0f);
+        else Destroy(gameObject);
     }
 
-    void OnEnable()
+    void Start()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        StartCoroutine(FadeIn());
     }
 
-    void OnDisable()
+    public IEnumerator FadeOut()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-    #endregion
-
-    #region Scene Handling
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        TryFindFadeImage();
-        SetAlpha(0f);
-    }
-    #endregion
-
-    #region Public API — Coroutine (compatibilidad)
-    public IEnumerator FadeOut(float duration = -1f)
-    {
-        yield return StartFade(0f, 1f, duration);
+        yield return Fade(1f);
     }
 
-    public IEnumerator FadeIn(float duration = -1f)
+    public IEnumerator FadeIn()
     {
-        yield return StartFade(1f, 0f, duration);
-    }
-    #endregion
-
-    #region Public API — Callback (SECUENCIAS)
-    public void FadeOut(Action onFinished, float duration = -1f)
-    {
-        StartCoroutine(FadeWithCallback(0f, 1f, duration, onFinished));
+        yield return Fade(0f);
     }
 
-    public void FadeIn(Action onFinished, float duration = -1f)
+    IEnumerator Fade(float targetAlpha)
     {
-        StartCoroutine(FadeWithCallback(1f, 0f, duration, onFinished));
-    }
-    #endregion
+        float startAlpha = fadeImage.color.a;
+        float timer = 0f;
 
-    #region Core Fade Logic
-    IEnumerator FadeWithCallback(float from, float to, float duration, Action onFinished)
-    {
-        yield return StartFade(from, to, duration);
-        onFinished?.Invoke();
-    }
+        // Mientras haya alpha > 0, bloqueamos raycasts
+        fadeCanvasGroup.blocksRaycasts = true;
 
-    IEnumerator StartFade(float from, float to, float duration)
-    {
-        if (fadeRoutine != null)
-            StopCoroutine(fadeRoutine);
-
-        fadeRoutine = StartCoroutine(CrossFade(from, to, duration));
-        yield return fadeRoutine;
-        fadeRoutine = null;
-    }
-
-    IEnumerator CrossFade(float from, float to, float duration)
-    {
-        if (fadeImage == null) yield break;
-
-        float time = duration <= 0 ? defaultFadeTime : duration;
-        float elapsed = 0f;
-
-        if (raycaster != null)
-            raycaster.enabled = to > from;
-
-        Color c = fadeImage.color;
-
-        while (elapsed < time)
+        while (timer < fadeDuration)
         {
-            elapsed += Time.unscaledDeltaTime;
-            c.a = Mathf.Lerp(from, to, elapsed / time);
-            fadeImage.color = c;
+            timer += Time.deltaTime;
+            float alpha = Mathf.Lerp(startAlpha, targetAlpha, timer / fadeDuration);
+            fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, alpha);
+
+            // Desbloquear raycasts solo cuando es casi transparente
+            fadeCanvasGroup.blocksRaycasts = alpha > 0.01f;
+
             yield return null;
         }
 
-        c.a = to;
-        fadeImage.color = c;
-
-        if (raycaster != null)
-            raycaster.enabled = to > 0f;
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, targetAlpha);
+        IsFaded = targetAlpha == 1f;
+        fadeCanvasGroup.blocksRaycasts = targetAlpha > 0.01f;
     }
-    #endregion
-
-    #region Setup
-    void SetupCanvas()
-    {
-        fadeCanvas = GetComponent<Canvas>();
-        if (fadeCanvas == null) return;
-
-        fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        fadeCanvas.sortingOrder = 1000;
-
-        raycaster = GetComponent<GraphicRaycaster>();
-        if (raycaster == null)
-            raycaster = gameObject.AddComponent<GraphicRaycaster>();
-    }
-
-    void TryFindFadeImage()
-    {
-        if (fadeImage != null) return;
-
-        GameObject canvasObj = GameObject.Find("C_Fade");
-        if (canvasObj == null) return;
-
-        fadeImage = canvasObj.transform.Find("P_Fade")?.GetComponent<Image>();
-    }
-
-    void SetAlpha(float alpha)
-    {
-        if (fadeImage == null) return;
-
-        Color c = fadeImage.color;
-        c.a = alpha;
-        fadeImage.color = c;
-
-        if (raycaster != null)
-            raycaster.enabled = alpha > 0f;
-    }
-    #endregion
 }

@@ -75,7 +75,6 @@ public class AudioManager : MonoBehaviour
             Debug.LogWarning("Clip no encontrado: " + trackID);
             return;
         }
-        Debug.Log("Reproduciendo música: " + trackID);
 
         if (!musicLibrary.ContainsKey(trackID)) return;
         StopMusic();

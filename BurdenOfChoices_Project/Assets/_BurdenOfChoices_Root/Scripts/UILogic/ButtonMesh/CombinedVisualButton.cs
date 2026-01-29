@@ -3,7 +3,7 @@ using UnityEngine;
 public class CombinedVisualButton : MonoBehaviour, IButtonVisual
 {
     [Header("Visuals")]
-    [SerializeField] MaterialMesh materialVisual;
+    [SerializeField] MaterialButtonVisual materialVisual;
     [SerializeField] AnimationButtonVisual animationVisual;
 
     public void SetNormal()
@@ -23,16 +23,13 @@ public class CombinedVisualButton : MonoBehaviour, IButtonVisual
 
     public void SetHover()
     {
-        //Hover persistente por material
         materialVisual?.SetHover();
     }
 
     public void OnHoverEnter()
     {
-        //Flash animado
+        // feedback puntual
         animationVisual?.OnHoverEnter();
-
-        //Hover normal
-        materialVisual?.SetHover();
+        materialVisual?.OnHoverEnter();
     }
 }
