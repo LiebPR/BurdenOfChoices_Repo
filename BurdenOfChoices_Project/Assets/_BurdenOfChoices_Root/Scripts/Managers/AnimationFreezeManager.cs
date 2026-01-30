@@ -17,7 +17,6 @@ public class AnimationFreezeManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     #region Public API

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6793465097408999347}
   - component: {fileID: 5558972429391909689}
   - component: {fileID: 3268713782794834354}
+  - component: {fileID: 2060557564449636004}
   m_Layer: 0
   m_Name: PF_Pipeline_Weapon
   m_TagString: Untagged
@@ -87,8 +88,10 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 3392292247003244673}
-  coll: {fileID: 5807593070569235071}
+  coll: {fileID: 0}
   rb: {fileID: 7659583239019159530}
 --- !u!114 &5558972429391909689
 MonoBehaviour:
@@ -118,6 +121,27 @@ MonoBehaviour:
   anim: {fileID: 6000195999618636706}
   data: {fileID: 11400000, guid: 6a156861b98f04643a147130a480a55d, type: 2}
   attackOrigin: {fileID: 3835793084950408186}
+--- !u!65 &2060557564449636004
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310265268783744682}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.14539719, y: 0.5418625, z: 0.083724976}
+  m_Center: {x: 0.030836105, y: 0.25990486, z: 0}
 --- !u!1 &641467759151654679
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,7 +398,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9030734420253875097}
   - component: {fileID: 6000195999618636706}
-  - component: {fileID: 5807593070569235071}
   m_Layer: 0
   m_Name: SM_Tuberia
   m_TagString: Untagged
@@ -421,24 +444,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &5807593070569235071
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8509636944937894179}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.14539719, y: 0.5418625, z: 0.083724976}
-  m_Center: {x: 0.030836105, y: 0.25990486, z: 0}

@@ -17,19 +17,22 @@ public class ThrowableBehaviour : MonoBehaviour
     }
 
     #region Throw
-    public void OnThrow (Vector3 direction, float horizontalForce, float verticalForce)
+    public void OnThrow(Vector3 direction, float horizontalForce, float verticalForce)
     {
-        if(!pickable.IsCatched) return;
+        if (!pickable.IsCatched) return;
 
-        //Drop para reactivar física 
+        // Liberar objeto para reactivar física
         pickable.OnDrop(true);
 
-        //Considerar el peso del objeto
-        Vector3 appliedForce = direction.normalized * horizontalForce + Vector3.up * verticalForce;
+        // Obtener el peso centralizado
+        float weight = pickable.Weight; // Usamos el DataProvider
 
-        // Aplicamos fuerza proporcional al peso
+        // Calculamos la fuerza considerando peso (objetos más pesados se lanzan más lento)
+        Vector3 appliedForce = (direction.normalized * horizontalForce + Vector3.up * verticalForce) / Mathf.Max(weight, 0.1f);
+
         pickable.rb.AddForce(appliedForce, ForceMode.Impulse);
 
+        // Armamos el daño por impacto si existe
         if (impactDamage != null)
         {
             impactDamage.Arm();

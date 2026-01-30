@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2689414511482622226}
   - component: {fileID: 9085255825559072819}
   - component: {fileID: 3478343789961252768}
+  - component: {fileID: 7582856047684515680}
   m_Layer: 9
   m_Name: PF_Barrel_Throwable
   m_TagString: Untagged
@@ -61,8 +62,10 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 8596034731295746595}
-  coll: {fileID: 6623831877655652657}
+  coll: {fileID: 7582856047684515680}
   rb: {fileID: 3478343789961252768}
 --- !u!114 &4917157048764655168
 MonoBehaviour:
@@ -145,6 +148,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &7582856047684515680
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945525563620559966}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.30832922, y: 0.36044478, z: 0.30832928}
+  m_Center: {x: -0.00043111295, y: 0.18130568, z: 0.0006183982}
 --- !u!1 &6205075470412233658
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,39 +259,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3149976871169583842, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6623831877655652657}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
 --- !u!4 &4649154209127137427 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2377100068364890200, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
   m_PrefabInstance: {fileID: 6951370844618305739}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5462529564309281321 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3149976871169583842, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
-  m_PrefabInstance: {fileID: 6951370844618305739}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &6623831877655652657
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5462529564309281321}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.30832922, y: 0.36044478, z: 0.30832928}
-  m_Center: {x: -0.00043111295, y: 0.18130568, z: 0.0006183982}

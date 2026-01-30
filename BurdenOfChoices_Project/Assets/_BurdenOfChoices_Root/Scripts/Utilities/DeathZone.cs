@@ -7,10 +7,18 @@ public class DeathZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //Solo el jugador activa la zona de muerte
-        if(other.TryGetComponent<PlayerController>(out _))
+        Debug.Log($"[DeathZone] Trigger con: {other.name}");
+        //Jugador
+        if (other.TryGetComponent<PlayerController>(out _))
         {
             HandlePlayerFallenDeath();
+            return;
+        }
+
+        //Pickable
+        if(other.TryGetComponent<PickableBehaviour>(out var pickable))
+        {
+            pickable.OnDeathZoneImpact();
             return;
         }
 

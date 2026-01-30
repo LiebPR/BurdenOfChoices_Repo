@@ -19,8 +19,12 @@ public class PickableBehaviour : MonoBehaviour
     [SerializeField] Color debugRayColor = Color.red;
 
     [Header("Restore")]
-    [SerializeField] bool isRestoreWithTime = true;
+    [SerializeField] bool isRestoreWithTime = false;
     [SerializeField] float restoreDelay = 1.5f;
+
+    [Header("DeathZone Behaviour")]
+    [SerializeField] bool restoreOnDeathZone = false;
+    [SerializeField] float deathZoneRestoreDelay = 1.5f;
 
     [Header("Grab Point")]
     [SerializeField] Transform grabPoint;
@@ -31,7 +35,7 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Internal States
     Transform catchPoint;
-    
+
     bool isCatched;
     bool pendingDropRequest;
     bool restoreRunning;
@@ -42,7 +46,7 @@ public class PickableBehaviour : MonoBehaviour
     Quaternion originalRotation;
     Vector3 originalScale;
 
-    float restoreTimer;
+    float restoreEndTime;
     float groundedStableTimer;
     #endregion
 
@@ -53,6 +57,7 @@ public class PickableBehaviour : MonoBehaviour
 
     #region Getters
     public bool IsCatched => isCatched;
+    public bool IsRestoreRunning => restoreRunning;
     #endregion
 
     #region Eventos
@@ -82,25 +87,26 @@ public class PickableBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        if(rb == null)
+        if (rb == null)
             rb = GetComponent<Rigidbody>();
-
         if(coll == null)
-            Debug.LogError("PickableBehaviour requiere un Collider asignado en el inspector.");
+            coll = GetComponent<Collider>();    
 
         dataProvider = GetComponent<DataProvider>();
 
-        //Guardamos el estado original del objeto
-        originalPosition = transform.position;
-        originalRotation = transform.rotation;
-        originalScale = transform.localScale;
+
+    }
+
+    private void Start()
+    {
+        CacheInitialTransform();
     }
 
     private void Update()
     {
         //Dibujar el rayo de comprobación del suelo sólo cuando el objeto esta cogido
 #if UNITY_EDITOR
-        if(debugDrawGroundRay && isCatched && groundCheckDistance > 0)
+        if (debugDrawGroundRay && isCatched && groundCheckDistance > 0)
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;
             float maxDistance = groundCheckDistance + 0.1f;
@@ -109,13 +115,19 @@ public class PickableBehaviour : MonoBehaviour
 #endif
 
         //Si hay una petición pediente de soltado y ahora está en suelo, ejecutarla
-        if(pendingDropRequest && isCatched)
+        if (pendingDropRequest && isCatched)
         {
             if (IsGrounded())
             {
                 pendingDropRequest = false;
                 OnDrop();
             }
+        }
+
+        if (restoreRunning && Time.time >= restoreEndTime)
+        {
+            restoreRunning = false;
+            RestoreInternal();
         }
     }
 
@@ -124,8 +136,6 @@ public class PickableBehaviour : MonoBehaviour
     public void OnEquip(ICatcher catcher)
     {
         CancelInvoke(nameof(RestoreInternal));
-        CancelInvoke(nameof(UpdateRestoreTimer));
-        restoreRunning = false;
 
         if (catcher == null)
         {
@@ -240,11 +250,8 @@ public class PickableBehaviour : MonoBehaviour
 
         if (isRestoreWithTime)
         {
-            restoreTimer = restoreDelay;
             restoreRunning = true;
-
-            InvokeRepeating(nameof(UpdateRestoreTimer), 0f, Time.deltaTime);
-            Invoke(nameof(RestoreInternal), restoreDelay);
+            restoreEndTime = Time.time + restoreDelay;
         }
     }
 
@@ -263,7 +270,6 @@ public class PickableBehaviour : MonoBehaviour
         OnDropped?.Invoke(this);
         NotifyDropListeners();
         restoreRunning = false;
-        CancelInvoke(nameof(UpdateRestoreTimer));
         CancelInvoke(nameof(RestoreInternal));
     }
 
@@ -285,7 +291,8 @@ public class PickableBehaviour : MonoBehaviour
     public void OnRestoreWithTime(float delay)
     {
         OnDrop(true);
-        Invoke(nameof(RestoreInternal), delay);
+        restoreRunning = true;
+        restoreEndTime = Time.time + delay;
     }
 
     //Suelta y restaura inmediatamente
@@ -295,13 +302,35 @@ public class PickableBehaviour : MonoBehaviour
         RestoreInternal();
     }
 
+    public void OnDeathZoneImpact()
+    {
+
+        if (restoreOnDeathZone)
+        {
+            OnRestoreWithTime(deathZoneRestoreDelay);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void RestoreInternal()
     {
+        restoreRunning = false;
+
+        transform.SetParent(null);
+
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        transform.localPosition = originalPosition;
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        coll.isTrigger = false;
+
+        transform.position = originalPosition;   // ✔ world space
         transform.rotation = originalRotation;
+        transform.localScale = originalScale;
     }
     #endregion
 
@@ -327,7 +356,7 @@ public class PickableBehaviour : MonoBehaviour
         if (!isCatched) return true;
 
         //Si la distancia es 0, asumimos que puede soltarse
-        if(groundCheckDistance <= 0f) return true;
+        if (groundCheckDistance <= 0f) return true;
 
         //Origen del raycast un poco por encima del centro del objeto para evitar empezar dentro del suelo
         Vector3 origin = transform.position + Vector3.up * 0.1f;
@@ -341,7 +370,7 @@ public class PickableBehaviour : MonoBehaviour
             groundedStableTimer = 0f;
             return false;
         }
-        
+
         //Hay suelo -> empezamos a contar estabilidad
         groundedStableTimer += Time.deltaTime;
 
@@ -377,25 +406,25 @@ public class PickableBehaviour : MonoBehaviour
     }
 
     #region Timer Visuals
-    void UpdateRestoreTimer()
+    public float GetRestoreRemainingTime()
     {
-        restoreTimer -= Time.deltaTime;
-
-        if (restoreTimer <= 0f)
-        {
-            restoreTimer = 0f;
-            CancelInvoke(nameof(UpdateRestoreTimer));
-        }
-    }
-
-    public float GetRestoreRmainingTime()
-    {
-        return restoreRunning ? restoreTimer : 0f;
+        if (!restoreRunning) return 0f;
+        return Mathf.Max(0f, restoreEndTime - Time.time);
     }
 
     public float GetRestoreTotalTime()
     {
         return restoreDelay;
+    }
+    #endregion
+
+    #region Utilities
+    void CacheInitialTransform()
+    {
+        //Guardamos el estado original del objeto
+        originalPosition = transform.position;
+        originalRotation = transform.rotation;
+        originalScale = transform.localScale;
     }
     #endregion
 }

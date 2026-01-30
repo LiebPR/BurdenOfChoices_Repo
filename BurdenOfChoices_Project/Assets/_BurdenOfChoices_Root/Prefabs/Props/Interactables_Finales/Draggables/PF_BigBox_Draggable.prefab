@@ -9,8 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4453005458151285471}
-  - component: {fileID: 2703495743438649359}
-  - component: {fileID: 2334749486049106018}
   m_Layer: 0
   m_Name: PointNegX
   m_TagString: Untagged
@@ -26,49 +24,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6798722763989188}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.526, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.548, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5058644464471404822}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2703495743438649359
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6798722763989188}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 0.5524357, y: 0.9175432, z: 0.62998277}
-  m_Center: {x: -0.2060912, y: -0.16010469, z: -0.048972815}
---- !u!114 &2334749486049106018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6798722763989188}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ba80138a0fd214b92105f02dd22e89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentDraggable: {fileID: 437426809271791753}
-  snapPoint: {fileID: 4453005458151285471}
-  lookDirection: {x: 1, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &256881303319161717
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,8 +40,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8605929511690201808}
-  - component: {fileID: 5139978713233220597}
-  - component: {fileID: 9100937838214654365}
   m_Layer: 0
   m_Name: PointNegZ
   m_TagString: Untagged
@@ -102,42 +62,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5058644464471404822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &5139978713233220597
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256881303319161717}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.6477193, y: 0.91754323, z: 0.3428011}
-  m_Center: {x: -0.009468526, y: -0.16010472, z: -0.037996054}
---- !u!114 &9100937838214654365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 256881303319161717}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ba80138a0fd214b92105f02dd22e89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentDraggable: {fileID: 437426809271791753}
-  snapPoint: {fileID: 8605929511690201808}
-  lookDirection: {x: 0, y: 0, z: 1}
 --- !u!1 &567570225585130831
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +92,7 @@ Transform:
   m_GameObject: {fileID: 567570225585130831}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.84, y: 0.45620397, z: -2.748}
+  m_LocalPosition: {x: -5.801101, y: 0.44944477, z: -2.748}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -201,6 +125,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 0}
   coll: {fileID: 9202843265134411524}
   rb: {fileID: 2230295612454499380}
@@ -277,13 +203,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e02c904c3e2d0441abadcca8f0a50b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentPlayer: {fileID: 0}
+  grabPoints:
+  - side: 0
+    grabPoint: {fileID: 5981551765247557702}
+    lookDirection: {x: -1, y: 0, z: 0}
+  - side: 1
+    grabPoint: {fileID: 4453005458151285471}
+    lookDirection: {x: 1, y: 0, z: 0}
+  - side: 2
+    grabPoint: {fileID: 8605929511690201808}
+    lookDirection: {x: 0, y: 0, z: -1}
+  - side: 3
+    grabPoint: {fileID: 8650105352034235335}
+    lookDirection: {x: 0, y: 0, z: 1}
   activeGrabPoint: {fileID: 0}
   grabFaceLocal: {x: 0, y: 0, z: 0}
   isBeingDragged: 0
+  currentPlayer: {fileID: 0}
   carrilA: {fileID: 0}
   carrilB: {fileID: 0}
-  weight: 1
+  weight: 100
 --- !u!1 &618562292080777990
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,8 +351,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5981551765247557702}
-  - component: {fileID: 5464860600997451682}
-  - component: {fileID: 1905669285861918056}
   m_Layer: 0
   m_Name: PointPosX
   m_TagString: Untagged
@@ -429,49 +366,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4763003905524616790}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.448, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0.49, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5058644464471404822}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &5464860600997451682
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4763003905524616790}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 0.5526381, y: 0.9121019, z: 0.62998253}
-  m_Center: {x: 0.21707526, y: -0.15738401, z: -0.048972875}
---- !u!114 &1905669285861918056
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4763003905524616790}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ba80138a0fd214b92105f02dd22e89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentDraggable: {fileID: 437426809271791753}
-  snapPoint: {fileID: 5981551765247557702}
-  lookDirection: {x: -1, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &7099649768218876819
 GameObject:
   m_ObjectHideFlags: 0
@@ -567,8 +468,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8650105352034235335}
-  - component: {fileID: 7391589235862181265}
-  - component: {fileID: 3578268275406324753}
   m_Layer: 0
   m_Name: PointPosZ
   m_TagString: Untagged
@@ -585,45 +484,9 @@ Transform:
   m_GameObject: {fileID: 8416996172544818179}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.053, y: 0, z: 0.89}
+  m_LocalPosition: {x: -0.053, y: 0, z: 0.47}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5058644464471404822}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!65 &7391589235862181265
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416996172544818179}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.65000474, y: 0.9067364, z: 0.28784347}
-  m_Center: {x: -0.0080420375, y: -0.15470123, z: 0.37307644}
---- !u!114 &3578268275406324753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8416996172544818179}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ba80138a0fd214b92105f02dd22e89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentDraggable: {fileID: 437426809271791753}
-  snapPoint: {fileID: 8650105352034235335}
-  lookDirection: {x: 0, y: 0, z: -1}
