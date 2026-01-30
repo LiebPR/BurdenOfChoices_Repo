@@ -9,7 +9,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] float knockbackForce = 5f; // fuerza del impulso hacia atrás
 
     [Header("Respawn System")]
-    [SerializeField] Transform firstDeathRespawnPoint; // punto donde reaparece en la primera muerte
+    [SerializeField] Transform defaultRespawnPoint; // punto donde reaparece en la primera muerte
 
     [Header("Fade Settings")]
     [SerializeField] float fadeInDelay = 0.7f; // tiempo configurable antes de permitir fade
@@ -20,9 +20,12 @@ public class PlayerHealth : MonoBehaviour
 
     #region Internal State
     bool isAlive = true;
-    int deathCount = 0;
+    bool respawnConsummed = false;
     int cameraHighPriority = 20;
     Vector3 lastHitDirection;
+
+    Transform overrideRespawnPoint; //respawn temporal (puzzle)
+    CinemachineCamera overrideRespawnCamera; //cámara temporal (puzzle)
     #endregion
 
     #region Getters
@@ -46,7 +49,7 @@ public class PlayerHealth : MonoBehaviour
         animatorManager = GetComponent<AnimatorManager>();
     }
 
-    #region Public Methods
+    #region API - Core
     public void TakeHit(Vector3 hitDirection)
     {
         if (!isAlive) return;
@@ -74,16 +77,34 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     public void OnDeathAnimationFinished()
     {
-        if(deathCount == 1)
+        if (!respawnConsummed)
         {
-            if(firstDeathRespawnPoint != null)
-                StartCoroutine(RespawnRoutine(firstDeathRespawnPoint));
+            Transform respawnPoint = GetCurrentRespawnPoint();
+
+            if (respawnPoint != null)
+            {
+                respawnConsummed = true;
+                StartCoroutine(RespawnRoutine(respawnPoint));
+                return;
+            }
         }
-        else
-        {
-            if (SceneController.Instance != null)
-                SceneController.Instance.LoadScene("SCN_LoseMenu");
-        }
+
+        //Si ya no hay respawn disponible -> perder
+        SceneController.Instance.LoadScene("SCN_LoseMenu");
+    }
+    #endregion
+
+    #region API - Respawn Point Override (Puzzle)
+    public void SetOverrideRespawnPoint(Transform newRespawn, CinemachineCamera newCamera = null)
+    {
+        overrideRespawnPoint = newRespawn;
+        overrideRespawnCamera = newCamera;
+    }
+
+    public void ClearOverrideRespawn()
+    {
+        overrideRespawnPoint = null;
+        overrideRespawnCamera = null;
     }
     #endregion
 
@@ -105,7 +126,6 @@ public class PlayerHealth : MonoBehaviour
     {
         //Girar al jugador hacia la dirección contraria del golpe
         RotateAwayFromHit();
-
         animatorManager.DeathAnim();
 
         var vision = FindAnyObjectByType<VisionSystem>();
@@ -113,21 +133,17 @@ public class PlayerHealth : MonoBehaviour
 
         var enemyFsm = FindAnyObjectByType<EnemyFSM>();
         if (enemyFsm != null) enemyFsm.ForceResetToPatrol();
+    }
 
-        deathCount++;
+    Transform GetCurrentRespawnPoint()
+    {
+        return overrideRespawnPoint != null ? overrideRespawnPoint : defaultRespawnPoint;
     }
 
     void ReappearAtPoint(Transform respawnPoint)
     {
-        if (respawnPoint == null)
-        {
-            Debug.LogWarning("ReappearAtPoint: respawnPoint es null.");
-            return;
-        }
-
         transform.position = respawnPoint.position;
         transform.rotation = respawnPoint.rotation;
-
         isAlive = true;
     }
 
@@ -156,10 +172,12 @@ public class PlayerHealth : MonoBehaviour
 
         ReappearAtPoint(respawnPoint);
 
-        if (deathCamera != null)
-            CameraManager.Instance.ActivateCamera(deathCamera, cameraHighPriority);
-        
-        
+        // Activar cámara del override si existe, sino la default
+        CinemachineCamera camToActivate = overrideRespawnCamera != null ? overrideRespawnCamera : deathCamera;
+        if (camToActivate != null)
+            CameraManager.Instance.ActivateCamera(camToActivate, cameraHighPriority);
+
+
         yield return new WaitForSeconds(fadeInDelay);
         // 5. Fade in
         if (fadeController != null)

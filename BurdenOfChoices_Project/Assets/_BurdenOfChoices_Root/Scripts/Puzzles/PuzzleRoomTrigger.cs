@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class PuzzleRoomTrigger : MonoBehaviour
@@ -13,6 +14,10 @@ public class PuzzleRoomTrigger : MonoBehaviour
 
     [Header("Puzzle de la sala")]
     [SerializeField] PuzzleObjective puzzle; //solo un puzzle por sala
+
+    [Header("Puzzle Respawn Player")]
+    [SerializeField] Transform puzzleRespawnPoint;
+    [SerializeField] CinemachineCamera puzzleRespawnCamera;
     #endregion
 
     #region Internal States
@@ -34,9 +39,12 @@ public class PuzzleRoomTrigger : MonoBehaviour
         puzzleActive = true;
 
         for (int i = 0; i < doorsToLock.Length; i++)
-        {
             doorsToLock[i].Lock();
-        }
+
+
+        var playerHealth = FindAnyObjectByType<PlayerHealth>();
+        if(playerHealth != null && puzzleRespawnPoint != null)
+            playerHealth.SetOverrideRespawnPoint(puzzleRespawnPoint, puzzleRespawnCamera);
 
         // Suscribirse al puzzle
         if (!puzzle.IsCompleted())
@@ -51,6 +59,9 @@ public class PuzzleRoomTrigger : MonoBehaviour
     public void CompletePuzzle()
     {
         if (puzzleCompleted) return;
+       
+        var playerHealth = FindAnyObjectByType<PlayerHealth>();
+        playerHealth.ClearOverrideRespawn();
 
         puzzleCompleted = true;
         puzzleActive = false;
