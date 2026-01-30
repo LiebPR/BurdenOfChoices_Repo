@@ -68,7 +68,7 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region Music API
-    public void PlayMusic(string trackID, float fadeInTime = 1f)
+    public void PlayMusic(string trackID, float fadeTime = 1f)
     {
         if (!musicLibrary.ContainsKey(trackID))
         {
@@ -76,13 +76,19 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        if (!musicLibrary.ContainsKey(trackID)) return;
-        StopMusic();
-        musicSource.clip = musicLibrary[trackID];
-        musicSource.volume = 0;
-        musicSource.loop = true;
-        musicSource.Play();
-        StartCoroutine(FadeVolume(musicSource, musicVolume, fadeInTime));
+        // Si no hay música sonando, entra directo
+        if (!musicSource.isPlaying)
+        {
+            musicSource.clip = musicLibrary[trackID];
+            musicSource.volume = 0f;
+            musicSource.loop = true;
+            musicSource.Play();
+            StartCoroutine(FadeVolume(musicSource, musicVolume, fadeTime));
+            return;
+        }
+
+        // Si hay música, transición con fade
+        StartCoroutine(ChangeMusicRoutine(trackID, fadeTime));
     }
 
     public void StopMusic(float fadeOutTime = 1f)
@@ -99,10 +105,18 @@ public class AudioManager : MonoBehaviour
 
     System.Collections.IEnumerator ChangeMusicRoutine(string newTrack, float fadeTime)
     {
-        yield return FadeVolume(musicSource, 0, fadeTime / 2f, stopAfterFade: true);
+        // Esperar un frame para dejar que la escena termine de cargar
+        yield return null;
+
+        if (musicSource.isPlaying)
+            yield return FadeVolume(musicSource, 0, fadeTime * 0.5f, stopAfterFade: true);
+
         musicSource.clip = musicLibrary[newTrack];
+        musicSource.volume = 0f;
+        musicSource.loop = true;
         musicSource.Play();
-        yield return FadeVolume(musicSource, musicVolume, fadeTime / 2f);
+
+        yield return FadeVolume(musicSource, musicVolume, fadeTime * 0.5f);
     }
     #endregion
 
