@@ -534,6 +534,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1687052249}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 9002574}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 483856183}
@@ -649,6 +653,11 @@ PrefabInstance:
 --- !u!4 &9002573 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3645540939327068194, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 9002572}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &9002574 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
   m_PrefabInstance: {fileID: 9002572}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &9805839
@@ -1852,6 +1861,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1687052249}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 41551978}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1505253504}
@@ -1963,6 +1976,11 @@ PrefabInstance:
 --- !u!4 &41551977 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3645540939327068194, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 41551976}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &41551978 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
   m_PrefabInstance: {fileID: 41551976}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &43510171
@@ -9342,6 +9360,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2567848254713866535, guid: 728ed5ec9ef349f48ad61aa90dd29e82, type: 3}
   m_PrefabInstance: {fileID: 276859965}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &280326942 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 761074476}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &282685898
 PrefabInstance:
@@ -19304,6 +19327,11 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!108 &583291115 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 586939579}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &586939579
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19312,6 +19340,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1100400809}
     m_Modifications:
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 583291115}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
@@ -19332,6 +19364,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 1963647149}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryDoorAnimDuration
       value: 0.7
@@ -22158,6 +22194,11 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1184590442143908730, guid: 8c29bfdccbfdc6b499b37c7fd159de3a, type: 3}
   m_PrefabInstance: {fileID: 1677222958}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &671944023 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1276140861}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &671964488
 PrefabInstance:
@@ -25073,6 +25114,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1634971443}
     m_Modifications:
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 280326942}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
@@ -28279,6 +28324,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 256779346}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 843969810}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 263164976}
@@ -28378,6 +28427,11 @@ PrefabInstance:
 --- !u!4 &843969809 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3645540939327068194, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 843969808}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &843969810 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
   m_PrefabInstance: {fileID: 843969808}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &851950296 stripped
@@ -29488,6 +29542,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1634971443}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1060808346}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 263164976}
@@ -29507,6 +29565,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 1806473621}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -35757,6 +35819,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 983495728313199086, guid: f71caa3bc9762e64e96142253785adf6, type: 3}
   m_PrefabInstance: {fileID: 1059907585}
   m_PrefabAsset: {fileID: 0}
+--- !u!108 &1060808346 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 892785701}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1062002363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36420,6 +36487,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 2053046849}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1768691845}
@@ -36435,6 +36506,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 124406405}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -37377,6 +37452,11 @@ Transform:
   - {fileID: 1347535480}
   m_Father: {fileID: 953122998}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &1100409013 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1340130923}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1102739340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42545,6 +42625,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1634971443}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 671944023}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1139810372}
@@ -42560,6 +42644,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 1887082635}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -43601,6 +43689,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 487bf92e4f1a32d4aa8b2cc4e88d02f2, type: 3}
+--- !u!108 &1312109061 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1318091882}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1315896384
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43672,6 +43765,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1258295864}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1312109061}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1505253504}
@@ -43687,6 +43784,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 23091646}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -44134,6 +44235,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2567848254713866535, guid: 728ed5ec9ef349f48ad61aa90dd29e82, type: 3}
   m_PrefabInstance: {fileID: 1330465085}
   m_PrefabAsset: {fileID: 0}
+--- !u!108 &1331163873 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1566056727}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1331332473 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4090236047031095346, guid: 487bf92e4f1a32d4aa8b2cc4e88d02f2, type: 3}
@@ -44386,6 +44492,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: f7fb81ee7429de544a02ad7cec2a3377, type: 2}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1100409013}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 483856183}
@@ -44405,6 +44515,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 548852134}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -44573,6 +44687,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c98791b39efbfea4eb90826dc788b014, type: 3}
+--- !u!108 &1341617861 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 2029993476}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1341877676 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4090236047031095346, guid: 487bf92e4f1a32d4aa8b2cc4e88d02f2, type: 3}
@@ -46032,6 +46151,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 256779346}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1383261699}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1139810372}
@@ -46131,6 +46254,11 @@ PrefabInstance:
 --- !u!4 &1383261698 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3645540939327068194, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1383261697}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &1383261699 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
   m_PrefabInstance: {fileID: 1383261697}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1383631760
@@ -49500,6 +49628,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1634971443}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1940862008}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1575771512}
@@ -49515,6 +49647,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 1779628735}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -53269,6 +53405,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1575412753}
     m_Modifications:
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1331163873}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1505253504}
@@ -53286,7 +53426,7 @@ PrefabInstance:
       objectReference: {fileID: 732280261}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: obstacleMask.m_Bits
-      value: 383
+      value: 512
       objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
@@ -65958,6 +66098,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c409e878c293c6418f70bfbaaed10e4, type: 3}
+--- !u!108 &1940862008 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1460822774}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1944724038
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -68942,6 +69087,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: doorLight
+      value: 
+      objectReference: {fileID: 1341617861}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: entryCamera
       value: 
       objectReference: {fileID: 1505253504}
@@ -68957,6 +69106,10 @@ PrefabInstance:
       propertyPath: entryDoorAnimator
       value: 
       objectReference: {fileID: 1736023959}
+    - target: {fileID: 1623580266293329965, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 1681270222956911545, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -69885,6 +70038,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 775978969}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &2053046849 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8312140326375362270, guid: a07e9c6a90076304d95ff45d7208edf4, type: 3}
+  m_PrefabInstance: {fileID: 1079152221}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2058103803
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -72951,6 +73109,10 @@ PrefabInstance:
       propertyPath: deathCamera
       value: 
       objectReference: {fileID: 1575771512}
+    - target: {fileID: 985198509913786634, guid: 8516e22b19861434384ae8aced3954fe, type: 3}
+      propertyPath: defaultRespawnPoint
+      value: 
+      objectReference: {fileID: 1146293776}
     - target: {fileID: 985198509913786634, guid: 8516e22b19861434384ae8aced3954fe, type: 3}
       propertyPath: firstDeathRespawnPoint
       value: 

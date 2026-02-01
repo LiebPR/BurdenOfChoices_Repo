@@ -175,13 +175,39 @@ public class AudioManager : MonoBehaviour
 
     public AudioEmitter PlaySFXAttached(string sfxID, Transform parent, float volume = 1f)
     {
-        if (!sfxLibrary.ContainsKey(sfxID)) return null;
+        if (!sfxLibrary.ContainsKey(sfxID))
+        {
+            Debug.LogWarning("[AudioManager] SFX no encontrado: {sfxID}");
+            return null;
+        }
+
         GameObject go = new GameObject("SFX_" + sfxID);
         go.transform.parent = parent;
         go.transform.localPosition = Vector3.zero;
         AudioEmitter emitter = go.AddComponent<AudioEmitter>();
-        emitter.Play3D(sfxLibrary[sfxID], false, volume * sfxVolume, 0);
+        emitter.Play3D(sfxLibrary[sfxID], true, volume * sfxVolume, 0);
         return emitter;
+    }
+
+    public void PlayAnimationSFX(string sfxID, Transform origin, float rangeMultiplier = 1f)
+    {
+        if (!sfxLibrary.ContainsKey(sfxID))
+        {
+            Debug.LogWarning("[AudioManager] SFX no encontrado: {sfxID}");
+            return;
+        }
+
+        GameObject go = new GameObject("AnimSFX_" + sfxID);
+        go.transform.parent = origin;
+        go.transform.localPosition = Vector3.zero;
+
+        AudioEmitter emitter = go.AddComponent<AudioEmitter>();
+        emitter.Play3D(sfxLibrary[sfxID], false, sfxVolume, 0);
+
+        //Ajuste de rango específico
+        var src = go.GetComponent<AudioSource>();
+        src.minDistance *= rangeMultiplier;
+        src.maxDistance *= rangeMultiplier;
     }
 
     public void StopSFX(AudioEmitter emitter)

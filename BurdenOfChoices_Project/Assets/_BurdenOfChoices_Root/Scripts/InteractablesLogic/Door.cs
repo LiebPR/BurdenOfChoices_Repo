@@ -26,6 +26,9 @@ public class Door : MonoBehaviour, IInteractable
     [SerializeField] Vector3 rayDirection = Vector3.forward;
     [SerializeField] float rayDistance = 0.6f;
     [SerializeField] LayerMask obstacleMask;
+
+    [Header("Light")]
+    [SerializeField] Light doorLight;
     #endregion
 
     #region Internal States
@@ -46,6 +49,18 @@ public class Door : MonoBehaviour, IInteractable
     {
         if (isSecondaryDoor)
             locked = true;
+    }
+
+    private void Update()
+    {
+        if (!locked)
+        {
+            doorLight.enabled = true;
+        }
+        else
+        {
+            doorLight.enabled = false;
+        }
     }
 
     public void OnHighlight(){}

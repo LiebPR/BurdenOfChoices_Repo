@@ -80,6 +80,7 @@ public class PlayerHealth : MonoBehaviour
         if (!respawnConsummed)
         {
             Transform respawnPoint = GetCurrentRespawnPoint();
+            if (respawnPoint == null) respawnPoint = defaultRespawnPoint; 
 
             if (respawnPoint != null)
             {
@@ -87,6 +88,8 @@ public class PlayerHealth : MonoBehaviour
                 StartCoroutine(RespawnRoutine(respawnPoint));
                 return;
             }
+            else
+                Debug.LogWarning("No hay respawn point asignado. Se cargará la LoseScene");
         }
 
         //Si ya no hay respawn disponible -> perder
@@ -179,6 +182,7 @@ public class PlayerHealth : MonoBehaviour
 
 
         yield return new WaitForSeconds(fadeInDelay);
+
         // 5. Fade in
         if (fadeController != null)
             yield return fadeController.FadeIn();
