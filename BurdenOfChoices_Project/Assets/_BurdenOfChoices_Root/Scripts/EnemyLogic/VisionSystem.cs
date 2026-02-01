@@ -111,6 +111,7 @@ public class VisionSystem : MonoBehaviour
             {
                 if (!canSeePlayer)
                 {
+                    AudioManager.Instance.PlaySFXAttached("SFX_Sectario_Chase", transform, false); //gruñido cuando sigue
                     canSeePlayer = true;
                     OnSeeTarget?.Invoke(Target);
                 }

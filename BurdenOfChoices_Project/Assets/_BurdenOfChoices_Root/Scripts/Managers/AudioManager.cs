@@ -173,7 +173,7 @@ public class AudioManager : MonoBehaviour
         return emitter;
     }
 
-    public AudioEmitter PlaySFXAttached(string sfxID, Transform parent, float volume = 1f)
+    public AudioEmitter PlaySFXAttached(string sfxID, Transform parent, bool loop = false, float volume = 1f)
     {
         if (!sfxLibrary.ContainsKey(sfxID))
         {
@@ -185,7 +185,7 @@ public class AudioManager : MonoBehaviour
         go.transform.parent = parent;
         go.transform.localPosition = Vector3.zero;
         AudioEmitter emitter = go.AddComponent<AudioEmitter>();
-        emitter.Play3D(sfxLibrary[sfxID], true, volume * sfxVolume, 0);
+        emitter.Play3D(sfxLibrary[sfxID], loop, volume * sfxVolume, 0);
         return emitter;
     }
 

@@ -431,6 +431,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 0}
   coll: {fileID: 0}
   rb: {fileID: 0}
@@ -2184,6 +2186,9 @@ Transform:
   - {fileID: 750894519}
   - {fileID: 1747871539}
   - {fileID: 2015504167}
+  - {fileID: 373358596}
+  - {fileID: 973765490}
+  - {fileID: 576654671}
   - {fileID: 1219143350}
   - {fileID: 704371062}
   m_Father: {fileID: 0}
@@ -2686,8 +2691,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d711daa19a1dbb643a834bea99d73362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  impulseDirection: {x: -1, y: 0, z: 0}
-  impulseForce: 3
+  explosionVFX: {fileID: 3998614160772082374, guid: cc556e3eb3f37d241be573456198cc3b, type: 3}
 --- !u!4 &373358596
 Transform:
   m_ObjectHideFlags: 0
@@ -2697,11 +2701,11 @@ Transform:
   m_GameObject: {fileID: 373358590}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.01196003, y: 0.90599996, z: -0.31853342}
-  m_LocalScale: {x: 0.48, y: 0.48, z: 0.16}
+  m_LocalPosition: {x: 3.18502, y: 0.729, z: -2.1718001}
+  m_LocalScale: {x: 0.24, y: 0.24, z: 0.24}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1219143350}
+  m_Father: {fileID: 314954978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &384451207 stripped
 Transform:
@@ -3051,6 +3055,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 0}
   coll: {fileID: 0}
   rb: {fileID: 0}
@@ -3940,8 +3946,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d711daa19a1dbb643a834bea99d73362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  impulseDirection: {x: -1, y: 0, z: 0}
-  impulseForce: 3
+  explosionVFX: {fileID: 3998614160772082374, guid: cc556e3eb3f37d241be573456198cc3b, type: 3}
 --- !u!4 &576654671
 Transform:
   m_ObjectHideFlags: 0
@@ -3951,11 +3956,11 @@ Transform:
   m_GameObject: {fileID: 576654665}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.01196003, y: 0.90599996, z: 0.30146646}
-  m_LocalScale: {x: 0.48, y: 0.48, z: 0.16}
+  m_LocalPosition: {x: 3.18502, y: 0.729, z: -1.2418003}
+  m_LocalScale: {x: 0.24, y: 0.24, z: 0.24}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1219143350}
+  m_Father: {fileID: 314954978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &579176368
 GameObject:
@@ -7028,8 +7033,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d711daa19a1dbb643a834bea99d73362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  impulseDirection: {x: -1, y: 0, z: 0}
-  impulseForce: 3
+  explosionVFX: {fileID: 3998614160772082374, guid: cc556e3eb3f37d241be573456198cc3b, type: 3}
 --- !u!4 &973765490
 Transform:
   m_ObjectHideFlags: 0
@@ -7039,11 +7043,11 @@ Transform:
   m_GameObject: {fileID: 973765484}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.01196003, y: 0.90599996, z: -0.015866756}
-  m_LocalScale: {x: 0.48, y: 0.48, z: 0.16}
+  m_LocalPosition: {x: 3.18502, y: 0.729, z: -1.7178001}
+  m_LocalScale: {x: 0.24, y: 0.24, z: 0.24}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1219143350}
+  m_Father: {fileID: 314954978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &979613978
 GameObject:
@@ -7470,6 +7474,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 225097229}
   coll: {fileID: 1021507762}
   rb: {fileID: 1021507763}
@@ -8516,10 +8522,7 @@ Transform:
   m_LocalPosition: {x: 3.191, y: 0.276, z: -1.694}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1.5}
   m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 373358596}
-  - {fileID: 973765490}
-  - {fileID: 576654671}
+  m_Children: []
   m_Father: {fileID: 314954978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1219143351
@@ -10378,6 +10381,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 688796480}
   coll: {fileID: 1452569920}
   rb: {fileID: 1452569921}
@@ -11933,6 +11938,8 @@ MonoBehaviour:
   keyPrefab: {fileID: 8126332879141554604, guid: d9011ae27bac90641aeb56a5333a6971, type: 3}
   keyDropPoint: {fileID: 1213874365}
   puzzle: {fileID: 1639529744}
+  puzzleRespawnPoint: {fileID: 0}
+  puzzleRespawnCamera: {fileID: 0}
 --- !u!1 &1654103769
 GameObject:
   m_ObjectHideFlags: 0
@@ -12057,6 +12064,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 0}
   coll: {fileID: 0}
   rb: {fileID: 0}
@@ -16118,6 +16127,8 @@ MonoBehaviour:
   debugRayColor: {r: 1, g: 0, b: 0, a: 1}
   isRestoreWithTime: 0
   restoreDelay: 1.5
+  restoreOnDeathZone: 0
+  deathZoneRestoreDelay: 1.5
   grabPoint: {fileID: 1638052268}
   coll: {fileID: 2119813983}
   rb: {fileID: 2119813984}

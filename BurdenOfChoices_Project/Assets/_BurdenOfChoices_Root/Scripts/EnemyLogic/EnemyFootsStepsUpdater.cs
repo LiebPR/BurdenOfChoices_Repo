@@ -35,7 +35,7 @@ public class EnemyFootsStepsUpdater : MonoBehaviour
         //En caso de que no exista el emitter se crea
         if (emitter == null)
         {
-            emitter = AudioManager.Instance.PlaySFXAttached("SFX_Sectario_Walk", transform);
+            emitter = AudioManager.Instance.PlaySFXAttached("SFX_Sectario_Walk", transform, true);
             Debug.Log("Buen Audio Bro");
         }
 
