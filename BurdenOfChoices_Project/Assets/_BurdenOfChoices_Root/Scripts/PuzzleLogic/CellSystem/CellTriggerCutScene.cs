@@ -2,13 +2,21 @@ using UnityEngine;
 
 public class CellTriggerCutScene : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] Cell cell;
-    [SerializeField] SequenceController freedomSequenceController;
     [SerializeField] Animator bibboAnimator;
+    [SerializeField] RepercusionRemorse remorseRepercus;
+
+    [Header("Cineamatics Because Remorse")]
+    [SerializeField] SequenceController sequenceRegular;
+    [SerializeField] SequenceController sequenceMid;
+    [SerializeField] SequenceController sequenceMax;
 
     #region Animator Parameters
     static readonly int IFreedomHash = Animator.StringToHash("IFreedom");
     #endregion
+    
+    bool hasPlayed;
 
     private void OnEnable()
     {
@@ -24,8 +32,25 @@ public class CellTriggerCutScene : MonoBehaviour
 
     void PlayCutscene()
     {
-        if (freedomSequenceController != null)
-            freedomSequenceController.Play();
-        bibboAnimator.SetBool(IFreedomHash, true);
+        if (hasPlayed) return;
+        hasPlayed = true;
+
+        RemorseLevel level = remorseRepercus.GetRemorseLevel();
+
+        if (level == RemorseLevel.Regular)
+        {
+            bibboAnimator.SetBool(IFreedomHash, true);
+            sequenceRegular.Play();
+        }
+        else if (level == RemorseLevel.Mid)
+        {
+            bibboAnimator.SetBool(IFreedomHash, true);
+            sequenceMid.Play();
+        }
+        else
+        {
+            bibboAnimator.SetBool(IFreedomHash, false);
+            sequenceMax.Play();
+        }
     }
 }

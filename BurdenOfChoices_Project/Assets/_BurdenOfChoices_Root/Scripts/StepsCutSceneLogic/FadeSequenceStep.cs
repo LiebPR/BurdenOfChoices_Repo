@@ -12,6 +12,8 @@ public class FadeSequenceStep : MonoBehaviour, ISequenceStep
             FadeController.Instance.FadeOut();
         else
             FadeController.Instance.FadeIn();
+
+        onFinished?.Invoke();
     }
 }
 

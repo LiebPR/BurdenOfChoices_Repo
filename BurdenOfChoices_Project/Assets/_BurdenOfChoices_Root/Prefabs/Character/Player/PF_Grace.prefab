@@ -706,6 +706,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3656558846235611619}
   - component: {fileID: 2404647501614493191}
+  - component: {fileID: 800333837539625021}
   m_Layer: 0
   m_Name: Cube.028
   m_TagString: Untagged
@@ -828,6 +829,20 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00005578721, y: 0.00034390646, z: 0.0002057883}
     m_Extent: {x: 0.0018528167, y: 0.0043262728, z: 0.002359633}
   m_DirtyAABB: 0
+--- !u!114 &800333837539625021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2689278954086331989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e18d4199b07a1548b3917f5d756065a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shaderRend: {fileID: 2100000, guid: 2ffecf766fcaabc449446651d6fdb690, type: 2}
+  remorse: {fileID: 0}
 --- !u!1 &3038537167178060203
 GameObject:
   m_ObjectHideFlags: 0

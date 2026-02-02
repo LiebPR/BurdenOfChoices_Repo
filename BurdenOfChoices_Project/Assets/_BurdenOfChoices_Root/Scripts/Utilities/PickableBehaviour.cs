@@ -324,8 +324,8 @@ public class PickableBehaviour : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        rb.isKinematic = true;
-        rb.useGravity = false;
+        rb.isKinematic = false;
+        rb.useGravity = true;
         coll.isTrigger = false;
 
         transform.position = originalPosition;   // ✔ world space
