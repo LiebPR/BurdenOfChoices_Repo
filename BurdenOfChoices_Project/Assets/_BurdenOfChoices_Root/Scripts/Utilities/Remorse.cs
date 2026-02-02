@@ -4,7 +4,7 @@ public class Remorse : MonoBehaviour
 {
     [SerializeField] EnemyFSM[] enemies;
     [SerializeField] int remorsePointsEnemy = 1;
-    float maxShaderValue;
+    [SerializeField] float maxShaderValue = 5f;
 
     int currentRemorse;
 
@@ -14,8 +14,11 @@ public class Remorse : MonoBehaviour
     {
         get
         {
-            if (enemies.Length == 0) return 0f;
-            return((float)currentRemorse / enemies.Length) * maxShaderValue;
+            if (enemies == null || enemies.Length == 0) return 0f;
+
+            //Proporción de remordimiento acumulado respecto al total posible
+            float proportion = (float)currentRemorse / (enemies.Length * remorsePointsEnemy);
+            return proportion * maxShaderValue;
         }
     }
 
@@ -40,5 +43,7 @@ public class Remorse : MonoBehaviour
 
         //Se multiplican los enemigos muertos por el remordimiento y se almacena en currentRemorse
         currentRemorse = deadEnemies * remorsePointsEnemy;
+
+        Debug.Log($"DeadEnemies: {deadEnemies}, CurrentRemorse: {currentRemorse}");
     }
 }

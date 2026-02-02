@@ -131,6 +131,20 @@ public class PlayerHealth : MonoBehaviour
         RotateAwayFromHit();
         animatorManager.DeathAnim();
 
+        var pick = FindAnyObjectByType<PickableBehaviour>();
+        if (pick != null && pick.IsCatched)
+        {
+            pick.OnDrop(true);
+        }
+
+        // Soltar cualquier objeto recogido de tipo Pickable en escena (si hay otros sistemas)
+        var pickables = GetComponentsInChildren<PickableBehaviour>();
+        foreach (var p in pickables)
+        {
+            if (p.IsCatched)
+                p.OnDrop(true);
+        }
+
         var vision = FindAnyObjectByType<VisionSystem>();
         if (vision != null) vision.ResetVisionToDefault();
 

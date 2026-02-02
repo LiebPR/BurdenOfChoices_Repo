@@ -3,18 +3,26 @@ using UnityEngine;
 public class PlayerRemorseFeedback : MonoBehaviour
 {
     [SerializeField] Remorse remorse;
-    Material material;
+    [SerializeField] Renderer targetRenderer;
 
-    private void Awake()
+    MaterialPropertyBlock mpb;
+
+    static readonly int BloodAmountID = Shader.PropertyToID("_BloodAmount");
+    static readonly int OtherAmountID = Shader.PropertyToID("_OtherAmount");
+  
+    void Awake()
     {
-        material = GetComponent<Material>();
+        mpb = new MaterialPropertyBlock();
     }
 
-    private void Update()
+    void Update()
     {
-        float i = remorse.ShaderRemorseValue;
-
-        material.SetFloat("_BloodAmount", i);
-        material.SetFloat("_OtherAmount", i);
+        float value = remorse.ShaderRemorseValue;
+        Debug.Log($"Shader Value: {value}, Renderer: {targetRenderer.name}, Material: {targetRenderer.sharedMaterial.name}");
+        Debug.Log("Shader Value: " + value);
+        targetRenderer.GetPropertyBlock(mpb);
+        mpb.SetFloat(BloodAmountID, value);
+        mpb.SetFloat(OtherAmountID, value);
+        targetRenderer.SetPropertyBlock(mpb);
     }
 }
