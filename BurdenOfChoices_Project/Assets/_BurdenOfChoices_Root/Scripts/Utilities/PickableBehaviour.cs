@@ -1,0 +1,430 @@
+﻿using UnityEngine;
+using System;
+
+/// <summary>
+/// PickableBehaviour: Es el que gestiona la logica de recoger un objeto, soltarlo o reseteralo.
+/// </summary>
+public class PickableBehaviour : MonoBehaviour
+{
+    #region Inspector Variables
+    [Tooltip("Si es falso, el objeto no se equipa y solo se usa para interacción/drag.")]
+    public bool AllowEquip = true;
+    [Header("Drop / GroundCheck")]
+    [SerializeField] LayerMask groundLayer;
+    [SerializeField] float groundCheckDistance = 0.25f;
+    [SerializeField] float groundStickTime = 0.05f; //tiempo de pegado al suelo
+
+    [Header("Debug")]
+    [SerializeField] bool debugDrawGroundRay = true;
+    [SerializeField] Color debugRayColor = Color.red;
+
+    [Header("Restore")]
+    [SerializeField] bool isRestoreWithTime = false;
+    [SerializeField] float restoreDelay = 1.5f;
+
+    [Header("DeathZone Behaviour")]
+    [SerializeField] bool restoreOnDeathZone = false;
+    [SerializeField] float deathZoneRestoreDelay = 1.5f;
+
+    [Header("Grab Point")]
+    [SerializeField] Transform grabPoint;
+
+    [Header("Collider")]
+    [SerializeField] Collider coll;
+    #endregion
+
+    #region Internal States
+    Transform catchPoint;
+
+    bool isCatched;
+    bool pendingDropRequest;
+    bool restoreRunning;
+    bool blockDrop;
+
+    //Original States:
+    Vector3 originalPosition;
+    Quaternion originalRotation;
+    Vector3 originalScale;
+
+    float restoreEndTime;
+    float groundedStableTimer;
+    #endregion
+
+    #region Rferences
+    public Rigidbody rb;
+    DataProvider dataProvider;
+    #endregion
+
+    #region Getters
+    public bool IsCatched => isCatched;
+    public bool IsRestoreRunning => restoreRunning;
+    #endregion
+
+    #region Eventos
+    public static event Action<PickableBehaviour> OnEquipped;
+    public static event Action<PickableBehaviour> OnDropped;
+    #endregion
+
+    /// <summary>
+    /// Peso del objeto. Se obtiene desde el DataProvider si existe.
+    /// </summary>
+    public float Weight
+    {
+        get
+        {
+            if (dataProvider == null) return 1f; //peso por defecto
+            var so = dataProvider.Data;
+            if (so == null) return 1f;
+
+            // Buscamos un campo llamado "weight" en el SO
+            var field = so.GetType().GetField("weight");
+            if (field != null)
+                return (float)field.GetValue(so);
+
+            return 1f; // fallback
+        }
+    }
+
+    private void Awake()
+    {
+        if (rb == null)
+            rb = GetComponent<Rigidbody>();
+        if(coll == null)
+            coll = GetComponent<Collider>();    
+
+        dataProvider = GetComponent<DataProvider>();
+
+
+    }
+
+    private void Start()
+    {
+        CacheInitialTransform();
+    }
+
+    private void Update()
+    {
+        //Dibujar el rayo de comprobación del suelo sólo cuando el objeto esta cogido
+#if UNITY_EDITOR
+        if (debugDrawGroundRay && isCatched && groundCheckDistance > 0)
+        {
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            float maxDistance = groundCheckDistance + 0.1f;
+            Debug.DrawRay(origin, Vector3.down * maxDistance, debugRayColor);
+        }
+#endif
+
+        //Si hay una petición pediente de soltado y ahora está en suelo, ejecutarla
+        if (pendingDropRequest && isCatched)
+        {
+            if (IsGrounded())
+            {
+                pendingDropRequest = false;
+                OnDrop();
+            }
+        }
+
+        if (restoreRunning && Time.time >= restoreEndTime)
+        {
+            restoreRunning = false;
+            RestoreInternal();
+        }
+    }
+
+    #region Equip
+    //Coloca el obejto en la mano del jugador. 
+    public void OnEquip(ICatcher catcher)
+    {
+        CancelInvoke(nameof(RestoreInternal));
+
+        if (catcher == null)
+        {
+            Debug.LogWarning("No se proporcionó un ICatcher válido");
+            return;
+        }
+
+        var draggable = GetComponent<DraggableObject>();
+        if (draggable != null)
+        {
+            isCatched = true;
+            OnEquipped?.Invoke(this);
+            NotifyEquipListeners(catcher);
+            return;
+        }
+
+
+        // Si no es arrastrable, equip normal
+        if (!AllowEquip)
+        {
+            NotifyEquipListeners(catcher);
+            return;
+        }
+
+        catchPoint = catcher.GetCatchPoint();
+        isCatched = true;
+
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = true;
+        }
+
+        SnapTopGrabPoint();
+
+        OnEquipped?.Invoke(this);
+        NotifyEquipListeners(catcher);
+    }
+
+    void NotifyEquipListeners(ICatcher catcher)
+    {
+        var listeners = GetComponents<IPickListener>();
+        for (int i = 0; i < listeners.Length; i++)
+            listeners[i].OnPick(catcher);
+    }
+    #endregion
+
+    #region Drop
+    //Suelta el objeto en el mundo.
+    //Si force == false, sólo soltará si detecta suelo debajo.
+    //Si force == true, obligará el drop.
+    public void OnDrop(bool force = false)
+    {
+        var draggable = GetComponent<DraggableObject>();
+        if (draggable != null)
+        {
+            // Si está siendo arrastrado, avisamos al DragController
+            if (draggable.currentPlayer != null)
+            {
+                var dragController = draggable.currentPlayer.GetComponent<DraggController>();
+                if (dragController != null)
+                    dragController.StopDrag();
+
+                draggable.currentPlayer = null; // Limpiamos referencia
+            }
+            transform.SetParent(null);
+            isCatched = false;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = false;
+
+            OnDropped?.Invoke(this);
+            NotifyDropListeners();
+            return;
+        }
+
+        // Comportamiento normal para objetos equipables
+        if (!force && !IsGrounded())
+        {
+            pendingDropRequest = true;
+
+            isCatched = true;
+            SnapTopGrabPoint();
+
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                coll.isTrigger = true;
+            }
+
+            return;
+        }
+
+        pendingDropRequest = false;
+        isCatched = false;
+
+        transform.SetParent(null);
+
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            coll.isTrigger = false;
+        }
+
+        transform.localScale = originalScale;
+
+        OnDropped?.Invoke(this);
+        NotifyDropListeners();
+
+        if (isRestoreWithTime)
+        {
+            restoreRunning = true;
+            restoreEndTime = Time.time + restoreDelay;
+        }
+    }
+
+    public void OnDropWithoutPhysics()
+    {
+        pendingDropRequest = false;
+        isCatched = false;
+
+        //Quitar parent
+        transform.SetParent(null);
+
+        //Restaurar escala si fue alterada
+        transform.localScale = originalScale;
+
+        //notificar eventos
+        OnDropped?.Invoke(this);
+        NotifyDropListeners();
+        restoreRunning = false;
+        CancelInvoke(nameof(RestoreInternal));
+    }
+
+    public void BlockDrop()
+    {
+        blockDrop = true;
+    }
+
+    void NotifyDropListeners()
+    {
+        var listeners = GetComponents<IPickListener>();
+        for (int i = 0; i < listeners.Length; i++)
+            listeners[i].OnDrop();
+    }
+    #endregion
+
+    #region Restore
+    //Suelta y restaura tras un tiempo
+    public void OnRestoreWithTime(float delay)
+    {
+        OnDrop(true);
+        restoreRunning = true;
+        restoreEndTime = Time.time + delay;
+    }
+
+    //Suelta y restaura inmediatamente
+    public void OnRestore()
+    {
+        OnDrop(true);
+        RestoreInternal();
+    }
+
+    public void OnDeathZoneImpact()
+    {
+
+        if (restoreOnDeathZone)
+        {
+            OnRestoreWithTime(deathZoneRestoreDelay);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void RestoreInternal()
+    {
+        restoreRunning = false;
+
+        transform.SetParent(null);
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        coll.isTrigger = false;
+
+        transform.position = originalPosition;   // ✔ world space
+        transform.rotation = originalRotation;
+        transform.localScale = originalScale;
+    }
+    #endregion
+
+    #region Public API
+    public void RequestDrop()
+    {
+        if (blockDrop)
+            return;
+        //Llamamos a OnDrop sin forzar: se encargará de encolar si no hay suelo
+        OnDrop(false);
+    }
+
+    public bool CanBeDropped()
+    {
+        return IsGrounded();
+    }
+    #endregion
+
+    #region Ground Check
+    bool IsGrounded()
+    {
+        //Si no esta cogido, no ejecutamos el raycast
+        if (!isCatched) return true;
+
+        //Si la distancia es 0, asumimos que puede soltarse
+        if (groundCheckDistance <= 0f) return true;
+
+        //Origen del raycast un poco por encima del centro del objeto para evitar empezar dentro del suelo
+        Vector3 origin = transform.position + Vector3.up * 0.1f;
+        float maxDistance = groundCheckDistance + 0.1f;
+
+        bool hitGround = Physics.Raycast(origin, Vector3.down, maxDistance, groundLayer);
+
+        if (!hitGround)
+        {
+            //si no hay suelo, reiniciamos el contador
+            groundedStableTimer = 0f;
+            return false;
+        }
+
+        //Hay suelo -> empezamos a contar estabilidad
+        groundedStableTimer += Time.deltaTime;
+
+        //Mientras no supere el buffer, seguimos considerándolo grounded
+        return groundedStableTimer >= groundStickTime;
+    }
+    #endregion
+
+    void SnapTopGrabPoint()
+    {
+        if (catchPoint == null) return;
+
+        transform.SetParent(catchPoint);
+
+        if (grabPoint != null)
+        {
+            transform.localPosition = -grabPoint.localPosition;
+            transform.localRotation = Quaternion.Inverse(grabPoint.localRotation);
+        }
+        else
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+
+        // No tocar velocities
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            coll.isTrigger = true;
+        }
+    }
+
+    #region Timer Visuals
+    public float GetRestoreRemainingTime()
+    {
+        if (!restoreRunning) return 0f;
+        return Mathf.Max(0f, restoreEndTime - Time.time);
+    }
+
+    public float GetRestoreTotalTime()
+    {
+        return restoreDelay;
+    }
+    #endregion
+
+    #region Utilities
+    void CacheInitialTransform()
+    {
+        //Guardamos el estado original del objeto
+        originalPosition = transform.position;
+        originalRotation = transform.rotation;
+        originalScale = transform.localScale;
+    }
+    #endregion
+}

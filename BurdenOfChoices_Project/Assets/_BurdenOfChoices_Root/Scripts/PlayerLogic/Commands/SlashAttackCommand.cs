@@ -1,0 +1,26 @@
+using UnityEngine;
+
+/// <summary>
+/// SlashAttackCommand
+/// Comando de ataque radial (área alrededro del origen)
+/// </summary>
+public class SlashAttackCommand : AttackCommand
+{
+    public SlashAttackCommand(WeaponData data, Transform origin) : base(data, origin) { }
+
+    public override void Execute()
+    {
+        //Detecta enemigos en área
+        Collider[] hits = Physics.OverlapSphere(tOrigin.position, weaponData.range);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Vector3 hitDirection = tOrigin.forward.normalized;
+
+            EnemyHealth enemyHealth = hits[i].GetComponent<EnemyHealth>();
+            if (enemyHealth == null) continue;
+
+            enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+        }
+    }
+}
