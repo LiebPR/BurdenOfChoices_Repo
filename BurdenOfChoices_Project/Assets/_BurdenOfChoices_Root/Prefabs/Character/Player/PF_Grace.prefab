@@ -841,8 +841,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e18d4199b07a1548b3917f5d756065a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderRend: {fileID: 2100000, guid: 2ffecf766fcaabc449446651d6fdb690, type: 2}
   remorse: {fileID: 0}
+  targetRenderer: {fileID: 0}
 --- !u!1 &3038537167178060203
 GameObject:
   m_ObjectHideFlags: 0
@@ -1666,6 +1666,7 @@ GameObject:
   - component: {fileID: 5853911336545188776}
   - component: {fileID: 3281906536427343029}
   - component: {fileID: 3246851960515059402}
+  - component: {fileID: 1173983696437504124}
   - component: {fileID: 4657328812516123858}
   m_Layer: 7
   m_Name: PF_Grace
@@ -1971,6 +1972,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hideCursorDuringGameplay: 1
+--- !u!114 &1173983696437504124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6144243115190639110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de953bdcc5d542e49b317c8f66301d80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &4657328812516123858
 Animator:
   serializedVersion: 7

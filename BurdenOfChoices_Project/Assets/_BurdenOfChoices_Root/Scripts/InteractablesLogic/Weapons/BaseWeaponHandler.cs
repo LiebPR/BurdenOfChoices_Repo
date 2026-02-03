@@ -56,6 +56,7 @@ public class BaseWeaponHandler : MonoBehaviour, IPickListener, IWeapon
         if(anim != null)
         {
             anim.SetTrigger(IsAttackHash);
+            AudioManager.Instance.PlaySFX2D(data.weaponSFX);
         }
     }
 }

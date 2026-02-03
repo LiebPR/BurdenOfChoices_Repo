@@ -9,13 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5dedfb1453c044443854338fd238243d, type: 3}
-  m_Name: SO_Plank_Att
+  m_Script: {fileID: 11500000, guid: 55313f39233ce0944b332ee5efc6c181, type: 3}
+  m_Name: SO_Level_Tutorial
   m_EditorClassIdentifier: 
-  attackType: 0
-  damage: 1
-  range: 1
-  knockBack: 5
-  attackdelay: 0.45
-  cooldown: 1.5
-  weaponSFX: SFX_Weapon_Swing
+  levelName: TUTORIAL
+  sceneName: SCN_Tutorial

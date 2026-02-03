@@ -18,8 +18,6 @@ public class PlayerRemorseFeedback : MonoBehaviour
     void Update()
     {
         float value = remorse.ShaderRemorseValue;
-        Debug.Log($"Shader Value: {value}, Renderer: {targetRenderer.name}, Material: {targetRenderer.sharedMaterial.name}");
-        Debug.Log("Shader Value: " + value);
         targetRenderer.GetPropertyBlock(mpb);
         mpb.SetFloat(BloodAmountID, value);
         mpb.SetFloat(OtherAmountID, value);

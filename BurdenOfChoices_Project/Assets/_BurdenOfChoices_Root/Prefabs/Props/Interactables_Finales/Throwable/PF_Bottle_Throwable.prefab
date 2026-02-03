@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: 75cf7144824a10247a281a2c200a92f5, type: 2}
-  isBreakeable: 0
+  isBreakeable: 1
   breakLayer:
     serializedVersion: 2
     m_Bits: 264
@@ -235,7 +235,7 @@ MonoBehaviour:
   groundCheckDistance: 0.2
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
 --- !u!54 &5185568688036365445
 Rigidbody:
   m_ObjectHideFlags: 0
