@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 9085255825559072819}
   - component: {fileID: 3478343789961252768}
   - component: {fileID: 7582856047684515680}
-  m_Layer: 9
+  m_Layer: 6
   m_Name: PF_Barrel_Throwable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,10 +117,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: ca67fb5438a5fa942b86bbee311cd54e, type: 2}
+  isBreakeable: 0
   breakLayer:
     serializedVersion: 2
     m_Bits: 0
   impactPrefab: {fileID: 0}
+  brokenGlasVFX: {fileID: 0}
+  groundCheckDistance: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!54 &3478343789961252768
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -167,8 +173,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.30832922, y: 0.36044478, z: 0.30832928}
-  m_Center: {x: -0.00043111295, y: 0.18130568, z: 0.0006183982}
+  m_Size: {x: 0.30832922, y: 0.5100679, z: 0.30832928}
+  m_Center: {x: -0.0004311204, y: 0.25611725, z: 0.0006183982}
 --- !u!1 &6205075470412233658
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +184,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8596034731295746595}
-  m_Layer: 9
+  m_Layer: 6
   m_Name: GrabPoint
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -254,7 +260,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3149976871169583842, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
