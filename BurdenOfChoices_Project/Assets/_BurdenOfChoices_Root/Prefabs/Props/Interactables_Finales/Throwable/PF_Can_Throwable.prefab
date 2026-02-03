@@ -117,10 +117,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: f4b167187b78f194fa68d4f237540b7e, type: 2}
+  isBreakeable: 0
   breakLayer:
     serializedVersion: 2
     m_Bits: 0
   impactPrefab: {fileID: 0}
+  brokenGlasVFX: {fileID: 0}
+  groundCheckDistance: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!65 &3699742485160514899
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -140,8 +146,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.09694919, y: 0.14175493, z: 1}
-  m_Center: {x: -0.0055916756, y: 0.07265511, z: 0}
+  m_Size: {x: 0.09694919, y: 0.14175493, z: 0.09519321}
+  m_Center: {x: -0.0055916756, y: 0.07265511, z: -0.0069231093}
 --- !u!54 &3671360871256490147
 Rigidbody:
   m_ObjectHideFlags: 0
