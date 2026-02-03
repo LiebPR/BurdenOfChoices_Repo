@@ -1,5 +1,15 @@
-using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
+using UnityEngine;
+
+[System.Serializable]
+public class SFXData
+{
+    public string id; //Nombre del SFX principal
+    public AudioClip mainClip;
+    public bool isRandom = false;
+    public AudioClip[] randomClips; //clips aleatorios
+}
 
 /// <summary>
 /// AudioManager centralizado. Maneja música, ambiente y SFX (2D y 3D).
@@ -21,6 +31,13 @@ public class AudioManager : MonoBehaviour
 
         // Cargar todos los clips asignados en el Inspector
         LoadClips(musicClips, ambientClips, sfxClips);
+        // Cargar SFXData en diccionario
+        sfxDataLibrary.Clear();
+        foreach (var sfx in sfxDatabase)
+        {
+            if (sfx != null && !string.IsNullOrEmpty(sfx.id))
+                sfxDataLibrary[sfx.id] = sfx;
+        }
     }
     #endregion
 
@@ -48,13 +65,15 @@ public class AudioManager : MonoBehaviour
 
     [Header("SFX Clips")]
     public AudioClip[] sfxClips;
+    public SFXData[] sfxDatabase;
     #endregion
-    
+
     #region AudioLibrary
     // Diccionario de AudioClips
     public Dictionary<string, AudioClip> musicLibrary = new Dictionary<string, AudioClip>();
     public Dictionary<string, AudioClip> ambientLibrary = new Dictionary<string, AudioClip>();
     public Dictionary<string, AudioClip> sfxLibrary = new Dictionary<string, AudioClip>();
+    public Dictionary<string, SFXData> sfxDataLibrary = new Dictionary<string, SFXData>();
 
     /// <summary>
     /// Se pueden cargar todos los clips desde Resources o Addressables
@@ -156,28 +175,54 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region SFX API
+    AudioClip GetSFXClip(string sfxID)
+    {
+        if (sfxDataLibrary.ContainsKey(sfxID))
+        {
+            var sfx = sfxDataLibrary[sfxID];
+            if (sfx.isRandom && sfx.randomClips.Length > 0)
+            {
+                int rand = Random.Range(0, sfx.randomClips.Length);
+                return sfx.randomClips[rand];
+            }
+            return sfx.mainClip;
+        }
+        if (sfxLibrary.ContainsKey(sfxID)) return sfxLibrary[sfxID];
+        return null;
+    }
+
     public void PlaySFX2D(string sfxID, float volume = 1f)
     {
-        if (!sfxLibrary.ContainsKey(sfxID)) return;
-        AudioSource.PlayClipAtPoint(sfxLibrary[sfxID], Camera.main.transform.position, volume * sfxVolume * masterVolume);
+        AudioClip clip = GetSFXClip(sfxID);
+        if (clip == null)
+        {
+            Debug.LogWarning("[AudioManager] SFX no encontrado: " + sfxID);
+            return;
+        }
+
+        Vector3 position = (Camera.main != null) ? Camera.main.transform.position : Vector3.zero;
+        AudioSource.PlayClipAtPoint(clip, position, volume * sfxVolume * masterVolume);
     }
 
     public AudioEmitter PlaySFXAtPosition(string sfxID, Vector3 position, float volume = 1f)
     {
-        if (!sfxLibrary.ContainsKey(sfxID)) return null;
+        AudioClip clip = GetSFXClip(sfxID);
+        if (clip == null) return null;
+
         GameObject go = new GameObject("SFX_" + sfxID);
         go.transform.position = position;
         go.transform.parent = sfxContainer;
         AudioEmitter emitter = go.AddComponent<AudioEmitter>();
-        emitter.Play3D(sfxLibrary[sfxID], false, volume * sfxVolume, 0);
+        emitter.Play3D(clip, false, volume * sfxVolume, 0);
         return emitter;
     }
 
     public AudioEmitter PlaySFXAttached(string sfxID, Transform parent, bool loop = false, float volume = 1f)
     {
-        if (!sfxLibrary.ContainsKey(sfxID))
+        AudioClip clip = GetSFXClip(sfxID);
+        if (clip == null)
         {
-            Debug.LogWarning("[AudioManager] SFX no encontrado: {sfxID}");
+            Debug.LogWarning("[AudioManager] SFX no encontrado: " + sfxID);
             return null;
         }
 
@@ -185,15 +230,16 @@ public class AudioManager : MonoBehaviour
         go.transform.parent = parent;
         go.transform.localPosition = Vector3.zero;
         AudioEmitter emitter = go.AddComponent<AudioEmitter>();
-        emitter.Play3D(sfxLibrary[sfxID], loop, volume * sfxVolume, 0);
+        emitter.Play3D(clip, loop, volume * sfxVolume, 0);
         return emitter;
     }
 
     public void PlayAnimationSFX(string sfxID, Transform origin, float rangeMultiplier = 1f)
     {
-        if (!sfxLibrary.ContainsKey(sfxID))
+        AudioClip clip = GetSFXClip(sfxID);
+        if (clip == null)
         {
-            Debug.LogWarning("[AudioManager] SFX no encontrado: {sfxID}");
+            Debug.LogWarning("[AudioManager] SFX no encontrado: " + sfxID);
             return;
         }
 
@@ -202,9 +248,8 @@ public class AudioManager : MonoBehaviour
         go.transform.localPosition = Vector3.zero;
 
         AudioEmitter emitter = go.AddComponent<AudioEmitter>();
-        emitter.Play3D(sfxLibrary[sfxID], false, sfxVolume, 0);
+        emitter.Play3D(clip, false, sfxVolume, 0);
 
-        //Ajuste de rango específico
         var src = go.GetComponent<AudioSource>();
         src.minDistance *= rangeMultiplier;
         src.maxDistance *= rangeMultiplier;

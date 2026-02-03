@@ -12,6 +12,7 @@ public class AnimationEventRelay : MonoBehaviour
     #region Animation Events
     public void OnAttackStart()
     {
+        AudioManager.Instance.PlaySFX2D("GraceAttack");
         if (playerController != null)
             playerController.PausePlayer();
         if(playerController != null)

@@ -131,6 +131,7 @@ public class PlayerHealth : MonoBehaviour
         RotateAwayFromHit();
         animatorManager.DeathAnim();
 
+        AudioManager.Instance.PlaySFX2D("SFX_Grace_Death");
         var pick = FindAnyObjectByType<PickableBehaviour>();
         if (pick != null && pick.IsCatched)
         {
