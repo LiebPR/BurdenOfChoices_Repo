@@ -80,6 +80,7 @@ public class PlayerHealth : MonoBehaviour
         if (!respawnConsummed)
         {
             Transform respawnPoint = GetCurrentRespawnPoint();
+            if (respawnPoint == null) respawnPoint = defaultRespawnPoint; 
 
             if (respawnPoint != null)
             {
@@ -87,6 +88,8 @@ public class PlayerHealth : MonoBehaviour
                 StartCoroutine(RespawnRoutine(respawnPoint));
                 return;
             }
+            else
+                Debug.LogWarning("No hay respawn point asignado. Se cargará la LoseScene");
         }
 
         //Si ya no hay respawn disponible -> perder
@@ -127,6 +130,21 @@ public class PlayerHealth : MonoBehaviour
         //Girar al jugador hacia la dirección contraria del golpe
         RotateAwayFromHit();
         animatorManager.DeathAnim();
+
+        AudioManager.Instance.PlaySFX2D("SFX_Grace_Death");
+        var pick = FindAnyObjectByType<PickableBehaviour>();
+        if (pick != null && pick.IsCatched)
+        {
+            pick.OnDrop(true);
+        }
+
+        // Soltar cualquier objeto recogido de tipo Pickable en escena (si hay otros sistemas)
+        var pickables = GetComponentsInChildren<PickableBehaviour>();
+        foreach (var p in pickables)
+        {
+            if (p.IsCatched)
+                p.OnDrop(true);
+        }
 
         var vision = FindAnyObjectByType<VisionSystem>();
         if (vision != null) vision.ResetVisionToDefault();
@@ -179,6 +197,7 @@ public class PlayerHealth : MonoBehaviour
 
 
         yield return new WaitForSeconds(fadeInDelay);
+
         // 5. Fade in
         if (fadeController != null)
             yield return fadeController.FadeIn();

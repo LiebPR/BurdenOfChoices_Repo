@@ -29,5 +29,7 @@ public class WeaponData : ScriptableObject
     [Tooltip("Tiempo de retraso antes de que el ataque se ejecute.")]
     public float attackdelay = 0.2f;
     public float cooldown = 0.5f;
+
+    public string weaponSFX = "SFX_Weapon_";
     #endregion
 }

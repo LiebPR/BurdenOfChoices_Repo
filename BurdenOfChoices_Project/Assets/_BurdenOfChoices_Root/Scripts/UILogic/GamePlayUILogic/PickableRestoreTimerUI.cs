@@ -30,9 +30,10 @@ public class PickableRestoreTimerUI : MonoBehaviour
 
         float remainingTime = pickable.GetRestoreRemainingTime();
         bool isRestoring = pickable.IsRestoreRunning;
+        bool isCatched = pickable.IsCatched;
 
         // Apagar el contador cuando ya no se esté restaurando
-        if (!isRestoring || remainingTime <= 0f)
+        if (!isRestoring || remainingTime <= 0f || isCatched)
         {
             timerText.enabled = false;
             timerText.color = defaultColor;

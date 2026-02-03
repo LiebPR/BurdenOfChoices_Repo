@@ -7,7 +7,6 @@ public class DeathZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"[DeathZone] Trigger con: {other.name}");
         //Jugador
         if (other.TryGetComponent<PlayerController>(out _))
         {

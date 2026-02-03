@@ -126,8 +126,16 @@ public class PickableBehaviour : MonoBehaviour
 
         if (restoreRunning && Time.time >= restoreEndTime)
         {
-            restoreRunning = false;
-            RestoreInternal();
+            //Solo restaurar si no esta cogido
+            if (!isCatched)
+            {
+                restoreRunning = false;
+                RestoreInternal();
+            }
+            else
+            {
+                restoreEndTime = Time.time + 0.1f; //reintentar en el próximo frame
+            }
         }
     }
 
@@ -290,6 +298,7 @@ public class PickableBehaviour : MonoBehaviour
     //Suelta y restaura tras un tiempo
     public void OnRestoreWithTime(float delay)
     {
+        if (isCatched) return; //ignorar restore si está cogido
         OnDrop(true);
         restoreRunning = true;
         restoreEndTime = Time.time + delay;
@@ -324,8 +333,8 @@ public class PickableBehaviour : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        rb.isKinematic = true;
-        rb.useGravity = false;
+        rb.isKinematic = false;
+        rb.useGravity = true;
         coll.isTrigger = false;
 
         transform.position = originalPosition;   // ✔ world space

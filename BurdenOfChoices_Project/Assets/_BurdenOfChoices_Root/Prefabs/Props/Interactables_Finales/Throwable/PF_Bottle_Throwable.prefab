@@ -226,10 +226,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: 75cf7144824a10247a281a2c200a92f5, type: 2}
+  isBreakeable: 1
   breakLayer:
     serializedVersion: 2
     m_Bits: 264
   impactPrefab: {fileID: 3569143904732285720, guid: fbbdfaecbd1193841afe1332091b84dc, type: 3}
+  brokenGlasVFX: {fileID: 705360815990067702, guid: 010d10e05bd07494285270f9863ded18, type: 3}
+  groundCheckDistance: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!54 &5185568688036365445
 Rigidbody:
   m_ObjectHideFlags: 0

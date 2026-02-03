@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +9,7 @@ public class SequenceController : MonoBehaviour
 
     public void Play()
     {
+        Debug.Log($"Play llamado en {name}");
         if (steps == null || steps.Count == 0)
         {
             Debug.LogWarning("SequenceController: No hay pasos asignados.");
@@ -22,22 +22,18 @@ public class SequenceController : MonoBehaviour
 
     void PlayNext()
     {
-        if (currentIndex >= steps.Count)
+        while (currentIndex < steps.Count)
         {
-            Debug.Log("SequenceController: Secuencia finalizada");
-            return;
-        }
-
-        var step = steps[currentIndex] as ISequenceStep;
-        if (step == null)
-        {
-            Debug.LogWarning($"SequenceController: Paso {currentIndex} no implementa ISequenceStep");
+            var step = steps[currentIndex] as ISequenceStep;
             currentIndex++;
-            PlayNext();
-            return;
+            if (step != null)
+            {
+                step.Play(PlayNext);
+                break; // espera callback
+            }
         }
 
-        currentIndex++;
-        step.Play(PlayNext);
+        if (currentIndex >= steps.Count)
+            Debug.Log("SequenceController: Secuencia finalizada");
     }
 }

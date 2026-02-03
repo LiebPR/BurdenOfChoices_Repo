@@ -196,9 +196,9 @@ MonoBehaviour:
   ambientSource: {fileID: 620659186}
   sfxContainer: {fileID: 195684425}
   masterVolume: 1
-  musicVolume: 0.5
-  ambientVolume: 0.8
-  sfxVolume: 0.8
+  musicVolume: 0.3
+  ambientVolume: 1
+  sfxVolume: 1
   musicClips:
   - {fileID: 8300000, guid: 60f891eb97a538640af8355cd9d14f4c, type: 3}
   - {fileID: 8300000, guid: 75510f35322018f41807c569902c3c85, type: 3}
@@ -212,6 +212,19 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 36299be9073b6bc439df95d1141e3d8e, type: 3}
   - {fileID: 8300000, guid: 6b70af3ac26cb5744bc49e100ed72eff, type: 3}
   - {fileID: 8300000, guid: e2de892990c210d49866ea1f349880d9, type: 3}
+  - {fileID: 8300000, guid: 9d9cbdca668b2d04ca1cb9d8343b6caf, type: 3}
+  - {fileID: 8300000, guid: 1cf392c8528df2f449249ddb278b4e2f, type: 3}
+  - {fileID: 8300000, guid: 3fbc6f10b0224dc4aa01c25e4b07b775, type: 3}
+  - {fileID: 8300000, guid: e95214e01c3fb534e93758033dfa2441, type: 3}
+  - {fileID: 8300000, guid: cf26c3b0c6421564b9f0f47e89d9cdeb, type: 3}
+  sfxDatabase:
+  - id: GraceAttack
+    mainClip: {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
+    isRandom: 1
+    randomClips:
+    - {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
+    - {fileID: 8300000, guid: a02cb3ea8d846fd4bb7625777795a356, type: 3}
+    - {fileID: 8300000, guid: 47ed6503295c4db40a0de3d4af0228b2, type: 3}
 --- !u!4 &151707395
 Transform:
   m_ObjectHideFlags: 0
@@ -228,6 +241,7 @@ Transform:
   - {fileID: 195684425}
   - {fileID: 842013780}
   - {fileID: 620659187}
+  - {fileID: 1002263119}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &195684424
@@ -959,6 +973,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 151707395}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1002263118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1002263119}
+  - component: {fileID: 1002263120}
+  m_Layer: 0
+  m_Name: AudioEmitter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1002263119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002263118}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 151707395}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1002263120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002263118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee43f99cebd55174eaf419281e55fcf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1040746448
 GameObject:
   m_ObjectHideFlags: 0

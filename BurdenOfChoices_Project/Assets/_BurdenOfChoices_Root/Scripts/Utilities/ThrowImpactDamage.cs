@@ -6,9 +6,15 @@ public class ThrowImpactDamage : MonoBehaviour
     [Header("Data")]
     [SerializeField] WeaponData weaponData;
 
-    [Header("Data")]
+    [Header("Settings")]
+    [SerializeField] bool isBreakeable;
     [SerializeField] LayerMask breakLayer;
     [SerializeField] GameObject impactPrefab;
+    [SerializeField] GameObject brokenGlasVFX;
+
+    [Header("GroundCheck")]
+    [SerializeField] float groundCheckDistance = 0.2f;
+    [SerializeField] LayerMask groundLayer;
     #endregion
 
     #region Internal States
@@ -16,11 +22,20 @@ public class ThrowImpactDamage : MonoBehaviour
     bool hasCollided;
     bool damageConsumed;
     Rigidbody rb;
+    bool hasLeftGround;
     #endregion
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+    }
+
+    private void FixedUpdate()
+    {
+        if (!hasBeenThrown) return;
+
+        if (!IsGrounded())
+            hasLeftGround = true;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -29,7 +44,7 @@ public class ThrowImpactDamage : MonoBehaviour
         if (hasCollided) return;
 
         EnemyHealth enemy = collision.collider.GetComponent<EnemyHealth>();
-        if(enemy != null)
+        if (enemy != null)
         {
             hasCollided = true;
             ApplyDamage(enemy, collision);
@@ -38,7 +53,7 @@ public class ThrowImpactDamage : MonoBehaviour
         }
 
         // 2. ¿Es capa que rompe el objeto?
-        if (IsBreakLayer(collision.gameObject.layer))
+        if (IsBreakLayer(collision.gameObject.layer) && hasLeftGround)
         {
             hasCollided = true;
             Break(collision);
@@ -54,6 +69,7 @@ public class ThrowImpactDamage : MonoBehaviour
         hasBeenThrown = true;
         hasCollided = false;
         damageConsumed = false;
+        hasLeftGround = false;
     }
 
     /// <summary>
@@ -84,6 +100,8 @@ public class ThrowImpactDamage : MonoBehaviour
     #region Break Logic
     void Break(Collision collision)
     {
+        if (!isBreakeable) return;
+        SpawnBreakVFX();
         SpawnImpact(collision.contacts[0].point);
         Destroy(gameObject);
     }
@@ -93,9 +111,34 @@ public class ThrowImpactDamage : MonoBehaviour
     }
     void SpawnImpact(Vector3 position)
     {
-        if(impactPrefab == null) return;
+        if (impactPrefab == null) return;
 
         Instantiate(impactPrefab, position, Quaternion.identity);
+    }
+    #endregion
+
+    #region Ground Check
+    bool IsGrounded()
+    {
+        return Physics.Raycast(
+        transform.position,
+        Vector3.down,
+        groundCheckDistance,
+        groundLayer);
+    }
+    #endregion
+
+    #region VFX 
+    void SpawnBreakVFX()
+    {
+        if (!isBreakeable) return;
+        if (brokenGlasVFX == null) return;
+
+        Instantiate(
+            brokenGlasVFX,
+            transform.position,
+            Quaternion.identity
+        );
     }
     #endregion
 }

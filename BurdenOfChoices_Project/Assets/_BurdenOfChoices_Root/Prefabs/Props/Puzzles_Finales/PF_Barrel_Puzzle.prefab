@@ -118,10 +118,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: ca67fb5438a5fa942b86bbee311cd54e, type: 2}
+  isBreakeable: 0
   breakLayer:
     serializedVersion: 2
     m_Bits: 0
   impactPrefab: {fileID: 0}
+  brokenGlasVFX: {fileID: 0}
+  groundCheckDistance: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!54 &3478343789961252768
 Rigidbody:
   m_ObjectHideFlags: 0
