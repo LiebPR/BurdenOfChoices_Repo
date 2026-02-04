@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class FlowManager : MonoBehaviour
 {
+    #region Instance
     public static FlowManager Instance;
 
     public enum FlowState
@@ -12,9 +13,10 @@ public class FlowManager : MonoBehaviour
     }
 
     public FlowState CurrentState { get; private set; }
+    #endregion
 
     [Header("UI")]
-    [SerializeField] GameObject levelInfoPanel;
+    [SerializeField] LevelInfoPanel levelInfoPanel;
 
     private MeshButtonSelectable lockedPlant;
 
@@ -28,8 +30,6 @@ public class FlowManager : MonoBehaviour
             Instance = this;
 
         CurrentState = FlowState.WaitingForStartButton;
-        if(levelInfoPanel != null)
-            levelInfoPanel.SetActive(false);
     }
 
     // Llamar desde botón Start UI
@@ -52,14 +52,15 @@ public class FlowManager : MonoBehaviour
         CurrentState = FlowState.PlantSelectedLocked;
         lockedPlant = plant;
 
-        foreach (var p in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var p in Object.FindObjectsByType<MeshButtonSelectable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (p != plant)
                 p.SetSelectable(false);
         }
 
-        //Mostrar panel
-        levelInfoPanel?.SetActive(true);
+        levelInfoPanel.SetLevel(plant);
+        levelInfoPanel.gameObject.SetActive(true);
     }
 
     // Llamar desde Escape o botón UI de volver atrás
@@ -69,14 +70,15 @@ public class FlowManager : MonoBehaviour
 
         CurrentState = FlowState.WaitingForPlantSelection;
 
-        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             plant.SetSelectable(true);
             plant.Deselect();
         }
 
         lockedPlant = null;
-        levelInfoPanel?.SetActive(false);
+        levelInfoPanel.gameObject.SetActive(false);
     }
 
     public MeshButtonSelectable GetLockedPlant() => lockedPlant;

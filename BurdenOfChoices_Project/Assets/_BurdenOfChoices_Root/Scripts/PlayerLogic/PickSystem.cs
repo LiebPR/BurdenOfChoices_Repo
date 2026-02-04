@@ -16,6 +16,7 @@ public class PickSystem : MonoBehaviour
     #region Internal States
     PickableBehaviour currentPickable;
     ICatcher catcher;
+    Highlight currentHighlight;
     #endregion
 
     #region Eventos
@@ -37,6 +38,10 @@ public class PickSystem : MonoBehaviour
         if (catcher == null) Debug.LogError("PlayerHand no implementa ICatcher");
     }
 
+    private void Update()
+    {
+        HandleHighlight();
+    }
     #region Unity Events
     private void OnEnable()
     {
@@ -102,6 +107,53 @@ public class PickSystem : MonoBehaviour
         OnPickEnded?.Invoke(currentPickable);
 
         currentPickable = null;
+    }
+    #endregion
+
+    #region Highlight Logic
+    void HandleHighlight()
+    {
+        if (currentPickable != null)
+        {
+            ClearHighlight();
+            return;
+        }
+
+        Collider[] hits = Physics.OverlapSphere(pickOrigin.position, pickRange);
+
+        Highlight closest = null;
+        float closestDist = float.MaxValue;
+
+        foreach (var hit in hits)
+        {
+            var highlight = hit.GetComponentInParent<Highlight>();
+            if (highlight == null) continue;
+
+            float d = Vector3.Distance(
+                pickOrigin.position,
+                hit.ClosestPoint(pickOrigin.position)
+            );
+
+            if (d < closestDist)
+            {
+                closestDist = d;
+                closest = highlight;
+            }
+        }
+
+        if (closest != currentHighlight)
+        {
+            ClearHighlight();
+            currentHighlight = closest;
+            currentHighlight?.EnableHighlight();
+        }
+    }
+
+    void ClearHighlight()
+    {
+        if (currentHighlight == null) return;
+        currentHighlight.DisableHighlight();
+        currentHighlight = null;
     }
     #endregion
 

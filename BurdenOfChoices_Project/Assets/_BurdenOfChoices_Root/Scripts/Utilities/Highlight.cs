@@ -1,20 +1,20 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Highlight : MonoBehaviour
 {
     [SerializeField] Material highlightMaterial;
+    [SerializeField] PickableBehaviour pickable;
 
     Renderer rend;
-    PickableBehaviour pickable;
-
     Material[] baseMaterials;
+
     bool isHighlighted;
     bool blocked;
 
     void Awake()
     {
         rend = GetComponent<Renderer>();
-        pickable = GetComponent<PickableBehaviour>();
         baseMaterials = rend.materials;
     }
 

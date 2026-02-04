@@ -36,7 +36,6 @@ public class EnemyFootsStepsUpdater : MonoBehaviour
         if (emitter == null)
         {
             emitter = AudioManager.Instance.PlaySFXAttached("SFX_Sectario_Walk", transform, true);
-            Debug.Log("Buen Audio Bro");
         }
 
         //Ajuste de Pitch según el estado

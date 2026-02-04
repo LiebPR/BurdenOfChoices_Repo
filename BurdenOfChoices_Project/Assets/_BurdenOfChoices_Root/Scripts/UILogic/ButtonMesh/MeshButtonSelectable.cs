@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Cinemachine;
+using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class MeshButtonSelectable : MonoBehaviour
@@ -6,10 +7,17 @@ public class MeshButtonSelectable : MonoBehaviour
     [Header("Flow Settings")]
     [SerializeField] bool canInteractBeforeStart = false; // si false, bloquea hasta Start UI
 
+    [Header("Level Info")]
+    [SerializeField] LevelData levelData;
+    [SerializeField] CinemachineCamera levelCamera; //CAMARA DEL NIVEL
+
     CameraPriorityButton cameraPriorityButton;
 
     bool isSelected = false;
     bool isSelectable = false;
+
+    public LevelData LevelData => levelData;
+    public CinemachineCamera LevelCamera => levelCamera; 
 
     private void Awake()
     {
