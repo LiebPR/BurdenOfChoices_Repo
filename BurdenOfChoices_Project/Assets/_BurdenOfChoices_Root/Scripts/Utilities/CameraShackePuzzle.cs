@@ -49,6 +49,8 @@ public class CameraShackePuzzle : MonoBehaviour
     /// </summary>
     public void TriggerShake(float duration, float magnitude)
     {
+
+        AudioManager.Instance.PlaySFX2D("SFX_Rumble");
         shakeDuration = duration;
         shakeMagnitude = magnitude;
         currentShakeDuration = duration;
