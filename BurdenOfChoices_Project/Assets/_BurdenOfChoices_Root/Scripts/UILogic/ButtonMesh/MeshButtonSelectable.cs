@@ -9,7 +9,8 @@ public class MeshButtonSelectable : MonoBehaviour
 
     [Header("Level Info")]
     [SerializeField] LevelData levelData;
-    [SerializeField] CinemachineCamera levelCamera; //CAMARA DEL NIVEL
+    [SerializeField] CinemachineCamera previewCamera;  //Menu / Preview
+    [SerializeField] CinemachineCamera playCamera; //Nivel / Play
 
     CameraPriorityButton cameraPriorityButton;
 
@@ -17,7 +18,8 @@ public class MeshButtonSelectable : MonoBehaviour
     bool isSelectable = false;
 
     public LevelData LevelData => levelData;
-    public CinemachineCamera LevelCamera => levelCamera; 
+    public CinemachineCamera PreviewCamera => previewCamera;
+    public CinemachineCamera PlayCamera => playCamera; 
 
     private void Awake()
     {
@@ -53,4 +55,13 @@ public class MeshButtonSelectable : MonoBehaviour
     // API para otros sistemas
     public bool IsSelected() => isSelected;
     public bool IsSelectable() => isSelectable;
+    public void ForceHighlight()
+    {
+        isSelected = true; // primero interno
+        var highlight = GetComponent<MeshButtonHighlight>();
+        if (highlight != null)
+        {
+            highlight.ForceSelected(); // luego forzar visual
+        }
+    }
 }

@@ -184,6 +184,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2835839580713856675}
   - component: {fileID: 863712573656289032}
+  - component: {fileID: 802417134650424650}
+  - component: {fileID: 1191673987168306788}
   m_Layer: 0
   m_Name: Cylinder.001
   m_TagString: Untagged
@@ -263,6 +265,41 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00031468633, y: 0.0023694115, z: 0.000031054195}
     m_Extent: {x: 0.00069398026, y: 0.0026301343, z: 0.00032784735}
   m_DirtyAABB: 0
+--- !u!114 &802417134650424650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936301996104817985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c100f3dbe2dd4748a76217580c27705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightMaterial: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+  pickable: {fileID: 6793465097408999347}
+--- !u!65 &1191673987168306788
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936301996104817985}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.879604, y: 6.5569515, z: 52.602676}
+  m_Center: {x: 3.4956021, y: -0.056427836, z: -25.93465}
 --- !u!1 &4112554761224292552
 GameObject:
   m_ObjectHideFlags: 0

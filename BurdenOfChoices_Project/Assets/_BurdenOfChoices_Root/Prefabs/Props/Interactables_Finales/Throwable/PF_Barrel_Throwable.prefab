@@ -265,10 +265,56 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3149976871169583842, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6290896488641893644}
+    - targetCorrespondingSourceObject: {fileID: 3149976871169583842, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3922181290614104031}
   m_SourcePrefab: {fileID: 100100000, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
 --- !u!4 &4649154209127137427 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2377100068364890200, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
   m_PrefabInstance: {fileID: 6951370844618305739}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5462529564309281321 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3149976871169583842, guid: 7dd8365add4e0104fa465321cdb8aa5b, type: 3}
+  m_PrefabInstance: {fileID: 6951370844618305739}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6290896488641893644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5462529564309281321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c100f3dbe2dd4748a76217580c27705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightMaterial: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+  pickable: {fileID: 2522494874687449761}
+--- !u!65 &3922181290614104031
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5462529564309281321}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.32687962, y: 0.36044478, z: 0.32687968}
+  m_Center: {x: -0.0010494515, y: 0.18130568, z: 0.000000052154064}

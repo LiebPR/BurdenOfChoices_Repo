@@ -38,6 +38,10 @@ public class PuzzleRoomTrigger : MonoBehaviour
     {
         puzzleActive = true;
 
+        var cameraShake = FindAnyObjectByType<CameraShackePuzzle>();
+        if (cameraShake != null)
+            cameraShake.TriggerShake(1.8f, 0.05f);
+
         for (int i = 0; i < doorsToLock.Length; i++)
             doorsToLock[i].Lock();
 

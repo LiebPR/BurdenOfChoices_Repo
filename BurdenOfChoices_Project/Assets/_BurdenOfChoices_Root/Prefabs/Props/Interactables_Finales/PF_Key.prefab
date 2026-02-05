@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 3326355497722096326}
   - component: {fileID: 3874563962557238073}
   - component: {fileID: 1555737076036093945}
+  - component: {fileID: 5690589386175874032}
   m_Layer: 0
   m_Name: SM_Llave (1)
   m_TagString: Untagged
@@ -162,6 +163,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5690589386175874032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3830710346906798867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c100f3dbe2dd4748a76217580c27705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightMaterial: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+  pickable: {fileID: 3407419725261951561}
 --- !u!1 &8126332879141554604
 GameObject:
   m_ObjectHideFlags: 0

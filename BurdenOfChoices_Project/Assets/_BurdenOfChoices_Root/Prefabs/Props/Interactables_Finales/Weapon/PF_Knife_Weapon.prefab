@@ -247,6 +247,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b69e67a584dfc148bd1156a15840358, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8110758343553677802}
+    - targetCorrespondingSourceObject: {fileID: -7095123823780819837, guid: 6b69e67a584dfc148bd1156a15840358, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2195061599930764104}
+    - targetCorrespondingSourceObject: {fileID: -7095123823780819837, guid: 6b69e67a584dfc148bd1156a15840358, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8188408290686599970}
   m_SourcePrefab: {fileID: 100100000, guid: 6b69e67a584dfc148bd1156a15840358, type: 3}
 --- !u!4 &2595698254051390933 stripped
 Transform:
@@ -280,3 +286,43 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4469385896554847933 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7095123823780819837, guid: 6b69e67a584dfc148bd1156a15840358, type: 3}
+  m_PrefabInstance: {fileID: 2562403818124399166}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2195061599930764104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4469385896554847933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c100f3dbe2dd4748a76217580c27705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightMaterial: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
+  pickable: {fileID: 9048542668576223443}
+--- !u!65 &8188408290686599970
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4469385896554847933}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.00009483722, y: 0.0005777641, z: 0.0029311462}
+  m_Center: {x: -0.0000051264788, y: 0.00013341026, z: 0.0012049566}

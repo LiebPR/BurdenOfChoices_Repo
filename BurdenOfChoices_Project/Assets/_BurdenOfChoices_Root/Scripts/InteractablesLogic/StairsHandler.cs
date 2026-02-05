@@ -9,6 +9,9 @@ public class StairsHandler : MonoBehaviour
 
     [Header("Scene Config")]
     [SerializeField] string nextScene;
+
+    [Header("Level Data")]
+    [SerializeField] LevelData currentLevelData;
     #endregion
 
     void OnTriggerEnter(Collider other)
@@ -26,7 +29,6 @@ public class StairsHandler : MonoBehaviour
         if (!cell.AreAllLocksUnlocked)
         {
             // Aquí irá el sistema de diálogos
-            Debug.Log("Tendría que salvar al MOCOSO");
             return;
         }
 
@@ -38,6 +40,13 @@ public class StairsHandler : MonoBehaviour
     {
         if (SceneController.Instance != null)
         {
+            //Consolidar porgreso
+            currentLevelData.CommitSessionIfBetter();
+
+            //Contexto de retorno al Menú
+            GameFlowContext.ReturnFromLevel = true;
+            GameFlowContext.LastPlayedLevel = currentLevelData;
+
             SceneController.Instance.LoadScene(nextScene);
         }
         else
