@@ -15,20 +15,17 @@ public class DraggController : MonoBehaviour
     [SerializeField] bool debug = false;
     public Transform dragAnchor;
     [SerializeField] float followDamp = 0.05f;
-    [SerializeField] float initialResistance = 0.3f; // resistencia inicial
-    [SerializeField] float resistanceDuration = 0.2f;
     #endregion
 
     #region Internal
     Vector3 dragVelocitySmooth;
     Vector3 initialLocalOffset;
+    Coroutine resistanceCoroutine;
     #endregion
 
     #region Getters
     public bool IsDragging => currentDrag != null;
     public DraggableObject CurrentDrag => currentDrag;
-    public Transform CarrilA => currentDrag != null ? currentDrag.carrilA : null;
-    public Transform CarrilB => currentDrag != null ? currentDrag.carrilB : null;
     #endregion
 
     private void Awake()
@@ -37,10 +34,7 @@ public class DraggController : MonoBehaviour
         animator = GetComponent<AnimatorManager>();
 
         if (dragAnchor == null)
-        {
-            Debug.LogWarning("DragAnchor no asignado. Usando transform del jugador como fallback.");
             dragAnchor = transform;
-        }
     }
 
     private void FixedUpdate()
@@ -52,7 +46,7 @@ public class DraggController : MonoBehaviour
     #region Public API
     public void StartDrag(DraggableObject draggable)
     {
-        if (draggable == null || draggable.activeGrabPoint == null) return;
+        if (draggable == null || !draggable.ResolveGrabPoint(player.transform)) return;
 
         currentDrag = draggable;
         currentDrag.StartDragging();
@@ -64,16 +58,17 @@ public class DraggController : MonoBehaviour
         currentDrag.transform.SetParent(dragAnchor);
         initialLocalOffset = dragAnchor.InverseTransformPoint(currentDrag.transform.position);
 
+        // Detener al jugador al instante
+        player.rb.linearVelocity = Vector3.zero;
+        player.ResetMovementModifier();
+
         ApplyInputClamp();
 
-        // --- Aplicamos peso del objeto arrastrable ---
-        var pickable = currentDrag.GetComponent<PickableBehaviour>();
-        float objectWeight = pickable != null ? pickable.Weight : 1f;
-        float dragWeightFactor = Mathf.Clamp01(1f - objectWeight * 0.15f);
-        player.SetMovementModifier(dragWeightFactor, 1f);
+        // Aplicamos peso y resistencia del objeto
+        player.SetWeight(currentDrag.Weight);
 
-        // Resistencia inicial temporal
-        StartCoroutine(TemporaryResistance(player, dragWeightFactor * initialResistance, resistanceDuration));
+        if (resistanceCoroutine != null) StopCoroutine(resistanceCoroutine);
+        resistanceCoroutine = StartCoroutine(TemporaryResistance(player, currentDrag.InitialResistance, currentDrag.TimeInitialResistance));
     }
 
     public void StopDrag()
@@ -85,10 +80,23 @@ public class DraggController : MonoBehaviour
         animator?.SetGrabbing(false);
         player.UnlockRotation();
         player.UnlockCrouch();
-        player.ResetMovementModifier();
+
+        // Resetear peso y resistencia
+        player.SetWeight(1f);
+        player.ApplyDragResistance(0f);
 
         currentDrag.transform.SetParent(null);
         RemoveInputClamp();
+
+        // Limpiar bloqueos de movimiento al soltar
+        player.ClearBlockedDirections();
+        player.rb.linearVelocity = Vector3.zero; // detener cualquier velocidad residual
+
+        if (resistanceCoroutine != null)
+        {
+            StopCoroutine(resistanceCoroutine);
+            resistanceCoroutine = null;
+        }
 
         if (debug)
             Debug.Log("[Drag] Stopped dragging object: " + currentDrag.name);
@@ -101,20 +109,47 @@ public class DraggController : MonoBehaviour
     #region Drag Logic
     void UpdateDrag()
     {
-        if (currentDrag == null || dragAnchor == null) return;
+        if (currentDrag == null) return;
 
-        Vector3 targetLocalPos = initialLocalOffset;
-        currentDrag.transform.localPosition = Vector3.SmoothDamp(
-            currentDrag.transform.localPosition,
-            targetLocalPos,
-            ref dragVelocitySmooth,
-            followDamp
-        );
-
-        if (currentDrag.carrilA != null && currentDrag.carrilB != null)
+        if (currentDrag.CarrilA != null && currentDrag.CarrilB != null)
         {
-            Vector3 projectedPos = currentDrag.ProjectedPosition(player.transform.position);
-            player.rb.position = new Vector3(projectedPos.x, player.rb.position.y, projectedPos.z);
+            Vector3 dir = (currentDrag.CarrilB.position - currentDrag.CarrilA.position).normalized;
+            float totalLength = Vector3.Distance(currentDrag.CarrilA.position, currentDrag.CarrilB.position);
+            float distanceAlong = Vector3.Dot(currentDrag.transform.position - currentDrag.CarrilA.position, dir);
+
+            // Clamp distance dentro del carril
+            distanceAlong = Mathf.Clamp(distanceAlong, 0f, totalLength);
+            Vector3 clampedPos = currentDrag.CarrilA.position + dir * distanceAlong;
+            clampedPos.y = currentDrag.transform.position.y;
+
+            // SmoothDamp hacia la posición clamped
+            currentDrag.transform.position = Vector3.SmoothDamp(
+                currentDrag.transform.position,
+                clampedPos,
+                ref dragVelocitySmooth,
+                followDamp
+            );
+
+            // --- Bloqueos dinámicos y detención del jugador ---
+            if (distanceAlong <= 0f)
+            {
+                // Objeto en A
+                player.BlockMovementInDirection(-dir);  // bloquear hacia A
+                player.ClearMovementBlock(dir);         // permitir hacia B
+                player.rb.linearVelocity = Vector3.ProjectOnPlane(player.rb.linearVelocity, -dir); // detener movimiento hacia A
+            }
+            else if (distanceAlong >= totalLength)
+            {
+                // Objeto en B
+                player.BlockMovementInDirection(dir);   // bloquear hacia B
+                player.ClearMovementBlock(-dir);        // permitir hacia A
+                player.rb.linearVelocity = Vector3.ProjectOnPlane(player.rb.linearVelocity, dir);  // detener movimiento hacia B
+            }
+            else
+            {
+                // Objeto en medio
+                player.ClearBlockedDirections();
+            }
         }
     }
     #endregion
@@ -122,9 +157,9 @@ public class DraggController : MonoBehaviour
     #region Input Restrictions
     void ApplyInputClamp()
     {
-        if (currentDrag == null || player == null || CarrilA == null || CarrilB == null) return;
+        if (currentDrag == null || player == null || currentDrag.CarrilA == null || currentDrag.CarrilB == null) return;
 
-        Vector3 dir = (CarrilB.position - CarrilA.position).normalized;
+        Vector3 dir = (currentDrag.CarrilB.position - currentDrag.CarrilA.position).normalized;
 
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z))
             player.LockMovementAxis(Vector3.forward);
@@ -134,23 +169,22 @@ public class DraggController : MonoBehaviour
 
     void RemoveInputClamp()
     {
-        if (player == null) return;
-        player.UnlockMovementAxis();
+        player?.UnlockMovementAxis();
     }
     #endregion
 
     #region Resistance Coroutine
-    IEnumerator TemporaryResistance(PlayerController player, float extraPenalty, float duration)
+    IEnumerator TemporaryResistance(PlayerController player, float extraResistance, float duration)
     {
         float timer = duration;
         while (timer > 0f)
         {
-            float factor = 1f - extraPenalty * (timer / duration);
-            player.SetMovementModifier(factor, 1f);
+            float factor = 1f - extraResistance * (timer / duration);
+            player.ApplyDragResistance(factor);
             timer -= Time.deltaTime;
             yield return null;
         }
-        player.ResetMovementModifier();
+        player.ApplyDragResistance(0f);
     }
     #endregion
 }

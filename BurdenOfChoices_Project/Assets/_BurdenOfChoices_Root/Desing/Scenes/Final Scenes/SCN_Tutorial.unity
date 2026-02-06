@@ -2689,6 +2689,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1706433927}
     m_Modifications:
     - target: {fileID: 437426809271791753, guid: 944eb1e45d787bd4e801584ce699bc2e, type: 3}
+      propertyPath: weight
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 437426809271791753, guid: 944eb1e45d787bd4e801584ce699bc2e, type: 3}
       propertyPath: carrilA
       value: 
       objectReference: {fileID: 859992545}
@@ -5358,7 +5362,7 @@ Transform:
   m_GameObject: {fileID: 859992544}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5126599, y: 0.51276875, z: -4.286}
+  m_LocalPosition: {x: 0.5126599, y: 0.51276875, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

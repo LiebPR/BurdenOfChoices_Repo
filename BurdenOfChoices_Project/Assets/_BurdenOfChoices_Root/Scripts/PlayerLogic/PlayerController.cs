@@ -51,12 +51,12 @@ public class PlayerController : MonoBehaviour
     bool crouchLocked;
 
     // PESO EQUIP
-    float currentEquipWeight = 1f;             // Peso actual del objeto
     float currentWeightSpeedMultiplier = 1f;   // Penalización aplicada a la velocidad
 
     // MODIFICADORES EXTERNOS
     float movementSpeedMultiplier = 1f;
     float accelerationMultiplier = 1f;
+    Vector3 blockedDirection = Vector3.zero; // dirección actualmente bloqueada
 
     // GAME STOP
     bool wasGamePaused;
@@ -150,7 +150,7 @@ public class PlayerController : MonoBehaviour
         float targetSpeed = baseSpeed * currentWeightSpeedMultiplier * movementSpeedMultiplier;
 
         Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        Vector3 desiredVelocity = inputDir * targetSpeed;
+        Vector3 desiredVelocity = ApplyBlockedDirections(inputDir * targetSpeed);
 
         if (isTouchingWall)
         {
@@ -264,29 +264,26 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Weight API
-    /// <summary>
-    /// Aplica el peso de un objeto al jugador.
-    /// </summary>
+    float equipmentWeight = 1f;
+    float dragResistanceMultiplier = 1f;
+
     public void SetWeight(float weight)
     {
-        currentEquipWeight = Mathf.Max(1f, weight);
+        equipmentWeight = Mathf.Max(1f, weight);
+        RecalculateWeightMultiplier();
+    }
+
+    public void ApplyDragResistance(float resistance)
+    {
+        dragResistanceMultiplier = Mathf.Clamp01(1f - resistance);
         RecalculateWeightMultiplier();
     }
 
     void RecalculateWeightMultiplier()
     {
-        if (currentEquipWeight <= 1f)
-        {
-            currentWeightSpeedMultiplier = 1f;
-            return;
-        }
-
-        float penalty = (currentEquipWeight - 1f) * weightSpeedSensitivity;
-        currentWeightSpeedMultiplier = Mathf.Clamp(
-            1f - penalty,
-            weightAccelerationSensitivity,
-            1f
-        );
+        float penalty = (equipmentWeight - 1f) * weightSpeedSensitivity;
+        currentWeightSpeedMultiplier = Mathf.Clamp(1f - penalty, weightAccelerationSensitivity, 1f)
+                                      * dragResistanceMultiplier;
     }
     #endregion
 
@@ -335,6 +332,52 @@ public class PlayerController : MonoBehaviour
 
         animatorManager.SetVelocity(speed);
         animatorManager.SetMovementRatio(speed / walkSpeed);
+    }
+    #endregion
+
+    #region Bloqued Movement Dragg
+    /// <summary>Bloquea el movimiento hacia una dirección específica.</summary>
+    public void BlockMovementInDirection(Vector3 dir)
+    {
+        blockedDirection = dir.normalized;
+    }
+
+    /// <summary>Libera el bloqueo en una dirección específica.</summary>
+    public void ClearMovementBlock(Vector3 dir)
+    {
+        if (blockedDirection == dir.normalized)
+            blockedDirection = Vector3.zero;
+    }
+
+    /// <summary>Libera todos los bloqueos de movimiento.</summary>
+    public void ClearBlockedDirections()
+    {
+        blockedDirection = Vector3.zero;
+    }
+
+    /// <summary>Aplica los bloqueos de dirección sobre un vector de movimiento deseado.</summary>
+    public Vector3 ApplyBlockedDirections(Vector3 desiredMovement)
+    {
+        if (blockedDirection == Vector3.zero) return desiredMovement;
+
+        // Bloquear movimiento hacia la dirección prohibida
+        float dot = Vector3.Dot(desiredMovement, blockedDirection);
+        if (dot > 0f)
+        {
+            // Proyectamos el movimiento eliminando la componente hacia la dirección bloqueada
+            desiredMovement = Vector3.ProjectOnPlane(desiredMovement, blockedDirection);
+
+            // También frenamos la velocidad residual del jugador en esa dirección
+            Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            float velDot = Vector3.Dot(planarVelocity, blockedDirection);
+            if (velDot > 0f)
+            {
+                planarVelocity -= blockedDirection * velDot;
+                rb.linearVelocity = new Vector3(planarVelocity.x, rb.linearVelocity.y, planarVelocity.z);
+            }
+        }
+
+        return desiredMovement;
     }
     #endregion
 }

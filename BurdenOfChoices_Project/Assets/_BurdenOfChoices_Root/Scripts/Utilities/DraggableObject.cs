@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Objeto arrastrable: define resistencia, puntos de agarre y carril de arrastre.
+/// </summary>
 public class DraggableObject : MonoBehaviour
 {
     #region Grab Definition
@@ -25,10 +28,23 @@ public class DraggableObject : MonoBehaviour
     #endregion
 
     #region Drag Config
-    public Transform carrilA;
-    public Transform carrilB;
+    [Header("Carril & Peso")]
+    [SerializeField] Transform carrilA;
+    [SerializeField] Transform carrilB;
+
+    [Header("Resistencias")]
     [SerializeField] float weight = 1f;
+    [SerializeField] float initialResistance = 0.3f;
+    [SerializeField] float constantResistance = 0.1f;
+    [SerializeField] float timeInitialResistance = 0.2f;
+
     public float Weight => weight;
+    public float InitialResistance => initialResistance;
+    public float ConstantResistance => constantResistance;
+    public float TimeInitialResistance => timeInitialResistance;
+
+    public Transform CarrilA => carrilA;
+    public Transform CarrilB => carrilB;
     #endregion
 
     #region Grab Resolution
@@ -81,8 +97,8 @@ public class DraggableObject : MonoBehaviour
         if (carrilA == null || carrilB == null) return targetPos;
 
         Vector3 direction = (carrilB.position - carrilA.position).normalized;
-        float t = Vector3.Dot(targetPos - carrilA.position, direction) / Vector3.Distance(carrilA.position, carrilB.position);
-        t = Mathf.Clamp01(t);
+        Vector3 projected = Vector3.Project(targetPos - carrilA.position, direction);
+        float t = Mathf.Clamp01(projected.magnitude / Vector3.Distance(carrilA.position, carrilB.position));
         return carrilA.position + direction * Vector3.Distance(carrilA.position, carrilB.position) * t;
     }
     #endregion
