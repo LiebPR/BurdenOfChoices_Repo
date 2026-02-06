@@ -30,7 +30,6 @@ public class TutorialMissionSystem : MonoBehaviour
     {
         if (currentIndex >= missions.Count)
         {
-            Debug.Log("[MissionSystem] Todas las misiones completadas.");
             return;
         }
 
@@ -47,13 +46,10 @@ public class TutorialMissionSystem : MonoBehaviour
 
         if (mission.IsCompleted)
         {
-            Debug.Log($"[MissionSystem] {mono.name} ya estaba completada. Saltando.");
             currentIndex++;
             PlayNextMission();
             return;
         }
-
-        Debug.Log($"[MissionSystem] Iniciando misión: {mono.name}");
 
         currentIndex++;
 

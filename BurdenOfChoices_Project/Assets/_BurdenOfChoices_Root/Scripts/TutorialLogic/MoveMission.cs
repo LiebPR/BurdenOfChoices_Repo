@@ -65,7 +65,6 @@ public class MoveMission : MonoBehaviour, IMissionStep
         {
             dialogSystem.StartDialog(completeDialog, () =>
             {
-                Debug.Log("[MoveMission] Completada");
                 OnMissionCompleted?.Invoke();
             });
         }

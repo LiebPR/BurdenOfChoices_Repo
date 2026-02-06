@@ -67,7 +67,6 @@ public class RunMission : MonoBehaviour, IMissionStep
         {
             dialogSystem.StartDialog(completeDialog, () =>
             {
-                Debug.Log("[RunMission] Completada");
                 OnMissionCompleted?.Invoke();
             });
         }

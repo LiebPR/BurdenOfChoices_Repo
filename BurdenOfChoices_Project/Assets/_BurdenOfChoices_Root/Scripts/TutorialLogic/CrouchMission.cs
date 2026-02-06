@@ -6,8 +6,10 @@ public class CrouchMission : MonoBehaviour, IMissionStep
     #region Inspector
     [SerializeField] TriggerNotifier startTrigger;
     [SerializeField] TriggerNotifier completeTrigger;
+
     [SerializeField] DialogSystem dialogSystem;
     [SerializeField] DialogData entryDialog;
+    [SerializeField] DialogData completeDialog;
     #endregion
 
     bool isCompleted;
@@ -18,7 +20,7 @@ public class CrouchMission : MonoBehaviour, IMissionStep
     public void StartMission()
     {
         startTrigger.OnTriggerEntered += OnStart;
-        completeTrigger.OnTriggerEntered += CompleteMission;
+        completeTrigger.OnTriggerEntered += OnCompleteTrigger;
     }
 
     void OnStart()
@@ -29,20 +31,29 @@ public class CrouchMission : MonoBehaviour, IMissionStep
             dialogSystem.StartDialog(entryDialog);
     }
 
-    void CompleteMission()
+    void OnCompleteTrigger()
     {
         if (isCompleted) return;
 
         isCompleted = true;
-        completeTrigger.OnTriggerEntered -= CompleteMission;
+        completeTrigger.OnTriggerEntered -= OnCompleteTrigger;
 
-        Debug.Log("[CrouchMission] Completada");
-        OnMissionCompleted?.Invoke();
+        if (dialogSystem && completeDialog)
+        {
+            dialogSystem.StartDialog(completeDialog, () =>
+            {
+                OnMissionCompleted?.Invoke();
+            });
+        }
+        else
+        {
+            OnMissionCompleted?.Invoke();
+        }
     }
 
     void OnDisable()
     {
         startTrigger.OnTriggerEntered -= OnStart;
-        completeTrigger.OnTriggerEntered -= CompleteMission;
+        completeTrigger.OnTriggerEntered -= OnCompleteTrigger;
     }
 }

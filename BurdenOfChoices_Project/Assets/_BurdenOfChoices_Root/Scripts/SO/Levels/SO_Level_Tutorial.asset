@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55313f39233ce0944b332ee5efc6c181, type: 3}
   m_Name: SO_Level_Tutorial
   m_EditorClassIdentifier: 
-  levelName: TUTORIAL
+  levelName: Tutorial
   sceneName: SCN_Tutorial
+  maxPeackUps: 3
+  collectedPeackUps: 0
+  sessionPeackUps: 0
+  restoreMenuCameraOnReturn: 1
