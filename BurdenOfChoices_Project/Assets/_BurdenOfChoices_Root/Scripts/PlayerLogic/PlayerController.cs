@@ -29,6 +29,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("External Forces")]
     [SerializeField] float externalDamping = 8f;
+
+    [Header("Footsteps SFX")]
+    [SerializeField] string footstepSFXID = "footstep"; //id audiomanager
+    [SerializeField] float walkStepInterval = 0.5f;
+    [SerializeField] float runStepInterval = 0.32f;
+    [SerializeField] float crouchStepinterval = 0.75f;
+    [SerializeField] float minSpeedForFootsteps = 0.1f;
     #endregion
 
     #region Internal State
@@ -63,6 +70,9 @@ public class PlayerController : MonoBehaviour
 
     Vector3 wallNormal;
     bool isTouchingWall;
+
+    // FOOTSTEPS
+    float footstepTimer = 0f;
     #endregion
 
     #region References
@@ -111,7 +121,10 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         if (!movementLocked)
+        {
             HandleMovementSpeed();
+            HandleFootsteps();
+        }
         else
             BreakToStop();
 
@@ -378,6 +391,35 @@ public class PlayerController : MonoBehaviour
         }
 
         return desiredMovement;
+    }
+    #endregion
+
+    #region Handle Audio Footsteps
+    void HandleFootsteps()
+    {
+        Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speed = planar.magnitude;
+
+        if (speed < minSpeedForFootsteps || movementLocked)
+        {
+            footstepTimer = 0f;
+            return;
+        }
+
+        //Calculamos intervalo según estado
+        float stepInterval = isCrouching ? crouchStepinterval : (isRunning ? runStepInterval : walkStepInterval);
+
+        //Reducimos intervalo según velocidad real
+        float velocityFactor = speed / (isRunning ? runSpeed : isCrouching ? crouchSpeed : walkSpeed);
+        stepInterval /= Mathf.Clamp(velocityFactor, 0.1f, 2f);
+
+        footstepTimer += Time.fixedDeltaTime;
+
+        if(footstepTimer >= stepInterval)
+        {
+            AudioManager.Instance.PlaySFXAtPosition(footstepSFXID, transform.position, 1f);
+            footstepTimer = 0f;
+        }
     }
     #endregion
 }

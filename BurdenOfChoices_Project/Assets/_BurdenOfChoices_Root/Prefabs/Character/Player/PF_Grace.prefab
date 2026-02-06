@@ -6603,6 +6603,11 @@ MonoBehaviour:
   weightSpeedSensitivity: 0.25
   weightAccelerationSensitivity: 0.1
   externalDamping: 10
+  footstepSFXID: SFX_Grace_Walk
+  walkStepInterval: 0.5
+  runStepInterval: 0.32
+  crouchStepinterval: 0.75
+  minSpeedForFootsteps: 0.1
   rb: {fileID: 0}
 --- !u!114 &3861140670934981315
 MonoBehaviour:
@@ -6790,8 +6795,6 @@ MonoBehaviour:
   debug: 1
   dragAnchor: {fileID: 6606567005623497066}
   followDamp: 0.05
-  initialResistance: 0.3
-  resistanceDuration: 0.2
 --- !u!114 &3246851960515059402
 MonoBehaviour:
   m_ObjectHideFlags: 0
