@@ -80,6 +80,27 @@ public class MeshButtonHighlight : MonoBehaviour
         wasHovering = isHovering;
     }
 
+    public void ForceSelected()
+    {
+        if (visual != null)
+        {
+            visual.SetSelected();
+        }
+
+        // Asegura que Update() no sobreescriba visual
+        wasHovering = true;
+    }
+
+    public void ApplyHighlightImmediately()
+    {
+        // Asegurarse de que visual existe
+        if (visual != null)
+        {
+            // Forzar material de highlight aunque no haya hover
+            visual.SetSelected();
+        }
+    }
+
     bool IsHovering()
     {
         Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());

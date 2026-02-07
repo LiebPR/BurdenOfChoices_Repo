@@ -43,7 +43,5 @@ public class Remorse : MonoBehaviour
 
         //Se multiplican los enemigos muertos por el remordimiento y se almacena en currentRemorse
         currentRemorse = deadEnemies * remorsePointsEnemy;
-
-        Debug.Log($"DeadEnemies: {deadEnemies}, CurrentRemorse: {currentRemorse}");
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PuzzleThrowItem : MonoBehaviour, IInteractable
+public class PuzzleThrowItem : MonoBehaviour, IInteractable, IPickListener
 {
     #region Inspector States
     [SerializeField] int objectID;
@@ -50,6 +50,18 @@ public class PuzzleThrowItem : MonoBehaviour, IInteractable
     }
 
     public void OnRemoveHighlight()
+    {
+
+    }
+    #endregion
+
+    #region Pick 
+    public void OnPick(ICatcher catcher)
+    {
+
+    }
+
+    public void OnDrop()
     {
 
     }

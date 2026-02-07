@@ -51,7 +51,6 @@ public class MenuInputHandler : MonoBehaviour
         if (holdTimer >= holdTimeToSkip)
         {
             isHolding = false;
-            Debug.Log("[MenuInputHandler] Skip confirmado tras hold");
             OnSkipConfirmed?.Invoke();
         }
     }
@@ -68,6 +67,8 @@ public class MenuInputHandler : MonoBehaviour
 
         skipAction.started += OnInteractionStarted;
         skipAction.canceled += OnInteractionCanceled;
+
+        skipAction.performed += OnSkipPressed;
     }
 
     private void OnDisable()
@@ -105,7 +106,6 @@ public class MenuInputHandler : MonoBehaviour
     {
         isHolding = true;
         holdTimer = 0f;
-        Debug.Log("[MenuInputHandler] Inicio de hold para skip");
         OnSkipHoldStarted?.Invoke();
     }
 
@@ -114,8 +114,15 @@ public class MenuInputHandler : MonoBehaviour
     {
         isHolding = false;
         holdTimer = 0f;
-        Debug.Log("[MenuInputHandler] Hold cancelado");
         OnSkipHoldCanceled?.Invoke();
+    }
+
+    private void OnSkipPressed(InputAction.CallbackContext ctx)
+    {
+        // Dispara un evento que el DialogSystem escuchará
+        DialogSystem activeDialog = FindAnyObjectByType<DialogSystem>();
+        if (activeDialog != null)
+            activeDialog.SkipOrNext();
     }
     #endregion
 }

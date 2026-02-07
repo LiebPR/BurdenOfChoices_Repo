@@ -23,6 +23,7 @@ public class PuzzleRoomTrigger : MonoBehaviour
     #region Internal States
     bool puzzleActive;
     bool puzzleCompleted;
+    bool isPlaying;
     #endregion
 
     private void OnTriggerEnter(Collider other)
@@ -37,6 +38,10 @@ public class PuzzleRoomTrigger : MonoBehaviour
     void ActivatePuzzleRoom()
     {
         puzzleActive = true;
+
+        var cameraShake = FindAnyObjectByType<CameraShackePuzzle>();
+        if (cameraShake != null)
+            cameraShake.TriggerShake(2f, 0.05f);
 
         for (int i = 0; i < doorsToLock.Length; i++)
             doorsToLock[i].Lock();

@@ -8,7 +8,7 @@ public class DialogueSequenceStep : MonoBehaviour, ISequenceStep
 
     public void Play(Action onFinished)
     {
-        dialogSystem.onDialogFinished += onFinished;
+        dialogSystem.OnDialogFinished += onFinished;
         dialogSystem.StartDialog(data);
     }
 }

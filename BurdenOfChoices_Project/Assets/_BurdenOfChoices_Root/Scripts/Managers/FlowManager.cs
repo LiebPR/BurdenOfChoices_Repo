@@ -1,8 +1,31 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public class FlowManager : MonoBehaviour
 {
+    #region Instance
     public static FlowManager Instance;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
+        if (GameFlowContext.ReturnFromLevel)
+        {
+            CurrentState = FlowState.PlantSelectedLocked;
+        }
+        else
+        {
+            CurrentState = FlowState.WaitingForStartButton;
+        }
+    }
+    #endregion
 
     public enum FlowState
     {
@@ -14,25 +37,44 @@ public class FlowManager : MonoBehaviour
     public FlowState CurrentState { get; private set; }
 
     [Header("UI")]
-    [SerializeField] GameObject levelInfoPanel;
+    [SerializeField] LevelInfoPanel levelInfoPanel;
 
     private MeshButtonSelectable lockedPlant;
 
-    private void Awake()
+    private void Start()
     {
-        if (Instance != null && Instance != this)
+        if (GameFlowContext.ReturnFromLevel)
         {
-            Destroy(gameObject);
-        }
-        else
-            Instance = this;
+            var targetPlant = FindPlantByLevelData(GameFlowContext.LastPlayedLevel);
+            if (targetPlant != null)
+            {
+                lockedPlant = targetPlant;
+                lockedPlant.SetSelectable(true);
 
-        CurrentState = FlowState.WaitingForStartButton;
-        if(levelInfoPanel != null)
-            levelInfoPanel.SetActive(false);
+                // Forzar highlight con retraso de un frame
+                StartCoroutine(HighlightAfterInitialization(targetPlant));
+
+                CurrentState = FlowState.PlantSelectedLocked;
+
+                foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    plant.SetSelectable(plant == targetPlant);
+                    plant.Deselect();
+                }
+
+                // Cámara de preview
+                if (CameraManager.Instance != null && targetPlant.PreviewCamera != null)
+                    CameraManager.Instance.ActivateCamera(targetPlant.PreviewCamera);
+
+                levelInfoPanel.SetLevel(targetPlant);
+                levelInfoPanel.gameObject.SetActive(true);
+
+                GameFlowContext.Clear();
+            }
+        }
     }
 
-    // Llamar desde bot�n Start UI
+    // Llamar desde botón Start UI
     public void OnStartButtonPressed()
     {
         CurrentState = FlowState.WaitingForPlantSelection;
@@ -52,31 +94,59 @@ public class FlowManager : MonoBehaviour
         CurrentState = FlowState.PlantSelectedLocked;
         lockedPlant = plant;
 
-        foreach (var p in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var p in Object.FindObjectsByType<MeshButtonSelectable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (p != plant)
                 p.SetSelectable(false);
         }
 
-        //Mostrar panel
-        levelInfoPanel?.SetActive(true);
+        levelInfoPanel.SetLevel(plant);
+        levelInfoPanel.gameObject.SetActive(true);
     }
 
-    // Llamar desde Escape o bot�n UI de volver atr�s
+    // Llamar desde Escape o botón UI de volver atrás
     public void OnBackPressed()
     {
         if (CurrentState != FlowState.PlantSelectedLocked) return;
 
         CurrentState = FlowState.WaitingForPlantSelection;
 
-        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             plant.SetSelectable(true);
             plant.Deselect();
         }
 
         lockedPlant = null;
-        levelInfoPanel?.SetActive(false);
+        levelInfoPanel.gameObject.SetActive(false);
+    }
+
+    MeshButtonSelectable FindPlantByLevelData(LevelData data)
+    {
+        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (plant.LevelData == data)
+                return plant;
+        }
+
+        return null;
+    }
+
+    IEnumerator HighlightAfterInitialization(MeshButtonSelectable targetPlant)
+    {
+        // Espera un frame para que Awake/Start de todos los highlights se ejecute
+        yield return null;
+
+        // Asegura que el botón está seleccionado internamente
+        targetPlant.ForceHighlight();
+
+        // Aplica el material de highlight inmediatamente
+        var highlight = targetPlant.GetComponent<MeshButtonHighlight>();
+        if (highlight != null)
+            highlight.ApplyHighlightImmediately();
     }
 
     public MeshButtonSelectable GetLockedPlant() => lockedPlant;

@@ -18,9 +18,17 @@ public class SlashAttackCommand : AttackCommand
             Vector3 hitDirection = tOrigin.forward.normalized;
 
             EnemyHealth enemyHealth = hits[i].GetComponent<EnemyHealth>();
-            if (enemyHealth == null) continue;
+            if (enemyHealth != null)
+            {
+                enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+            }
 
-            enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+            // Objetos golpeables (tutorial, props, etc.)
+            IHittable hittable = hits[i].GetComponent<IHittable>();
+            if (hittable != null)
+            {
+                hittable.OnHit(hits[i].ClosestPoint(tOrigin.position), hitDirection);
+            }
         }
     }
 }

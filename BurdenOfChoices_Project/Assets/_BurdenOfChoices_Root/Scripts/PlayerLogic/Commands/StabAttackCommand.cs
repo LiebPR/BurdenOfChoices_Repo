@@ -17,16 +17,23 @@ public class StabAttackCommand : AttackCommand
 
         if(Physics.Raycast(ray, out RaycastHit hit, weaponData.range))
         {
+
+            Vector3 hitDirection = tOrigin.forward.normalized;
+
             EnemyHealth enemyHealth = hit.collider.GetComponent<EnemyHealth>();
             if(enemyHealth != null)
             {
-                Vector3 hitDirection = tOrigin.forward.normalized;
-
                 //Aplicamos el daño definido en el WeaponData
                 enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
             }
 
-            BrokenGlass brokenGlass = tOrigin.GetComponentInParent<BrokenGlass>();
+            IHittable hittable = hit.collider.GetComponent<IHittable>();
+            if (hittable != null)
+            {
+                hittable.OnHit(hit.point, hitDirection);
+            }
+
+            BrokenGlass brokenGlass = hit.collider.GetComponent<BrokenGlass>();
             if (brokenGlass != null)
             {
                 brokenGlass.BreakImmediate(hit.point);

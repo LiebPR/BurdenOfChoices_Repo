@@ -20,7 +20,7 @@ public class DialogSystem : MonoBehaviour
     #endregion
 
     #region Events
-    public event Action onDialogFinished;
+    public event Action OnDialogFinished;
     #endregion
 
     #region Public API
@@ -49,18 +49,52 @@ public class DialogSystem : MonoBehaviour
             StartCoroutine(AutoAdvanceRoutine());
     }
 
+    public void StartDialog(DialogData dialog, Action onFinished)
+    {
+        StartDialog(dialog); // Llama al método original
+
+        // Suscribirse a un evento interno que se dispara al terminar el diálogo
+        OnDialogFinished += onFinished;
+    }
+
     public void NextLine()
     {
         if (!isActive) return;
 
+        // Si el texto aún se está escribiendo, lo completamos y NO avanzamos
+        if (dialogUI.IsTyping)
+        {
+            dialogUI.SkipTyping();
+            return;
+        }
+
         currentLineIndex++;
 
-        if(currentLineIndex >= currentDialog.lines.Count)
+        if (currentLineIndex >= currentDialog.lines.Count)
         {
             EndDialog();
             return;
         }
+
         ShowLine();
+    }
+
+    /// <summary>
+    /// Llama cuando se presiona el botón de avance/skip.
+    /// Completa la línea si está escribiendo, o avanza si ya terminó.
+    /// </summary>
+    public void SkipOrNext()
+    {
+        if (!isActive) return;
+
+        if (dialogUI.IsTyping)
+        {
+            dialogUI.SkipTyping(); // Completa la línea
+        }
+        else
+        {
+            NextLine(); // Avanza a la siguiente línea
+        }
     }
     #endregion
 
@@ -101,8 +135,8 @@ public class DialogSystem : MonoBehaviour
 
         dialogUI.Hide();
 
-        onDialogFinished?.Invoke();
-        onDialogFinished = null;
+        OnDialogFinished?.Invoke();
+        OnDialogFinished = null;
     }
     #endregion
 
@@ -111,7 +145,13 @@ public class DialogSystem : MonoBehaviour
     {
         while (isActive)
         {
+            // Espera a que termine la línea actual
+            while (dialogUI.IsTyping)
+                yield return null;
+
+            // Espera el delay antes de avanzar
             yield return new WaitForSeconds(currentDialog.autoAdvanceDelay);
+
             NextLine();
         }
     }

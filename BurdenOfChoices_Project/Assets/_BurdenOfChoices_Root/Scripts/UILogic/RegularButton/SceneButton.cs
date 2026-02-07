@@ -9,22 +9,20 @@ public class SceneButton : MonoBehaviour
     [Tooltip("Delay antes de iniciar la carga de escena")]
     [SerializeField] float delaySeconds = 0f;
 
+    public void SetScene(string newScene)
+    {
+        sceneName = newScene;
+    }
+
     public void LoadSceneDelay()
     {
         if (string.IsNullOrEmpty(sceneName))
         {
-            Debug.LogWarning("SceneButton: No se ha asignado nombre de escena.");
+            Debug.LogWarning("SceneButton: Scene no asignada.");
             return;
         }
 
-        if (SceneController.Instance != null)
-        {
-            SceneController.Instance.LoadScene(sceneName, delaySeconds);
-        }
-        else
-        {
-            Debug.LogError("SceneButton: SceneController.Instance no encontrado en la escena.");
-        }
+        SceneController.Instance?.LoadScene(sceneName, delaySeconds);
     }
 
     public void QuitGame()

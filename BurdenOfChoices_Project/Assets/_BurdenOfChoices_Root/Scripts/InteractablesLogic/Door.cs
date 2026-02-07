@@ -53,13 +53,16 @@ public class Door : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (!locked)
+        if (doorLight != null)
         {
-            doorLight.enabled = true;
-        }
-        else
-        {
-            doorLight.enabled = false;
+            if (!locked)
+            {
+                doorLight.enabled = true;
+            }
+            else
+            {
+                doorLight.enabled = false;
+            }
         }
     }
 

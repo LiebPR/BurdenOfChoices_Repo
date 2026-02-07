@@ -14,7 +14,6 @@ public class Key : MonoBehaviour, IInteractable, IPickListener
     //Internal State
     Lock targetLock;
     bool isConsuming;
-
     #region References
     PickableBehaviour pickable;
     PlayerHand playerHand;
@@ -50,12 +49,12 @@ public class Key : MonoBehaviour, IInteractable, IPickListener
 
     public void OnHighlight()
     {
-        
+
     }
 
     public void OnRemoveHighlight()
     {
-        
+       
     }
     #endregion
 
