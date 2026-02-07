@@ -631,6 +631,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "PF_SueloMansi\xF3n"
       objectReference: {fileID: 0}
+    - target: {fileID: 6540972938893138403, guid: f13faf248150cf040bcd057be9dcb8f3, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: be219387d2d70264eaa406f865edee5f, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1167,6 +1171,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 20439779662730648, guid: 9238ae218960d23488214983c4bf8b45, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: be219387d2d70264eaa406f865edee5f, type: 2}
     - target: {fileID: 226643790429389680, guid: 9238ae218960d23488214983c4bf8b45, type: 3}
       propertyPath: m_Name
       value: PF_ArbolMansion
@@ -1223,6 +1231,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -37.811
       objectReference: {fileID: 0}
+    - target: {fileID: 7197130083692077786, guid: 9238ae218960d23488214983c4bf8b45, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: be219387d2d70264eaa406f865edee5f, type: 2}
+    - target: {fileID: 7788906530802960638, guid: 9238ae218960d23488214983c4bf8b45, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: be219387d2d70264eaa406f865edee5f, type: 2}
+    - target: {fileID: 7909932571468256923, guid: 9238ae218960d23488214983c4bf8b45, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: be219387d2d70264eaa406f865edee5f, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3948,7 +3968,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1521622972
 RectTransform:
   m_ObjectHideFlags: 0
