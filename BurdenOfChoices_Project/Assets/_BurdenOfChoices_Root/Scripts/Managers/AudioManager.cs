@@ -183,6 +183,7 @@ public class AudioManager : MonoBehaviour
             if (sfx.isRandom && sfx.randomClips.Length > 0)
             {
                 int rand = Random.Range(0, sfx.randomClips.Length);
+                Debug.Log($"Random SFX {sfxID}: seleccionando índice {rand} -> {sfx.randomClips[rand].name}");
                 return sfx.randomClips[rand];
             }
             return sfx.mainClip;
@@ -193,15 +194,46 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX2D(string sfxID, float volume = 1f)
     {
-        AudioClip clip = GetSFXClip(sfxID);
+        AudioClip clip = GetSFXClip(sfxID); // Evaluar solo una vez
         if (clip == null)
         {
             Debug.LogWarning("[AudioManager] SFX no encontrado: " + sfxID);
             return;
         }
 
-        Vector3 position = (Camera.main != null) ? Camera.main.transform.position : Vector3.zero;
-        AudioSource.PlayClipAtPoint(clip, position, volume * sfxVolume * masterVolume);
+        GameObject go = new GameObject("SFX2D_" + sfxID);
+        go.transform.parent = sfxContainer; // opcional, para mantener jerarquía limpia
+
+        AudioSource source = go.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.volume = volume * sfxVolume * masterVolume;
+        source.spatialBlend = 0f; // 2D
+        source.Play();
+
+        Destroy(go, clip.length + 0.1f); // Se destruye al terminar
+    }
+
+    public AudioSource PlaySFX2DLoop(string sfxID, bool loop, float volume = 1f, float pitch = 1f)
+    {
+        AudioClip clip = GetSFXClip(sfxID);
+        if (clip == null)
+        {
+            Debug.LogWarning("[AudioManager] SFX no encontrado: " + sfxID);
+            return null;
+        }
+
+        GameObject go = new GameObject("SFX2D_Loop_" + sfxID);
+        go.transform.parent = sfxContainer;
+
+        AudioSource source = go.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.loop = loop;
+        source.volume = volume * sfxVolume * masterVolume;
+        source.pitch = pitch;
+        source.spatialBlend = 0f;
+        source.Play();
+
+        return source;
     }
 
     public AudioEmitter PlaySFXAtPosition(string sfxID, Vector3 position, float volume = 1f)
@@ -259,6 +291,12 @@ public class AudioManager : MonoBehaviour
     {
         if (emitter != null) emitter.Stop(0);
     }
+
+    public void StopSFX2D(AudioSource source)
+{
+    if (source == null) return;
+    Destroy(source.gameObject);
+}
     #endregion
 
     #region Volume & Fade Helpers

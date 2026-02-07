@@ -30,12 +30,13 @@ public class PlayerController : MonoBehaviour
     [Header("External Forces")]
     [SerializeField] float externalDamping = 8f;
 
-    [Header("Footsteps SFX")]
-    [SerializeField] string footstepSFXID = "footstep"; //id audiomanager
-    [SerializeField] float walkStepInterval = 0.5f;
-    [SerializeField] float runStepInterval = 0.32f;
-    [SerializeField] float crouchStepinterval = 0.75f;
-    [SerializeField] float minSpeedForFootsteps = 0.1f;
+    [Header("FootSteps")]
+    [SerializeField] string footstepSFXID = "Footstep";
+    [SerializeField] float walkPitch = 1.2f;
+    [SerializeField] float runPitch = 1.7f;
+    [SerializeField] float crouchPitch = 1f;
+    [SerializeField] float minVelocityForFootsteps = 0.1f;
+
     #endregion
 
     #region Internal State
@@ -72,7 +73,7 @@ public class PlayerController : MonoBehaviour
     bool isTouchingWall;
 
     // FOOTSTEPS
-    float footstepTimer = 0f;
+    AudioSource footstepSource;
     #endregion
 
     #region References
@@ -306,6 +307,7 @@ public class PlayerController : MonoBehaviour
         movementLocked = true;
         inputMovement = Vector2.zero;
         currentVelocitySmooth = Vector3.zero;
+        StopFootsteps();
     }
 
     public void ResumePlayer()
@@ -394,32 +396,46 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Handle Audio Footsteps
+    #region Footsteps SFX
     void HandleFootsteps()
     {
-        Vector3 planar = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        float speed = planar.magnitude;
+        Vector3 planarVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float speedSqr = planarVelocity.sqrMagnitude;
 
-        if (speed < minSpeedForFootsteps || movementLocked)
+        // ÚNICA condición válida: movimiento físico real
+        if (speedSqr <= minVelocityForFootsteps * minVelocityForFootsteps)
         {
-            footstepTimer = 0f;
+            StopFootsteps();
             return;
         }
 
-        //Calculamos intervalo según estado
-        float stepInterval = isCrouching ? crouchStepinterval : (isRunning ? runStepInterval : walkStepInterval);
-
-        //Reducimos intervalo según velocidad real
-        float velocityFactor = speed / (isRunning ? runSpeed : isCrouching ? crouchSpeed : walkSpeed);
-        stepInterval /= Mathf.Clamp(velocityFactor, 0.1f, 2f);
-
-        footstepTimer += Time.fixedDeltaTime;
-
-        if(footstepTimer >= stepInterval)
+        if (footstepSource == null)
         {
-            AudioManager.Instance.PlaySFXAtPosition(footstepSFXID, transform.position, 1f);
-            footstepTimer = 0f;
+            footstepSource = AudioManager.Instance.PlaySFX2DLoop(
+                footstepSFXID,
+                loop: true,
+                0.2f,
+                pitch: GetFootstepPitch()
+            );
         }
+        else
+        {
+            footstepSource.pitch = GetFootstepPitch();
+        }
+    }
+
+    float GetFootstepPitch()
+    {
+        if (isRunning) return runPitch;
+        if (isCrouching) return crouchPitch;
+        return walkPitch;
+    }
+
+    void StopFootsteps()
+    {
+        if (footstepSource == null) return;
+        AudioManager.Instance.StopSFX2D(footstepSource);
+        footstepSource = null;
     }
     #endregion
 }
