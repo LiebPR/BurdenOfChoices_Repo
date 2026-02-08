@@ -414,7 +414,7 @@ public class PlayerController : MonoBehaviour
             footstepSource = AudioManager.Instance.PlaySFX2DLoop(
                 footstepSFXID,
                 loop: true,
-                0.2f,
+                0.1f,
                 pitch: GetFootstepPitch()
             );
         }

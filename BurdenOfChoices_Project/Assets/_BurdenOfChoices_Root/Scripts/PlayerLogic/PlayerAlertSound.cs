@@ -22,7 +22,7 @@ public class PlayerAlertSound : MonoBehaviour
 
         if (newState == EnemyState.InvestigateSound)
         {
-            AudioManager.Instance.PlaySFX2D("SFX_Grace_Alert");
+            AudioManager.Instance.PlaySFX2D("SFX_Grace_Alert", 0.7f);
         }
     }
 }
