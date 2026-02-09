@@ -183,7 +183,6 @@ public class AudioManager : MonoBehaviour
             if (sfx.isRandom && sfx.randomClips.Length > 0)
             {
                 int rand = Random.Range(0, sfx.randomClips.Length);
-                Debug.Log($"Random SFX {sfxID}: seleccionando índice {rand} -> {sfx.randomClips[rand].name}");
                 return sfx.randomClips[rand];
             }
             return sfx.mainClip;

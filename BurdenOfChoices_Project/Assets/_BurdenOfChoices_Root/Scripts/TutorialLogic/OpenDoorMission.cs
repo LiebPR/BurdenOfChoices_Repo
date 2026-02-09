@@ -10,11 +10,14 @@ using System;
 public class OpenDoorMission : MonoBehaviour, IMissionStep, IInteractable
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
+
     [Header("Puerta")]
     [SerializeField] Animator doorAnimator;
     [SerializeField] string openTrigger = "Open";
     [SerializeField] string idleTrigger = "Idle";
     [SerializeField] float openDuration = 1f;
+    [SerializeField] Light missionLight; // Luz que se enciende al iniciar
 
     [Header("Diálogos")]
     [SerializeField] DialogSystem dialogSystem;
@@ -46,9 +49,20 @@ public class OpenDoorMission : MonoBehaviour, IMissionStep, IInteractable
         if (hasStarted || isCompleted) return;
         hasStarted = true;
 
+        // Encender luz solo cuando la misión empieza
+        if (missionLight != null)
+            missionLight.enabled = true;
+
         // Dialogo inicial
         if (dialogSystem != null && entryDialog != null)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                // Mostrar tutorial al terminar el diálogo
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("F - Interact", null);
+            });
+        }
     }
     #endregion
 
@@ -92,6 +106,10 @@ public class OpenDoorMission : MonoBehaviour, IMissionStep, IInteractable
     {
         if (isCompleted) return;
         isCompleted = true;
+
+        // Apagar tutorial
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
 
         OnMissionCompleted?.Invoke();
     }

@@ -7,6 +7,8 @@ using UnityEngine;
 public class StatueTutorialMission : MonoBehaviour, IMissionStep
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
+
     [Header("Referencias del puzzle")]
     [SerializeField] Pillar pillar;         // Pilares del tutorial
     [SerializeField] Statue statue;         // Estatua asociada al pilar
@@ -30,7 +32,14 @@ public class StatueTutorialMission : MonoBehaviour, IMissionStep
 
         // Mostrar diálogo de entrada
         if (dialogSystem && entryDialog)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                // Mostrar tutorial al terminar el diálogo de entrada
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("Q - Throw", null);
+            });
+        }
 
         // Suscribirse al evento de la estatua
         if (statue != null)
@@ -48,11 +57,13 @@ public class StatueTutorialMission : MonoBehaviour, IMissionStep
     {
         isCompleted = true;
 
-        // Desuscribir evento
         if (statue != null)
             statue.OnFallen -= OnStatueFallen;
 
-        // Lanzar diálogo de finalización si existe
+        // Apagar tutorial
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
+
         if (dialogSystem && completeDialog)
         {
             dialogSystem.StartDialog(completeDialog, () =>

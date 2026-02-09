@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: MR.WHO
   lines:
-  - Hello, Grace...
-  - Welcome to the mansion...
-  - To begin your adventure, you will need to learn certain important skills.
-  - Let's start with the basics.
-  - To move, press WASD.
+  - "Hello, Grace\u2026"
+  - Welcome to the mansion.
+  - "You\u2019ve crossed the threshold. There\u2019s no turning back now."
+  - "Before you can save anyone\u2026 "
+  - ...you must learn how to walk through this place without hesitation.
+  - 'Take your first steps. '
+  - Let the house feel you move.
   emotions:
   - name: Regular
     portrait: {fileID: 21300000, guid: 766e18c403e2f7743a0fdb73c46703c9, type: 3}
@@ -27,6 +29,6 @@ MonoBehaviour:
   - name: Regular
     portrait: {fileID: 21300000, guid: 766e18c403e2f7743a0fdb73c46703c9, type: 3}
   autoAdvance: 0
-  typeSpeed: 0.008
+  typeSpeed: 0.03
   autoAdvanceDelay: 2
   blockPlayerController: 1

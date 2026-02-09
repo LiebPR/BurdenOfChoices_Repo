@@ -4,6 +4,7 @@ using UnityEngine;
 public class PickableObjectMission : MonoBehaviour, IMissionStep
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
     [SerializeField] DialogSystem dialogSystem;
     [SerializeField] DialogData completeDialog;
     #endregion
@@ -27,6 +28,11 @@ public class PickableObjectMission : MonoBehaviour, IMissionStep
         isCompleted = true;
         isActive = false;
 
+        // Apagar tutorial al completar
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
+
+        // Diálogo final
         if (dialogSystem && completeDialog)
         {
             dialogSystem.StartDialog(completeDialog, () =>

@@ -5,6 +5,8 @@ using UnityEngine;
 public class AttackMission : MonoBehaviour, IMissionStep
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
+
     [SerializeField] TriggerNotifier startTrigger;
     [SerializeField] TutorialHitTarget[] targets;
 
@@ -38,7 +40,14 @@ public class AttackMission : MonoBehaviour, IMissionStep
         startTrigger.OnTriggerEntered -= OnStart;
 
         if (dialogSystem && entryDialog)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                // Mostrar tutorial al terminar el diálogo
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("RIGHT CLICK + LEFT CLICK - Attack", null);
+            });
+        }
 
         foreach (var target in targets)
             target.OnHitReceived += OnTargetHit;
@@ -60,6 +69,10 @@ public class AttackMission : MonoBehaviour, IMissionStep
 
         foreach (var target in targets)
             target.OnHitReceived -= OnTargetHit;
+
+        // Apagar tutorial
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
 
         if (dialogSystem && completeDialog)
         {

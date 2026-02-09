@@ -3,6 +3,7 @@ using UnityEngine;
 public class PickableMissionStart : MonoBehaviour
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
     [SerializeField] PickableObjectMission targetMission;
     [SerializeField] DialogSystem dialogSystem;
     [SerializeField] DialogData entryDialog;
@@ -17,8 +18,19 @@ public class PickableMissionStart : MonoBehaviour
 
         hasStarted = true;
 
+        // Iniciar diálogo de entrada
         if (dialogSystem && entryDialog)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                // Mostrar tutorial al terminar el diálogo
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("RIGHT CLICK - Peek", null);
+
+                // Iniciar la misión
+                targetMission.StartMission();
+            });
+        }
 
         targetMission.StartMission();
     }

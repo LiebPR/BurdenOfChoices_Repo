@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class MeshButtonSelectable : MonoBehaviour
 {
+    #region Inspector
     [Header("Flow Settings")]
     [SerializeField] bool canInteractBeforeStart = false; // si false, bloquea hasta Start UI
 
@@ -12,14 +13,23 @@ public class MeshButtonSelectable : MonoBehaviour
     [SerializeField] CinemachineCamera previewCamera;  //Menu / Preview
     [SerializeField] CinemachineCamera playCamera; //Nivel / Play
 
+    [Header("Tutorial")]
+    [SerializeField] bool iTutorial; //define si el botón es de tutorial o no.
+    #endregion
+
+    #region Internal
     CameraPriorityButton cameraPriorityButton;
 
     bool isSelected = false;
     bool isSelectable = false;
+    #endregion
 
+    #region Getters
     public LevelData LevelData => levelData;
     public CinemachineCamera PreviewCamera => previewCamera;
     public CinemachineCamera PlayCamera => playCamera; 
+    public bool IsTutorial => iTutorial;   //propiedad para acceder al estado del tutorial
+    #endregion
 
     private void Awake()
     {

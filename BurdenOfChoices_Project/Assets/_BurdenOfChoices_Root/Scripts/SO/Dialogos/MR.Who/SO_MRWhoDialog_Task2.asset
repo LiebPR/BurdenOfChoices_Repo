@@ -14,11 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: MR.WHO
   lines:
-  - Now CTRL to go faster.
+  - "You can move faster\u2026 "
+  - ...but speed is a double-edged sword.
+  - 'The floors echo. '
+  - The walls listen.
+  - 'Try it. '
+  - Feel how the mansion reacts when you rush.
   emotions:
   - name: Regular
     portrait: {fileID: 21300000, guid: 766e18c403e2f7743a0fdb73c46703c9, type: 3}
   autoAdvance: 0
-  typeSpeed: 0.008
+  typeSpeed: 0.03
   autoAdvanceDelay: 2
   blockPlayerController: 1
