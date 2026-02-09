@@ -90,7 +90,7 @@ public class ThrowImpactDamage : MonoBehaviour
 
         Vector3 hitDirection = rb.linearVelocity.normalized;
 
-        enemy.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+        enemy.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack, collision.contacts[0].point);
 
         damageConsumed = true;
         Disarm();

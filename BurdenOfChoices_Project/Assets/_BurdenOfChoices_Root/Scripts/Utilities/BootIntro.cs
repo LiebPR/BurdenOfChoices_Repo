@@ -37,7 +37,6 @@ public class BootIntro : MonoBehaviour
 
     void SkipIntro()
     {
-        Debug.Log("[BootIntro] SkipIntro llamado");
         videoController.SkipVideo(() =>
         {
             SceneController.Instance.LoadScene(nextScene);

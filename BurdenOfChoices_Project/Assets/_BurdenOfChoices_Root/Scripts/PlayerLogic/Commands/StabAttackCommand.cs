@@ -23,8 +23,9 @@ public class StabAttackCommand : AttackCommand
             EnemyHealth enemyHealth = hit.collider.GetComponent<EnemyHealth>();
             if(enemyHealth != null)
             {
-                //Aplicamos el daño definido en el WeaponData
-                enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+                // Pasamos hit.point como cuarto parámetro
+                enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack, hit.point);
+                AudioManager.Instance.PlaySFX2D("SFX_Impact_Stab", 0.3f);
             }
 
             IHittable hittable = hit.collider.GetComponent<IHittable>();

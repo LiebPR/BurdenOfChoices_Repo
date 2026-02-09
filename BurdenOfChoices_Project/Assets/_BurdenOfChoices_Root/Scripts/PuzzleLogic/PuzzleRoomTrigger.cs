@@ -18,6 +18,10 @@ public class PuzzleRoomTrigger : MonoBehaviour
     [Header("Puzzle Respawn Player")]
     [SerializeField] Transform puzzleRespawnPoint;
     [SerializeField] CinemachineCamera puzzleRespawnCamera;
+
+    [Header("VFX Puzzle Start")]
+    [SerializeField] GameObject puzzleStartVFXPrefab; // Prefab del VFX
+    [SerializeField] Transform puzzleVFXSpawnPoint;   // Punto donde se instanciará
     #endregion
 
     #region Internal States
@@ -38,6 +42,12 @@ public class PuzzleRoomTrigger : MonoBehaviour
     void ActivatePuzzleRoom()
     {
         puzzleActive = true;
+
+        // Instanciar VFX al iniciar el puzzle
+        if (puzzleStartVFXPrefab != null && puzzleVFXSpawnPoint != null)
+        {
+            Instantiate(puzzleStartVFXPrefab, puzzleVFXSpawnPoint.position, puzzleVFXSpawnPoint.rotation);
+        }
 
         var cameraShake = FindAnyObjectByType<CameraShackePuzzle>();
         if (cameraShake != null)

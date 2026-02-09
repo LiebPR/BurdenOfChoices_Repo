@@ -3,10 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 
-public class UIButtonFocusFeedback : MonoBehaviour,
-    ISelectHandler, IDeselectHandler,
-    IPointerEnterHandler, IPointerExitHandler,
-    IPointerDownHandler, IPointerUpHandler
+public class UIButtonFocusFeedback : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Arrow References")]
     [SerializeField] Image arrow;
@@ -28,10 +25,15 @@ public class UIButtonFocusFeedback : MonoBehaviour,
     [Header("Button Reference")]
     [SerializeField] Button button;
 
+    [Header("Audio")]
+    [SerializeField] string highlightSFXID; //ID del sonido en AudioManager
+    [SerializeField] float volumen = 0.8f;
+
     RectTransform arrowRect;
     bool isHovered;
     Coroutine arrowCoroutine;
-    bool isPressed; 
+    bool isPressed;
+    bool hasPlayedHighlight = false;
 
     void Awake()
     {
@@ -42,7 +44,12 @@ public class UIButtonFocusFeedback : MonoBehaviour,
     void OnDisable() => StopArrowAnimation();
 
     public void OnSelect(BaseEventData eventData) => TryShowArrow();
-    public void OnDeselect(BaseEventData eventData) => StopArrowAnimation();
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        StopArrowAnimation();
+        hasPlayedHighlight = false;
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -53,6 +60,8 @@ public class UIButtonFocusFeedback : MonoBehaviour,
     public void OnPointerExit(PointerEventData eventData)
     {
         isHovered = false;
+        hasPlayedHighlight = false;
+
         if (UIInputModeManager.Instance.CurrentMode == UIInputModeManager.InputMode.Mouse)
             StopArrowAnimation();
     }
@@ -68,9 +77,19 @@ public class UIButtonFocusFeedback : MonoBehaviour,
             arrow.gameObject.SetActive(true);
             arrowRect.anchoredPosition = arrowOffset;
 
+            if (!hasPlayedHighlight && !string.IsNullOrEmpty(highlightSFXID))
+            {
+                AudioManager.Instance.PlaySFX2D(highlightSFXID, volumen);
+                hasPlayedHighlight = true;
+            }
+
             if (arrowCoroutine != null)
                 StopCoroutine(arrowCoroutine);
             arrowCoroutine = StartCoroutine(ArrowIdleAnimation());
+        }
+        else
+        {
+            hasPlayedHighlight = false; // Resetear cuando se pierde foco
         }
     }
 
@@ -181,4 +200,6 @@ public class UIButtonFocusFeedback : MonoBehaviour,
         if (UIInputModeManager.Instance.CurrentMode == UIInputModeManager.InputMode.Navigation)
             arrowCoroutine = StartCoroutine(ArrowIdleAnimation());
     }
+
+
 }

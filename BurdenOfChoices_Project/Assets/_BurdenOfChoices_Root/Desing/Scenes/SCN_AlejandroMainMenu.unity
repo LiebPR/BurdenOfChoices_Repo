@@ -838,6 +838,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bebf4dcf19c87643b47886f79495999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  highlightSFX: SFX_UI_MeshButtonHighlight
+  volumen: 1
 --- !u!114 &230988497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2077,6 +2079,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bebf4dcf19c87643b47886f79495999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  highlightSFX: SFX_UI_MeshButtonHighlight
+  volumen: 1
 --- !u!114 &744674993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2162,6 +2166,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator1: {fileID: 1373081846}
   animator2: {fileID: 1373081845}
+  highlightAnimSFX: SFX_Door_Locked
+  volumen: 0.5
 --- !u!114 &744674998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2917,6 +2923,83 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1032257415}
   m_CullTransparentMesh: 1
+--- !u!1001 &1056915858
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2775018861611015930, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_Name
+      value: VFXLluvia
+      objectReference: {fileID: 0}
+    - target: {fileID: 2775018861611015930, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 11.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.18000007
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9724514
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.2331059
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 26.96
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622145406269833070, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 42f51caaa26648e40ac1d6d3a4a435bb, type: 3}
 --- !u!1 &1059718151
 GameObject:
   m_ObjectHideFlags: 0
@@ -3174,6 +3257,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bebf4dcf19c87643b47886f79495999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  highlightSFX: SFX_UI_
+  volumen: 1
 --- !u!114 &1113019300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3188,6 +3273,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator1: {fileID: 1246687874}
   animator2: {fileID: 1246687873}
+  highlightAnimSFX: SFX_Door_Locked
+  volumen: 0.5
 --- !u!114 &1113019301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3915,6 +4002,7 @@ GameObject:
   - component: {fileID: 1265672402}
   - component: {fileID: 1265672401}
   - component: {fileID: 1265672400}
+  - component: {fileID: 1265672405}
   m_Layer: 5
   m_Name: BT_Exit
   m_TagString: Untagged
@@ -3998,6 +4086,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1265672405}
+        m_TargetAssemblyTypeName: ButtonSelectSFX, Assembly-CSharp
+        m_MethodName: OnButtonSelectedSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1265672401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4072,6 +4172,22 @@ MonoBehaviour:
   textPressScale: 0.8
   buttonText: {fileID: 1263388598}
   button: {fileID: 1265672400}
+  highlightSFXID: SFX_UI_ButtonHighlight
+  volumen: 0.5
+--- !u!114 &1265672405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265672398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f269a6c55dd8744894f81b37e686708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectButtonSFX: SFX_UI_Button_Pressed
+  volumen: 0.5
 --- !u!1 &1319908874
 GameObject:
   m_ObjectHideFlags: 0
@@ -5606,6 +5722,7 @@ GameObject:
   - component: {fileID: 1751365003}
   - component: {fileID: 1751365002}
   - component: {fileID: 1751365001}
+  - component: {fileID: 1751365007}
   m_Layer: 5
   m_Name: BT_Play
   m_TagString: Untagged
@@ -5713,6 +5830,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1751365007}
+        m_TargetAssemblyTypeName: ButtonSelectSFX, Assembly-CSharp
+        m_MethodName: OnButtonSelectedSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1751365002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5800,6 +5929,22 @@ MonoBehaviour:
   textPressScale: 0.8
   buttonText: {fileID: 126260045}
   button: {fileID: 1751365001}
+  highlightSFXID: SFX_UI_ButtonHighlight
+  volumen: 0.5
+--- !u!114 &1751365007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751364999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f269a6c55dd8744894f81b37e686708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectButtonSFX: SFX_UI_Button_Pressed
+  volumen: 0.5
 --- !u!1 &1768054024
 GameObject:
   m_ObjectHideFlags: 0
@@ -6642,6 +6787,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fdbddb676fdb046b06e562dcd36e17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeDelay: 0
 --- !u!4 &2134173030
 Transform:
   m_ObjectHideFlags: 0
@@ -6678,3 +6824,4 @@ SceneRoots:
   - {fileID: 674888989}
   - {fileID: 304242799}
   - {fileID: 246359277}
+  - {fileID: 1056915858}

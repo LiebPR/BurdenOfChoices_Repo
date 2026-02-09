@@ -16608,7 +16608,8 @@ Transform:
   m_LocalPosition: {x: 63.498993, y: 0, z: 22.609325}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1084413055}
   m_Father: {fileID: 2102195237}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &405266840
@@ -16634,6 +16635,8 @@ MonoBehaviour:
   puzzle: {fileID: 1901287517}
   puzzleRespawnPoint: {fileID: 310419050}
   puzzleRespawnCamera: {fileID: 1139810372}
+  puzzleStartVFXPrefab: {fileID: 8296159885341415084, guid: 3b4f9da3e1c574f4eae978816a182ac5, type: 3}
+  puzzleVFXSpawnPoint: {fileID: 1084413055}
 --- !u!1001 &405338903
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41610,7 +41613,7 @@ GameObject:
   m_Component:
   - component: {fileID: 999549773}
   m_Layer: 0
-  m_Name: VFX
+  m_Name: --- VFX ---
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45046,6 +45049,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1216252103743626629, guid: 5bea2d9fa562be44bbf4d262f6768cf7, type: 3}
   m_PrefabInstance: {fileID: 1081841457}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1084413054
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1084413055}
+  m_Layer: 0
+  m_Name: VFXPuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1084413055
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084413054}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.27499774, y: 0.50532, z: -38.781086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 405266839}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1084440565
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47366,9 +47400,10 @@ MonoBehaviour:
   thunderDelay: 0.8
   thunderLights:
   - {fileID: 2088421635}
+  - {fileID: 1754991317}
   maxIntensity: 25
-  flashCount: 3
-  flashDuration: 0.1
+  flashCount: 2
+  flashDuration: 0.3
   fadeOutTime: 3
 --- !u!4 &1139294031
 Transform:
@@ -47386,6 +47421,7 @@ Transform:
   - {fileID: 1708042078}
   - {fileID: 571842148}
   - {fileID: 2088421637}
+  - {fileID: 1754991315}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1139810369
@@ -74156,6 +74192,127 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1406008151}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1754991314
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1754991315}
+  - component: {fileID: 1754991317}
+  - component: {fileID: 1754991316}
+  m_Layer: 0
+  m_Name: Spot Light (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1754991315
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754991314}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 26.634, y: 0.92, z: 42.61001}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1139294031}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!114 &1754991316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754991314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+--- !u!108 &1754991317
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754991314}
+  m_Enabled: 1
+  serializedVersion: 11
+  m_Type: 0
+  m_Color: {r: 0.7028302, g: 1, b: 0.9909941, a: 1}
+  m_Intensity: 0
+  m_Range: 7.4821224
+  m_SpotAngle: 112.61539
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 1
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1001 &1759640159
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88872,10 +89029,10 @@ SceneRoots:
   - {fileID: 686416065}
   - {fileID: 1721449520}
   - {fileID: 719913894}
+  - {fileID: 999549773}
   - {fileID: 1059330742}
   - {fileID: 218548862}
   - {fileID: 459129092}
-  - {fileID: 999549773}
   - {fileID: 8624538361308622205}
   - {fileID: 815255784}
   - {fileID: 943107910}
