@@ -325,6 +325,12 @@ public class PlayerController : MonoBehaviour
         if (crouchLocked) return;
         isCrouching = crouchState;
         animatorManager?.SetCrouching(isCrouching);
+
+        //reproducir sonido solo al iniciar el agachado
+        if (isCrouching)
+        {
+            AudioManager.Instance.PlaySFX2D("SFX_Grace_Crouch", 0.1f);
+        }
     }
     #endregion
 

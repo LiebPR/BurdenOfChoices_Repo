@@ -49,20 +49,22 @@ public class OpenDoorMission : MonoBehaviour, IMissionStep, IInteractable
         if (hasStarted || isCompleted) return;
         hasStarted = true;
 
-        // Encender luz solo cuando la misión empieza
         if (missionLight != null)
             missionLight.enabled = true;
 
-        // Dialogo inicial
+        ShowTutorial();
+
+        // Si no hay diálogo, mostrar tutorial inmediatamente
         if (dialogSystem != null && entryDialog != null)
         {
-            dialogSystem.StartDialog(entryDialog, () =>
-            {
-                // Mostrar tutorial al terminar el diálogo
-                if (tutorialMenu != null)
-                    tutorialMenu.Show("F - Interact", null);
-            });
+            dialogSystem.StartDialog(entryDialog);
         }
+    }
+
+    void ShowTutorial()
+    {
+        if (tutorialMenu != null)
+            tutorialMenu.Show("F - INTERACT", null);
     }
     #endregion
 

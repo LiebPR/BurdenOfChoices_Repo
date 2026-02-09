@@ -43,6 +43,7 @@ public class Statue : MonoBehaviour
         rb.AddForce(pushDirection * forwardForce, ForceMode.Impulse);
 
         hasFallen = true;
+        Debug.Log("Para que funcione con el tutorial, solo sirvo para eso. Para retrasar la llamada de OnFallen sin afectar al sistema de Puzzle");
         OnFallen?.Invoke(this);
     }
     #endregion

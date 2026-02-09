@@ -4023,7 +4023,7 @@ Transform:
   m_GameObject: {fileID: 553549905}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.66397, y: 0.0408, z: 1.64152}
+  m_LocalPosition: {x: 1.66397, y: 0.0408, z: 2.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4048,8 +4048,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.2810724, y: 1.9814026, z: 1.9219456}
-  m_Center: {x: -0.14053634, y: 0.49070132, z: -1.3106322}
+  m_Size: {x: 0.7703956, y: 1.9814026, z: 2.4882488}
+  m_Center: {x: 0.11480209, y: 0.49070132, z: -1.5937839}
 --- !u!65 &553549908
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4069,8 +4069,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.9501927, y: 2.0164294, z: 1.1141864}
-  m_Center: {x: -2.258236, y: 0.5082145, z: -0.9251202}
+  m_Size: {x: 3.4442046, y: 2.0164294, z: 1.1141864}
+  m_Center: {x: -2.01123, y: 0.5082145, z: -0.9251202}
 --- !u!114 &553549909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6980,8 +6980,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e4f8e01d70a0f4a4d962d296822c9f5a, type: 2}
+  m_sharedMaterial: {fileID: 2733950863747637293, guid: e4f8e01d70a0f4a4d962d296822c9f5a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7071,10 +7071,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 100604188}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -55.53968, y: -68.50073}
-  m_SizeDelta: {x: 297.7832, y: 40.1911}
+  m_AnchorMin: {x: 0.26250002, y: 0.279}
+  m_AnchorMax: {x: 0.63000005, y: 0.36889327}
+  m_AnchoredPosition: {x: -0.8266449, y: -0.04245758}
+  m_SizeDelta: {x: 3.7832031, y: 0.19110107}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1193630262
 GameObject:
@@ -7435,6 +7435,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fdbddb676fdb046b06e562dcd36e17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeDelay: 0
 --- !u!4 &1260468940
 Transform:
   m_ObjectHideFlags: 0
@@ -8072,6 +8073,14 @@ PrefabInstance:
     - target: {fileID: 7843218512298704614, guid: 34ace9a204a163b40b723dac20436660, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8124462266455087351, guid: 34ace9a204a163b40b723dac20436660, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 8124462266455087351, guid: 34ace9a204a163b40b723dac20436660, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.079
       objectReference: {fileID: 0}
     - target: {fileID: 8838093390887151658, guid: 34ace9a204a163b40b723dac20436660, type: 3}
       propertyPath: m_Name
@@ -11922,7 +11931,7 @@ MonoBehaviour:
   tutorialMenu: {fileID: 2110752759}
   dragController: {fileID: 1827992992}
   missionTrigger: {fileID: 1220097053}
-  completionDistance: 0.1
+  completionDistance: 0.01
   dialogSystem: {fileID: 1586083584}
   entryDialog: {fileID: 11400000, guid: ca6f94c06f8fc4e41a029fad52cf39c1, type: 2}
   completeDialog: {fileID: 11400000, guid: 46877d67b87a4d34b8d43af370207303, type: 2}

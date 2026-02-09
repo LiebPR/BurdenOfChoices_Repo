@@ -31,17 +31,16 @@ public class DragMission : MonoBehaviour, IMissionStep
         isActive = true;
         hasEnteredTrigger = false;
 
+        // Mostrar tutorial al terminar el diálogo de entrada
+        if (tutorialMenu != null)
+            tutorialMenu.Show("R.CLICK - DRAG", null);
+
         if (missionTrigger != null)
             missionTrigger.OnTriggerEntered += OnTriggerEntered;
 
         if (dialogSystem && entryDialog)
         {
-            dialogSystem.StartDialog(entryDialog, () =>
-            {
-                // Mostrar tutorial al terminar el diálogo de entrada
-                if (tutorialMenu != null)
-                    tutorialMenu.Show("RIGHT CLICK - Drag", null);
-            });
+            dialogSystem.StartDialog(entryDialog);
         }
     }
 

@@ -91,6 +91,9 @@ public class Door : MonoBehaviour, IInteractable
         {
             exitDoorAnimator.SetTrigger(lockedTrigger);
         }
+
+        //Reproducir sonido de puerta bloqueada
+        AudioManager.Instance.PlaySFX2D("SFX_Door_Locked", 0.5f);
     }
 
     bool HasObstacleInFront()

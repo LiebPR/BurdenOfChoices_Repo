@@ -45,7 +45,7 @@ public class AttackMission : MonoBehaviour, IMissionStep
             {
                 // Mostrar tutorial al terminar el diálogo
                 if (tutorialMenu != null)
-                    tutorialMenu.Show("RIGHT CLICK + LEFT CLICK - Attack", null);
+                    tutorialMenu.Show("R.CLICK + L.CLICK - ATTACK", null);
             });
         }
 

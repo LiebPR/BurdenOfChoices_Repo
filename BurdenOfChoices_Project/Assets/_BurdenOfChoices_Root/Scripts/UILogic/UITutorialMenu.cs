@@ -18,6 +18,7 @@ public class UITutorialMenu : MonoBehaviour
     /// </summary>
     public void Show(string text, Action onHidden)
     {
+        gameObject.SetActive(true);
         onHiddenCallback = onHidden;
 
         tutorialText.text = text;
@@ -158,6 +159,7 @@ public class UITutorialMenu : MonoBehaviour
         tutorialText.gameObject.SetActive(false);
         onHiddenCallback?.Invoke();
         onHiddenCallback = null;
+        tutorialText.gameObject.SetActive(false);
     }
 
     void StopBlink()

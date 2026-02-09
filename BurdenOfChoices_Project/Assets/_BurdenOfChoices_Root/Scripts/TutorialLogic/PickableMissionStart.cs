@@ -25,7 +25,7 @@ public class PickableMissionStart : MonoBehaviour
             {
                 // Mostrar tutorial al terminar el diálogo
                 if (tutorialMenu != null)
-                    tutorialMenu.Show("RIGHT CLICK - Peek", null);
+                    tutorialMenu.Show("R.CLICK - PICK", null);
 
                 // Iniciar la misión
                 targetMission.StartMission();

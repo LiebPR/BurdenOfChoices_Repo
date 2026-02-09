@@ -30,26 +30,25 @@ public class StatueTutorialMission : MonoBehaviour, IMissionStep
         if (hasStarted || isCompleted) return;
         hasStarted = true;
 
-        // Mostrar diálogo de entrada
-        if (dialogSystem && entryDialog)
+        if (tutorialMenu != null)
         {
-            dialogSystem.StartDialog(entryDialog, () =>
-            {
-                // Mostrar tutorial al terminar el diálogo de entrada
-                if (tutorialMenu != null)
-                    tutorialMenu.Show("Q - Throw", null);
-            });
+            tutorialMenu.Show("Q - THROW", null);
         }
 
-        // Suscribirse al evento de la estatua
         if (statue != null)
+        {
             statue.OnFallen += OnStatueFallen;
+        }
+        else
+            Debug.LogError("Statue reference is null in the mission!");
+
+        if (dialogSystem != null)
+            dialogSystem.StartDialog(entryDialog);
     }
 
     private void OnStatueFallen(Statue fallenStatue)
     {
-        if (isCompleted) return;
-
+        if (isCompleted) return; // ignorar si ya completada
         CompleteMission();
     }
 
@@ -60,11 +59,10 @@ public class StatueTutorialMission : MonoBehaviour, IMissionStep
         if (statue != null)
             statue.OnFallen -= OnStatueFallen;
 
-        // Apagar tutorial
         if (tutorialMenu != null)
             tutorialMenu.Hide();
 
-        if (dialogSystem && completeDialog)
+        if (dialogSystem != null && completeDialog != null)
         {
             dialogSystem.StartDialog(completeDialog, () =>
             {

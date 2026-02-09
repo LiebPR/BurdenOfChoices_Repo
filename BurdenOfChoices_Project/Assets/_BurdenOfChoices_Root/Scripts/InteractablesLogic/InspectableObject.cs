@@ -21,9 +21,13 @@ public class InspectableObject : MonoBehaviour, IInteractable
     bool isInspecting;
     bool rotationReady;
     bool isReturning;
+    bool isReady = true;
 
     Vector3 originalPosition;
     Quaternion originalRotation;
+
+    Vector3 returnStartPosition;
+    Quaternion returnStartRotation;
     #endregion
 
     #region References
@@ -60,16 +64,17 @@ public class InspectableObject : MonoBehaviour, IInteractable
     #region IInteractable
     public void OnPress()
     {
-        if (isMovingToInspect || isInspecting || isReturning) return;
-        
+        if (!isReady || isMovingToInspect || isInspecting || isReturning) return;
+
         isMovingToInspect = true;
         rotationReady = false;
+        isReady = false; // Bloqueamos nuevas inspecciones
 
-        if(gameObject != null)
+        if (gameObject != null)
             objectCollider.isTrigger = true;
-        
+
         GameStopManager.Instance.PauseGame();
-        InspectionUIManager.Instance.Hide();
+        InspectionUIManager.Instance.RegisterInspectable(this);
     }
 
     // No se usa
@@ -92,7 +97,7 @@ public class InspectableObject : MonoBehaviour, IInteractable
         bool posDone = Vector3.Distance(transform.position, seeObject.position) < 0.02f;
         bool rotDone = Quaternion.Angle(transform.rotation, seeObject.rotation) < 0.5f;
 
-        if(posDone && rotDone)
+        if (posDone && rotDone)
         {
             isMovingToInspect = false;
             isInspecting = true;
@@ -117,21 +122,29 @@ public class InspectableObject : MonoBehaviour, IInteractable
 
     public void ExitInspection()
     {
-        InspectionUIManager.Instance.Hide();
+        // Si todavía se está moviendo hacia la inspección, interrumpir
+        if (isMovingToInspect)
+        {
+            isMovingToInspect = false;
+        }
+
+        // Guardar posición y rotación actual como punto de inicio del retorno
+        returnStartPosition = transform.position;
+        returnStartRotation = transform.rotation;
 
         isInspecting = false;
         rotationReady = false;
         isReturning = true;
 
         GameStopManager.Instance.ResumeGame();
+        InspectionUIManager.Instance.Hide();
     }
 
     void ReturnToOriginalTransform()
     {
+        // Lerp desde la posición actual hacia la original
         transform.position = Vector3.Lerp(transform.position, originalPosition, returnSpeed * Time.deltaTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, originalRotation, returnSpeed * Time.deltaTime);
-
-        if (!isReturning) return;
 
         bool posDone = Vector3.Distance(transform.position, originalPosition) < 0.02f;
         bool rotDone = Quaternion.Angle(transform.rotation, originalRotation) < 0.5f;
@@ -142,6 +155,10 @@ public class InspectableObject : MonoBehaviour, IInteractable
                 objectCollider.isTrigger = false;
 
             isReturning = false;
+            isMovingToInspect = false;
+            isInspecting = false;
+            rotationReady = false;
+            isReady = true; // listo para inspección otra vez
         }
     }
     #endregion
