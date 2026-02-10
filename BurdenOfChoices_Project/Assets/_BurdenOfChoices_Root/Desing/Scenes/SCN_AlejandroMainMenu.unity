@@ -857,6 +857,7 @@ MonoBehaviour:
   previewCamera: {fileID: 0}
   playCamera: {fileID: 0}
   iTutorial: 0
+  pressButtonSFX: SFX_UI_MeshButtonPress
 --- !u!65 &230988498
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2098,6 +2099,7 @@ MonoBehaviour:
   previewCamera: {fileID: 1319908876}
   playCamera: {fileID: 1600901377}
   iTutorial: 0
+  pressButtonSFX: SFX_UI_MeshButtonPress
 --- !u!65 &744674994
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2880,10 +2882,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1521622972}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.77152085, y: 0.3752209}
-  m_AnchorMax: {x: 0.85239667, y: 0.512}
-  m_AnchoredPosition: {x: 0, y: 23.4}
-  m_SizeDelta: {x: -6, y: 3}
+  m_AnchorMin: {x: 0.77152085, y: 0.39462966}
+  m_AnchorMax: {x: 0.84800005, y: 0.53448147}
+  m_AnchoredPosition: {x: 4, y: 0.9000015}
+  m_SizeDelta: {x: 2, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1032257417
 MonoBehaviour:
@@ -2905,7 +2907,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 52bf25447969ad04188726ad668879a1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: be3045d8b9473d4448c78e2bafa02148, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -3219,6 +3221,7 @@ MonoBehaviour:
   previewCamera: {fileID: 1264659906}
   playCamera: {fileID: 1013243431}
   iTutorial: 1
+  pressButtonSFX: SFX_UI_MeshButtonPress
 --- !u!65 &1113019297
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4396,7 +4399,7 @@ GameObject:
   - component: {fileID: 1379772781}
   - component: {fileID: 1379772780}
   m_Layer: 5
-  m_Name: Remorse
+  m_Name: TMP_Remorse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4416,10 +4419,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1521622972}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.6657501, y: 0.337}
-  m_AnchorMax: {x: 0.9443967, y: 0.3752209}
-  m_AnchoredPosition: {x: -3, y: -127.79999}
-  m_SizeDelta: {x: 3, y: 89}
+  m_AnchorMin: {x: 0.66210425, y: 0.25966665}
+  m_AnchorMax: {x: 0.75000006, y: 0.29700002}
+  m_AnchoredPosition: {x: 187, y: -44.799988}
+  m_SizeDelta: {x: 369, y: 91}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1379772780
 MonoBehaviour:
@@ -4506,7 +4509,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 91.65073}
+  m_margin: {x: 0, y: 0, z: 371.2702, w: 91.65073}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4532,7 +4535,7 @@ GameObject:
   - component: {fileID: 1379856518}
   - component: {fileID: 1379856517}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Filled_Remorse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4582,7 +4585,7 @@ MonoBehaviour:
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 1
-  m_FillAmount: 1
+  m_FillAmount: 0
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -4963,6 +4966,10 @@ MonoBehaviour:
   - {fileID: 290125921}
   activeColor: {r: 1, g: 1, b: 1, a: 1}
   inactiveColor: {r: 0, g: 0, b: 0, a: 1}
+  remorseFillImage: {fileID: 1379856517}
+  caughtImage: {fileID: 1032257417}
+  normalSprite: {fileID: 21300000, guid: be3045d8b9473d4448c78e2bafa02148, type: 3}
+  caughtSprite: {fileID: 21300000, guid: 52bf25447969ad04188726ad668879a1, type: 3}
 --- !u!1 &1474691899
 GameObject:
   m_ObjectHideFlags: 0

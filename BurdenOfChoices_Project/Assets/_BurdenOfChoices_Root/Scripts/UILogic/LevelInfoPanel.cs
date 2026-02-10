@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class LevelInfoPanel : MonoBehaviour
 {
+    #region Inspector
     [Header("UI")]
     [SerializeField] TextMeshProUGUI levelNameText;
     [SerializeField] SceneButton playButton;
@@ -12,6 +13,15 @@ public class LevelInfoPanel : MonoBehaviour
     [SerializeField] Image[] peackUpIcons;
     [SerializeField] Color activeColor = Color.white;
     [SerializeField] Color inactiveColor = Color.black;
+
+    [Header("Remorse")]
+    [SerializeField] Image remorseFillImage;
+
+    [Header("Caught UI")]
+    [SerializeField] Image caughtImage;
+    [SerializeField] Sprite normalSprite;
+    [SerializeField] Sprite caughtSprite;
+    #endregion
 
     private MeshButtonSelectable currentPlant;
 
@@ -26,6 +36,8 @@ public class LevelInfoPanel : MonoBehaviour
         playButton.SetScene(plant.LevelData.sceneName);
 
         UpdatePeackUpUI(plant.LevelData);
+        UpdateRemorseUI(plant.LevelData);
+        UpdateCaughtUI(plant.LevelData);
     }
 
     // Se llama desde el botón Play
@@ -53,6 +65,16 @@ public class LevelInfoPanel : MonoBehaviour
             peackUpIcons[i].color =
                 i < data.collectedPeackUps ? activeColor : inactiveColor;
         }
+    }
+
+    void UpdateRemorseUI(LevelData data)
+    {
+        remorseFillImage.fillAmount = Mathf.Clamp01(data.lastSessionRemorse);
+    }
+
+    void UpdateCaughtUI(LevelData data)
+    {
+        caughtImage.sprite = data.lastSessionWasCaught ? caughtSprite : normalSprite;
     }
     #endregion
 }

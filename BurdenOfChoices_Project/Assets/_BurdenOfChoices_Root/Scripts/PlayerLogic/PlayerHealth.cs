@@ -16,6 +16,8 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Cinemachine Cameras")]
     [SerializeField] CinemachineCamera deathCamera;
+
+    [SerializeField] LevelData currentLevelData;
     #endregion
 
     #region Internal State
@@ -23,6 +25,7 @@ public class PlayerHealth : MonoBehaviour
     bool respawnConsummed = false;
     int cameraHighPriority = 20;
     Vector3 lastHitDirection;
+    bool wasCaughtThisRun = false;
 
     Transform overrideRespawnPoint; //respawn temporal (puzzle)
     CinemachineCamera overrideRespawnCamera; //cámara temporal (puzzle)
@@ -30,6 +33,7 @@ public class PlayerHealth : MonoBehaviour
 
     #region Getters
     public bool IsAlive => isAlive;
+    public bool WasCaughtThisRun => wasCaughtThisRun;
     #endregion
 
     #region References
@@ -56,6 +60,9 @@ public class PlayerHealth : MonoBehaviour
 
         isAlive = false;
         lastHitDirection = hitDirection;
+
+        //Informar de que el jugador a sido atrapado en la partida para que se actualize en el LevelInfoPanel
+        wasCaughtThisRun = true; 
 
         //1. Pusar juego (estado global)
         GameStopManager.Instance.PauseGame();

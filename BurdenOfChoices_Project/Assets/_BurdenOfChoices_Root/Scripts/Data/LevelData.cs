@@ -11,6 +11,12 @@ public class LevelData : ScriptableObject
     public int collectedPeackUps; //mejor resultado histórico
     public int sessionPeackUps; //resultado de la partida actual
 
+    [Header("Remorse")]
+    public float lastSessionRemorse; //porcentaje 0-1, siempre se actualiza
+
+    [Header("Session Flags")]
+    public bool lastSessionWasCaught;
+
     [Header("Menu Return")]
     public bool restoreMenuCameraOnReturn = true;
 

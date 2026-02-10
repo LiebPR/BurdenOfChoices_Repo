@@ -102,6 +102,13 @@ public class PlayerController : MonoBehaviour
         draggController = GetComponent<DraggController>();
     }
 
+    private void Start()
+    {
+        if (GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused)
+        {
+            GameStopManager.Instance.ResumeGame();
+        }
+    }
     private void Update()
     {
         bool isPaused = GameStopManager.Instance != null && GameStopManager.Instance.isGamePaused;

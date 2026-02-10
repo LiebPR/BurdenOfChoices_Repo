@@ -3882,9 +3882,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 868433020}
     - target: {fileID: 7044661831334798980, guid: 9a5c4ab61299cdc41911279f9f1d5a33, type: 3}
+      propertyPath: remorse
+      value: 
+      objectReference: {fileID: 277581007}
+    - target: {fileID: 7044661831334798980, guid: 9a5c4ab61299cdc41911279f9f1d5a33, type: 3}
       propertyPath: nextScene
       value: SCN_WinMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 7044661831334798980, guid: 9a5c4ab61299cdc41911279f9f1d5a33, type: 3}
+      propertyPath: playerHealth
+      value: 
+      objectReference: {fileID: 8624538361308622207}
     - target: {fileID: 7044661831334798980, guid: 9a5c4ab61299cdc41911279f9f1d5a33, type: 3}
       propertyPath: currentLevelData
       value: 
@@ -88852,6 +88860,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff687143b1153504e815184550483e62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8624538361308622207 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 985198509913786634, guid: 8516e22b19861434384ae8aced3954fe, type: 3}
+  m_PrefabInstance: {fileID: 8624538361308622205}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d108982480c6fd844baac9c618198fa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &8906369393798205080

@@ -14,7 +14,9 @@ public class MeshButtonSelectable : MonoBehaviour
     [SerializeField] CinemachineCamera playCamera; //Nivel / Play
 
     [Header("Tutorial")]
-    [SerializeField] bool iTutorial; //define si el botón es de tutorial o no.
+    [SerializeField] bool iTutorial; //define si el botón es de tutorial o no. 
+
+    [SerializeField] string pressButtonSFX = "SFX_UI_MeshButtonPress";
     #endregion
 
     #region Internal
@@ -55,6 +57,7 @@ public class MeshButtonSelectable : MonoBehaviour
         isSelected = true;
         cameraPriorityButton?.OnButtonCameraPressed();
         FlowManager.Instance?.OnPlantSelected(this);
+        AudioManager.Instance.PlaySFX2D(pressButtonSFX);
     }
 
     public void Deselect()
