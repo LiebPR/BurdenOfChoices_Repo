@@ -141,13 +141,13 @@ public class Door : MonoBehaviour, IInteractable
 
         yield return new WaitForSeconds(exitDoorAnimatorDuration);
 
-        // Volver a Idle después de abrir
-        exitDoorAnimator.SetTrigger(idleTrigger);
 
         // Fade out
         if (FadeController.Instance != null)
             yield return FadeController.Instance.FadeOut();
 
+        // Volver a Idle después de abrir
+        exitDoorAnimator.SetTrigger(idleTrigger);
         // Teletransportar jugador
         Transform player = FindAnyObjectByType<PlayerController>().transform;
         if (player != null && playerSpawnPoint != null)

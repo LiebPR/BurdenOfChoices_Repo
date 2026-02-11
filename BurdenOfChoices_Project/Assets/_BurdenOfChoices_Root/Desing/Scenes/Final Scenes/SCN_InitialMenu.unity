@@ -234,6 +234,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3134869b1451570489ce882b9909cd9f, type: 3}
   - {fileID: 8300000, guid: d6b84ec2974ee31428fa82d04c92e181, type: 3}
   - {fileID: 8300000, guid: 510529cb30b956648b52c3dc18e6bce3, type: 3}
+  - {fileID: 8300000, guid: 10ad1f2e24ee46d4ebe4d0210412c1f3, type: 3}
+  - {fileID: 8300000, guid: 57d3574969c72a14991219df21e73969, type: 3}
   sfxDatabase:
   - id: SFX_Grace_Attack1
     mainClip: {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
@@ -242,6 +244,14 @@ MonoBehaviour:
     - {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
     - {fileID: 8300000, guid: a02cb3ea8d846fd4bb7625777795a356, type: 3}
     - {fileID: 8300000, guid: 47ed6503295c4db40a0de3d4af0228b2, type: 3}
+  - id: Dialog_MRWho
+    mainClip: {fileID: 8300000, guid: 20a3fc3b735838844a36e48d8ff63af2, type: 3}
+    isRandom: 1
+    randomClips:
+    - {fileID: 8300000, guid: 20a3fc3b735838844a36e48d8ff63af2, type: 3}
+    - {fileID: 8300000, guid: d699dced9eb83724ebfb85db50016338, type: 3}
+    - {fileID: 8300000, guid: 69d6efcde2eeba8449504ec22ec61be6, type: 3}
+    - {fileID: 8300000, guid: 8dbc7713561187e44a8841962f80d103, type: 3}
 --- !u!4 &151707395
 Transform:
   m_ObjectHideFlags: 0

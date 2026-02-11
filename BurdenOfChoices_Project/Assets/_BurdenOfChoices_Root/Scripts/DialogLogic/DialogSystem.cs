@@ -109,6 +109,7 @@ public class DialogSystem : MonoBehaviour
         }
 
         dialogUI.SetText(currentDialog.lines[currentLineIndex], currentDialog.typeSpeed);
+        dialogUI.SetTypingAudio(currentDialog.typingSFXID, currentDialog.typingSFXInterval, currentDialog.typingVolume);
 
         // Actualizar retrato con fade
         Sprite portrait = null;

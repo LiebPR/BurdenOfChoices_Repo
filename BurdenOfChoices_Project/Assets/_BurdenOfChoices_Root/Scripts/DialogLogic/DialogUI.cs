@@ -22,6 +22,13 @@ public class DialogUI : MonoBehaviour
     public bool IsTyping => typingCoroutine != null;
     #endregion
 
+    #region Audio
+    string typingSFXID;
+    float typingSFXInterval;
+    float typingVolume;
+    float lastTypingSFXTime;
+    #endregion
+
     private void Awake()
     {
         if (portraitImage != null)
@@ -69,6 +76,13 @@ public class DialogUI : MonoBehaviour
         }
     }
 
+    public void SetTypingAudio(string sfxID, float interval, float volume)
+    {
+        typingSFXID = sfxID;
+        typingSFXInterval = interval;
+        typingVolume = volume;
+    }
+
     public void SetSpeakerName(string speakerName)
     {
         speakerNameText.text = speakerName;
@@ -89,10 +103,27 @@ public class DialogUI : MonoBehaviour
     {
         dialogText.text = text;
         dialogText.maxVisibleCharacters = 0;
+        lastTypingSFXTime = 0f;
 
         for (int i = 0; i <= text.Length; i++)
         {
             dialogText.maxVisibleCharacters = i;
+
+            if (i > 0)
+            {
+                char c = text[i - 1];
+
+                // Ignorar espacios y signos
+                if (!char.IsWhiteSpace(c) && char.IsLetter(c))
+                {
+                    if (Time.time - lastTypingSFXTime >= typingSFXInterval)
+                    {
+                        AudioManager.Instance.PlaySFX2D(typingSFXID, typingVolume);
+                        lastTypingSFXTime = Time.time;
+                    }
+                }
+            }
+
             yield return new WaitForSeconds(typeSpeed);
         }
 
