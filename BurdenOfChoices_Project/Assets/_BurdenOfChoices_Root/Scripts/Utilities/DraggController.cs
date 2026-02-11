@@ -21,6 +21,9 @@ public class DraggController : MonoBehaviour
     Vector3 dragVelocitySmooth;
     Vector3 initialLocalOffset;
     Coroutine resistanceCoroutine;
+    Coroutine dragAudioFadeCoroutine;
+    AudioSource dragLoopSFX;
+    bool isDragAudioPaused = false; // NUEVO: controla si el sonido está pausado
     #endregion
 
     #region Getters
@@ -50,6 +53,12 @@ public class DraggController : MonoBehaviour
 
         currentDrag = draggable;
         currentDrag.StartDragging();
+        dragLoopSFX = AudioManager.Instance.PlaySFX2DLoop("SFX_Object_Drag", true, 0f);
+
+        if (dragAudioFadeCoroutine != null)
+            StopCoroutine(dragAudioFadeCoroutine);
+
+        dragAudioFadeCoroutine = StartCoroutine(FadeAudio(dragLoopSFX, 0.5f, 0.25f));
 
         animator?.SetGrabbing(true);
         player.LockRotation();
@@ -77,6 +86,20 @@ public class DraggController : MonoBehaviour
 
         currentDrag.StopDragging();
 
+        if (dragLoopSFX != null)
+        {
+            if (dragLoopSFX != null)
+            {
+                if (dragAudioFadeCoroutine != null)
+                    StopCoroutine(dragAudioFadeCoroutine);
+
+                dragAudioFadeCoroutine = StartCoroutine(FadeOutAndStop(dragLoopSFX, 0.25f));
+
+                dragLoopSFX = null;
+            }
+            dragLoopSFX = null;
+        }
+
         animator?.SetGrabbing(false);
         player.UnlockRotation();
         player.UnlockCrouch();
@@ -87,6 +110,7 @@ public class DraggController : MonoBehaviour
 
         currentDrag.transform.SetParent(null);
         RemoveInputClamp();
+
 
         // Limpiar bloqueos de movimiento al soltar
         player.ClearBlockedDirections();
@@ -130,25 +154,59 @@ public class DraggController : MonoBehaviour
                 followDamp
             );
 
-            // --- Bloqueos dinámicos y detención del jugador ---
+            // --- Bloqueos dinámicos y control de audio ---
             if (distanceAlong <= 0f)
             {
                 // Objeto en A
-                player.BlockMovementInDirection(-dir);  // bloquear hacia A
-                player.ClearMovementBlock(dir);         // permitir hacia B
-                player.rb.linearVelocity = Vector3.ProjectOnPlane(player.rb.linearVelocity, -dir); // detener movimiento hacia A
+                player.ClearMovementBlock(dir);      // permitir hacia A
+                player.BlockMovementInDirection(-dir); // bloquear hacia B
+                player.rb.linearVelocity = Vector3.ProjectOnPlane(player.rb.linearVelocity, -dir);
+
+                // Detener audio si está reproduciéndose
+                if (!isDragAudioPaused && dragLoopSFX != null)
+                {
+                    dragLoopSFX.Pause();
+                    isDragAudioPaused = true;
+                }
+
+                // Reanudar audio si el jugador empieza a mover hacia A
+                if (Vector3.Dot(player.rb.linearVelocity, dir) > 0.01f && dragLoopSFX != null)
+                {
+                    dragLoopSFX.UnPause();
+                    isDragAudioPaused = false;
+                }
             }
             else if (distanceAlong >= totalLength)
             {
                 // Objeto en B
-                player.BlockMovementInDirection(dir);   // bloquear hacia B
-                player.ClearMovementBlock(-dir);        // permitir hacia A
-                player.rb.linearVelocity = Vector3.ProjectOnPlane(player.rb.linearVelocity, dir);  // detener movimiento hacia B
+                player.ClearMovementBlock(-dir);       // permitir hacia B
+                player.BlockMovementInDirection(dir);// bloquear hacia A
+                player.rb.linearVelocity = Vector3.ProjectOnPlane(player.rb.linearVelocity, dir);
+
+                // Detener audio si está reproduciéndose
+                if (!isDragAudioPaused && dragLoopSFX != null)
+                {
+                    dragLoopSFX.Pause();
+                    isDragAudioPaused = true;
+                }
+
+                // Reanudar audio si el jugador empieza a mover hacia B
+                if (Vector3.Dot(player.rb.linearVelocity, dir) > 0.01f && dragLoopSFX != null)
+                {
+                    dragLoopSFX.UnPause();
+                    isDragAudioPaused = false;
+                }
             }
             else
             {
-                // Objeto en medio
+                // Objeto en medio: audio normal
                 player.ClearBlockedDirections();
+
+                if (isDragAudioPaused && dragLoopSFX != null)
+                {
+                    dragLoopSFX.UnPause();
+                    isDragAudioPaused = false;
+                }
             }
         }
     }
@@ -170,6 +228,38 @@ public class DraggController : MonoBehaviour
     void RemoveInputClamp()
     {
         player?.UnlockMovementAxis();
+    }
+    #endregion
+
+    #region Audio Routine
+    IEnumerator FadeAudio(AudioSource source, float targetVolume, float duration)
+    {
+        float start = source.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            source.volume = Mathf.Lerp(start, targetVolume, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        source.volume = targetVolume;
+    }
+
+    IEnumerator FadeOutAndStop(AudioSource source, float duration)
+    {
+        float start = source.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            source.volume = Mathf.Lerp(start, 0f, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        AudioManager.Instance.StopSFX2D(source);
     }
     #endregion
 

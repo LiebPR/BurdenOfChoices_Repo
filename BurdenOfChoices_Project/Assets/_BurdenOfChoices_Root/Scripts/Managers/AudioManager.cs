@@ -292,10 +292,10 @@ public class AudioManager : MonoBehaviour
     }
 
     public void StopSFX2D(AudioSource source)
-{
-    if (source == null) return;
-    Destroy(source.gameObject);
-}
+    {
+         if (source == null) return;
+         Destroy(source.gameObject);
+    }
     #endregion
 
     #region Volume & Fade Helpers

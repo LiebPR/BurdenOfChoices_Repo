@@ -48,7 +48,11 @@ public class ThrowImpactDamage : MonoBehaviour
         {
             hasCollided = true;
             ApplyDamage(enemy, collision);
-            Break(collision);
+            
+            //Romper solo si el rompible
+            if (isBreakeable)
+                Break(collision);
+
             return;
         }
 
