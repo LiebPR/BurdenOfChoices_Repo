@@ -70,6 +70,7 @@ public class BrokenGlass : MonoBehaviour
         }
 
         Destroy(gameObject);
+        AudioManager.Instance.PlaySFX2D("SFX_Object_GlassBroken", 0.2f);
     }
 
     void RegisterHit(Vector3 hitpoint)

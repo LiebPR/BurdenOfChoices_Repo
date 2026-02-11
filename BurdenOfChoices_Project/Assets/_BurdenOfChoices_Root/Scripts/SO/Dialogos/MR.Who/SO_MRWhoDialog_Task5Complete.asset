@@ -14,13 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: MR.WHO
   lines:
-  - And that's it?...
-  - ...I thought something else was going to happen...
-  - ...be careful, this statue is much more than a sculpture...
-  - It is said to represent vitality...
+  - "That\u2019s all?\u2026"
+  - Curious.
+  - I was expecting a different outcome.
+  - "It is said to embody vitality itself\u2026"
   - ...but thankfully that wasn't the case this time, right?
-  emotions: []
+  - "Yet, for some reason\u2026"
+  - Lucky you.
+  emotions:
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
   autoAdvance: 0
   typeSpeed: 0.03
   autoAdvanceDelay: 2
   blockPlayerController: 1
+  typingSFXID: Dialog_MRWho
+  typingSFXInterval: 0.05
+  typingVolume: 0.5

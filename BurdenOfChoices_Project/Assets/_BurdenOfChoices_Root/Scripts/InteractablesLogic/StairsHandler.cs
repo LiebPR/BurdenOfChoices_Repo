@@ -12,6 +12,8 @@ public class StairsHandler : MonoBehaviour
 
     [Header("Level Data")]
     [SerializeField] LevelData currentLevelData;
+    [SerializeField] Remorse remorse;
+    [SerializeField] PlayerHealth playerHealth;
     #endregion
 
     void OnTriggerEnter(Collider other)
@@ -42,6 +44,14 @@ public class StairsHandler : MonoBehaviour
         {
             //Consolidar porgreso
             currentLevelData.CommitSessionIfBetter();
+
+            //Remorse (siempre se actualiza)
+            if(remorse != null)
+                currentLevelData.lastSessionRemorse = remorse.RemorsePercentage;
+
+            //Caought (siempre)
+            if(playerHealth != null)
+                currentLevelData.lastSessionWasCaught = playerHealth.WasCaughtThisRun;
 
             //Contexto de retorno al Menú
             GameFlowContext.ReturnFromLevel = true;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class RunMission : MonoBehaviour, IMissionStep
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
     [SerializeField] DialogSystem dialogSystem;
     [SerializeField] DialogData entryDialog;
     [SerializeField] DialogData completeDialog;
@@ -32,7 +33,13 @@ public class RunMission : MonoBehaviour, IMissionStep
         yield return new WaitForSeconds(delayBeforeStart);
 
         if (dialogSystem && entryDialog)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("CTRL - RUN", null);
+            });
+        }
 
         runTimer = 0f;
         active = true;
@@ -62,6 +69,9 @@ public class RunMission : MonoBehaviour, IMissionStep
         active = false;
 
         InputManager.OnRunChanged -= OnRunChanged;
+
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
 
         if (dialogSystem && completeDialog)
         {

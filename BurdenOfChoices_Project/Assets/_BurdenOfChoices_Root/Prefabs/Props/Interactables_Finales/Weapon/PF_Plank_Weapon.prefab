@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 5731309641744915046}
   - component: {fileID: 4011034528896613714}
   - component: {fileID: 2603719803365615342}
+  - component: {fileID: 7284165682585371032}
   m_Layer: 0
   m_Name: PF_Plank_Weapon
   m_TagString: Untagged
@@ -172,6 +173,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.19153756, y: 0.51889133, z: 0.10838263}
   m_Center: {x: -0.002895683, y: 0.3139367, z: 0.029876774}
+--- !u!114 &7284165682585371032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3335363119273737271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.1
+  impactSFXID: SFX_Object_WoodImpact
+  volume: 0.4
 --- !u!1001 &2766052605083106660
 PrefabInstance:
   m_ObjectHideFlags: 0

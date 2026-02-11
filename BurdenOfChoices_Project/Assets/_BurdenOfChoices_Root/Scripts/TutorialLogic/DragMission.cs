@@ -4,6 +4,8 @@ using UnityEngine;
 public class DragMission : MonoBehaviour, IMissionStep
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
+
     [Header("References")]
     [SerializeField] DraggController dragController;
     [SerializeField] TriggerNotifier missionTrigger;
@@ -29,11 +31,17 @@ public class DragMission : MonoBehaviour, IMissionStep
         isActive = true;
         hasEnteredTrigger = false;
 
+        // Mostrar tutorial al terminar el diálogo de entrada
+        if (tutorialMenu != null)
+            tutorialMenu.Show("R.CLICK - DRAG", null);
+
         if (missionTrigger != null)
             missionTrigger.OnTriggerEntered += OnTriggerEntered;
 
         if (dialogSystem && entryDialog)
+        {
             dialogSystem.StartDialog(entryDialog);
+        }
     }
 
     void Update()
@@ -67,6 +75,9 @@ public class DragMission : MonoBehaviour, IMissionStep
         isActive = false;
 
         Cleanup();
+
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
 
         if (dialogSystem && completeDialog)
         {

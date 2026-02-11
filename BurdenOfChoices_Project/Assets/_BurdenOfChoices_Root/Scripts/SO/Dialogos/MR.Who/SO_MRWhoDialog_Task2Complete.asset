@@ -14,14 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: MR.WHO
   lines:
-  - Take it easy, you're not supposed to be here...
-  - ...if you make so much noise they'll catch you.
-  - To continue...
-  - ...you will learn the art of stealth...
+  - "Careful\u2026"
+  - You are not meant to be loud here.
+  - Every careless step draws attention.
+  - "If they hear you\u2026 "
+  - ...they will come.
   emotions:
   - name: Regular
-    portrait: {fileID: 21300000, guid: 766e18c403e2f7743a0fdb73c46703c9, type: 3}
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: Regular
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: Regular
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: Regular
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: Regular
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
   autoAdvance: 0
-  typeSpeed: 0.008
+  typeSpeed: 0.03
   autoAdvanceDelay: 2
   blockPlayerController: 1
+  typingSFXID: Dialog_MRWho
+  typingSFXInterval: 0.05
+  typingVolume: 0.5

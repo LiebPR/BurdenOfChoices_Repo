@@ -29,6 +29,14 @@ public class Door : MonoBehaviour, IInteractable
 
     [Header("Light")]
     [SerializeField] Light doorLight;
+
+    [Header("Audio")]
+    [SerializeField] string audioDoorOpen = "SFX_Door_Open";
+    [SerializeField] float volumeDoorOpen = 0.5f;
+    [SerializeField] string audioDoorClose = "SFX_Door_Close";
+    [SerializeField] float volumeDoorClose = 0.5f;
+    [SerializeField] string audioDoorLocked = "SFX_Door_Locked";
+    [SerializeField] float volumeDoorLock = 0.5f; 
     #endregion
 
     #region Internal States
@@ -91,6 +99,9 @@ public class Door : MonoBehaviour, IInteractable
         {
             exitDoorAnimator.SetTrigger(lockedTrigger);
         }
+
+        //Reproducir sonido de puerta bloqueada
+        AudioManager.Instance.PlaySFX2D(audioDoorLocked, volumeDoorLock);
     }
 
     bool HasObstacleInFront()
@@ -126,15 +137,17 @@ public class Door : MonoBehaviour, IInteractable
         // Abrir la puerta de salida
         if (exitDoorAnimator != null)
             exitDoorAnimator.SetTrigger(openExitTrigger);
+        AudioManager.Instance.PlaySFX2D(audioDoorOpen, volumeDoorOpen); //Audio puerta abriendo
+
         yield return new WaitForSeconds(exitDoorAnimatorDuration);
 
-        // Volver a Idle después de abrir
-        exitDoorAnimator.SetTrigger(idleTrigger);
 
         // Fade out
         if (FadeController.Instance != null)
             yield return FadeController.Instance.FadeOut();
 
+        // Volver a Idle después de abrir
+        exitDoorAnimator.SetTrigger(idleTrigger);
         // Teletransportar jugador
         Transform player = FindAnyObjectByType<PlayerController>().transform;
         if (player != null && playerSpawnPoint != null)
@@ -147,6 +160,7 @@ public class Door : MonoBehaviour, IInteractable
         // Cerrar puerta de entrada en la nueva sala
         if (entryDoorAnimator != null)
             entryDoorAnimator.SetTrigger(closeEntryTrigger);
+        AudioManager.Instance.PlaySFX2D(audioDoorClose, volumeDoorClose); //Audio puerta cerrando
 
         // Fade in
         if (FadeController.Instance != null)

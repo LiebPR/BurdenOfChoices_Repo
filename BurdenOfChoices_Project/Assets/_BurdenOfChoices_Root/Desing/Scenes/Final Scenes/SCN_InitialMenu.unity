@@ -197,12 +197,13 @@ MonoBehaviour:
   sfxContainer: {fileID: 195684425}
   masterVolume: 1
   musicVolume: 0.3
-  ambientVolume: 1
+  ambientVolume: 0.1
   sfxVolume: 1
   musicClips:
   - {fileID: 8300000, guid: 60f891eb97a538640af8355cd9d14f4c, type: 3}
   - {fileID: 8300000, guid: 75510f35322018f41807c569902c3c85, type: 3}
-  ambientClips: []
+  ambientClips:
+  - {fileID: 8300000, guid: 087fd8f3e0a363e4a8e2cecbb5eb9cf5, type: 3}
   sfxClips:
   - {fileID: 8300000, guid: 324a6495ded890b448725b9b746ea2cb, type: 3}
   - {fileID: 8300000, guid: 4c46c2f94ac1d2b47bf3ab517b939c29, type: 3}
@@ -217,16 +218,45 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3fbc6f10b0224dc4aa01c25e4b07b775, type: 3}
   - {fileID: 8300000, guid: e95214e01c3fb534e93758033dfa2441, type: 3}
   - {fileID: 8300000, guid: cf26c3b0c6421564b9f0f47e89d9cdeb, type: 3}
-  - {fileID: 8300000, guid: 0607dbdf23005f04eaf15f241c3b021a, type: 3}
   - {fileID: 8300000, guid: 2a355a52a0a2aaf42b1ef6b887e50eb5, type: 3}
+  - {fileID: 8300000, guid: db24c84dea424d04c8286bce666da212, type: 3}
+  - {fileID: 8300000, guid: 0607dbdf23005f04eaf15f241c3b021a, type: 3}
+  - {fileID: 8300000, guid: d975088c5143e114b9fd32433f6fb09b, type: 3}
+  - {fileID: 8300000, guid: 1d9dc601f1cc30a41afdd13adbf8d0a9, type: 3}
+  - {fileID: 8300000, guid: b8432ef0d63a16641939c4e82ff622e7, type: 3}
+  - {fileID: 8300000, guid: 1332482eff4810e4ab8c27913d99f022, type: 3}
+  - {fileID: 8300000, guid: 73022ac3d70f92a4daf874c9b44bc58b, type: 3}
+  - {fileID: 8300000, guid: a69e877224a781742a9cf12be4dcbd84, type: 3}
+  - {fileID: 8300000, guid: 60ac1e939e877024894b51ddfde09f70, type: 3}
+  - {fileID: 8300000, guid: c185e6bf04c87b34a9fb6b892f8c5d26, type: 3}
+  - {fileID: 8300000, guid: c485145fceccbf84cb8e07673ae0ca71, type: 3}
+  - {fileID: 8300000, guid: 8859bec4974d21c43b98256f5a190b40, type: 3}
+  - {fileID: 8300000, guid: 3134869b1451570489ce882b9909cd9f, type: 3}
+  - {fileID: 8300000, guid: d6b84ec2974ee31428fa82d04c92e181, type: 3}
+  - {fileID: 8300000, guid: 510529cb30b956648b52c3dc18e6bce3, type: 3}
+  - {fileID: 8300000, guid: 10ad1f2e24ee46d4ebe4d0210412c1f3, type: 3}
+  - {fileID: 8300000, guid: 57d3574969c72a14991219df21e73969, type: 3}
+  - {fileID: 8300000, guid: 44ad4216a2f366748ab6e2961e3f6c85, type: 3}
+  - {fileID: 8300000, guid: fb584fa4bcc8c9a449f2101a13280169, type: 3}
+  - {fileID: 8300000, guid: 1d57ace57973a614a9fc43f7bef3d8d9, type: 3}
+  - {fileID: 8300000, guid: 968632c7ec913004187854fd620e6a68, type: 3}
+  - {fileID: 8300000, guid: b744b47faff0e854388e061656d191ee, type: 3}
   sfxDatabase:
-  - id: GraceAttack
+  - id: SFX_Grace_Attack1
     mainClip: {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
     isRandom: 1
     randomClips:
     - {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
     - {fileID: 8300000, guid: a02cb3ea8d846fd4bb7625777795a356, type: 3}
     - {fileID: 8300000, guid: 47ed6503295c4db40a0de3d4af0228b2, type: 3}
+  - id: Dialog_MRWho
+    mainClip: {fileID: 8300000, guid: 20a3fc3b735838844a36e48d8ff63af2, type: 3}
+    isRandom: 1
+    randomClips:
+    - {fileID: 8300000, guid: 20a3fc3b735838844a36e48d8ff63af2, type: 3}
+    - {fileID: 8300000, guid: d699dced9eb83724ebfb85db50016338, type: 3}
+    - {fileID: 8300000, guid: 69d6efcde2eeba8449504ec22ec61be6, type: 3}
+    - {fileID: 8300000, guid: 8dbc7713561187e44a8841962f80d103, type: 3}
 --- !u!4 &151707395
 Transform:
   m_ObjectHideFlags: 0

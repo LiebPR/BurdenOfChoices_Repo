@@ -90,7 +90,7 @@ public class ThrowImpactDamage : MonoBehaviour
 
         Vector3 hitDirection = rb.linearVelocity.normalized;
 
-        enemy.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+        enemy.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack, collision.contacts[0].point);
 
         damageConsumed = true;
         Disarm();
@@ -104,6 +104,7 @@ public class ThrowImpactDamage : MonoBehaviour
         SpawnBreakVFX();
         SpawnImpact(collision.contacts[0].point);
         Destroy(gameObject);
+        AudioManager.Instance.PlaySFX2D("SFX_Object_GlassBroken", 0.5f);
     }
     bool IsBreakLayer(int layer)
     {

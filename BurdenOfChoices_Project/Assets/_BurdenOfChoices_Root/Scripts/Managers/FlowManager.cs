@@ -38,6 +38,7 @@ public class FlowManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] LevelInfoPanel levelInfoPanel;
+    [SerializeField] TutorialInfoPanel tutorialPanel;
 
     private MeshButtonSelectable lockedPlant;
 
@@ -94,15 +95,23 @@ public class FlowManager : MonoBehaviour
         CurrentState = FlowState.PlantSelectedLocked;
         lockedPlant = plant;
 
-        foreach (var p in Object.FindObjectsByType<MeshButtonSelectable>(
-            FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var p in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (p != plant)
                 p.SetSelectable(false);
         }
 
-        levelInfoPanel.SetLevel(plant);
-        levelInfoPanel.gameObject.SetActive(true);
+        //Aquí cambiamos el comportamiento según si es un tutorial
+        if (plant.IsTutorial)
+        {
+            tutorialPanel.SetTutorial(plant.LevelData.levelName);
+            tutorialPanel.gameObject.SetActive(true);
+        }
+        else
+        {
+            levelInfoPanel.SetLevel(plant);
+            levelInfoPanel.gameObject.SetActive(true);
+        }
     }
 
     // Llamar desde Escape o botón UI de volver atrás
@@ -121,6 +130,7 @@ public class FlowManager : MonoBehaviour
 
         lockedPlant = null;
         levelInfoPanel.gameObject.SetActive(false);
+        tutorialPanel.HidePanel();
     }
 
     MeshButtonSelectable FindPlantByLevelData(LevelData data)

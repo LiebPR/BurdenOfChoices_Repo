@@ -14,10 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: MR.WHO
   lines:
-  - Now I'll teach you one of the best skills I can teach you...
-  - SHIFT will help you pass through narrow places.
-  emotions: []
+  - "Now\u2026 "
+  - ...learn how to disappear.
+  - This place was built with secrets in mind.
+  - Some paths were never meant for those who stand tall.
+  - Lower yourself.
+  - 'Become smaller. '
+  - Become harder to notice.
+  emotions:
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
+  - name: 
+    portrait: {fileID: 21300000, guid: 26d3589353376614ea814e644a06391d, type: 3}
   autoAdvance: 0
   typeSpeed: 0.03
   autoAdvanceDelay: 2
   blockPlayerController: 1
+  typingSFXID: Dialog_MRWho
+  typingSFXInterval: 0.05
+  typingVolume: 0.5

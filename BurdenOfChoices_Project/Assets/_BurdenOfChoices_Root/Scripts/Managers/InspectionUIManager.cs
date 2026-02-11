@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -10,12 +11,10 @@ public class InspectionUIManager : MonoBehaviour
     [SerializeField] Button exitButton;
     [SerializeField] GameObject inspectionPanel;
 
-    InspectableObject currentInspectable;
+    [SerializeField] List<InspectableObject> currentInspectables = new List<InspectableObject>();
 
     private void Awake()
     {
-        currentInspectable = GetComponent<InspectableObject>();
-
         if (Instance != null)
         {
             Destroy(gameObject);
@@ -24,9 +23,10 @@ public class InspectionUIManager : MonoBehaviour
 
         Instance = this;
 
-        if(inspectionUI != null)
+        if (inspectionUI != null)
             inspectionUI.SetActive(false);
-        inspectionPanel.SetActive(false);
+        if (inspectionPanel != null)
+            inspectionPanel.SetActive(false);
 
         if (exitButton != null)
             exitButton.onClick.AddListener(OnExitButtonClicked);
@@ -34,31 +34,58 @@ public class InspectionUIManager : MonoBehaviour
 
     private void Update()
     {
-        // Si hay un objeto inspeccionable activo y se presiona ESC, simula click en botón
-        if (currentInspectable != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        // Salir de inspección con ESC
+        if (currentInspectables.Count > 0 && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             OnExitButtonClicked();
         }
     }
 
+    /// <summary>
+    /// Registra un objeto inspeccionable que entra a inspección
+    /// </summary>
+    public void RegisterInspectable(InspectableObject obj)
+    {
+        if (!currentInspectables.Contains(obj))
+        {
+            currentInspectables.Add(obj);
+            Show();
+        }
+    }
+
+    /// <summary>
+    /// Muestra la UI
+    /// </summary>
     public void Show()
     {
         if (inspectionUI != null)
             inspectionUI.SetActive(true);
-        inspectionPanel.SetActive(true);
+        if (inspectionPanel != null)
+            inspectionPanel.SetActive(true);
     }
 
+    /// <summary>
+    /// Oculta la UI
+    /// </summary>
     public void Hide()
     {
         if (inspectionUI != null)
             inspectionUI.SetActive(false);
-        inspectionPanel.SetActive(false);
+        if (inspectionPanel != null)
+            inspectionPanel.SetActive(false);
     }
 
-    //Se llama al pulsar ESC o el botón
+    /// <summary>
+    /// Sale de inspección de todos los objetos registrados
+    /// </summary>
     public void OnExitButtonClicked()
     {
-        if(currentInspectable != null)
-            currentInspectable.ExitInspection();
+        foreach (var inspectable in currentInspectables)
+        {
+            if (inspectable != null)
+                inspectable.ExitInspection();
+        }
+        currentInspectables.Clear();
+        Hide();
     }
 }

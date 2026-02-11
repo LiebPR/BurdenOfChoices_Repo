@@ -159,6 +159,8 @@ public class PlayerThrowController : MonoBehaviour
         cachedThrowDistance = Mathf.Lerp(minThrowDistance, maxThrowDistance, holdTime);
 
         animatorManager.TriggerThrow();
+        AudioManager.Instance.PlaySFX2D("SFX_Grace_Throw", 0.8f);
+        AudioManager.Instance.PlaySFX2D("SFX_Object_Throw", 0.8f);
 
         if (throwPreview != null)
             throwPreview.gameObject.SetActive(false);

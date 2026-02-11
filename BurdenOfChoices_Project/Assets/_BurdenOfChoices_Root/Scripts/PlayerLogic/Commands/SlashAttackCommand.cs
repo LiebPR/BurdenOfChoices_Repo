@@ -20,14 +20,18 @@ public class SlashAttackCommand : AttackCommand
             EnemyHealth enemyHealth = hits[i].GetComponent<EnemyHealth>();
             if (enemyHealth != null)
             {
-                enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack);
+                // Calcula punto exacto de impacto
+                Vector3 hitPoint = hits[i].ClosestPoint(tOrigin.position);
+                enemyHealth.TakeHit(weaponData.damage, hitDirection, weaponData.knockBack, hitPoint);
+                AudioManager.Instance.PlaySFX2D("SFX_Impact_Slash", 0.3f);
             }
 
             // Objetos golpeables (tutorial, props, etc.)
             IHittable hittable = hits[i].GetComponent<IHittable>();
             if (hittable != null)
             {
-                hittable.OnHit(hits[i].ClosestPoint(tOrigin.position), hitDirection);
+                Vector3 hitPoint = hits[i].ClosestPoint(tOrigin.position);
+                hittable.OnHit(hitPoint, hitDirection);
             }
         }
     }

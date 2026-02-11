@@ -7,6 +7,7 @@ public class CrouchMission : MonoBehaviour, IMissionStep
     [SerializeField] TriggerNotifier startTrigger;
     [SerializeField] TriggerNotifier completeTrigger;
 
+    [SerializeField] UITutorialMenu tutorialMenu;
     [SerializeField] DialogSystem dialogSystem;
     [SerializeField] DialogData entryDialog;
     [SerializeField] DialogData completeDialog;
@@ -28,7 +29,13 @@ public class CrouchMission : MonoBehaviour, IMissionStep
         startTrigger.OnTriggerEntered -= OnStart;
 
         if (dialogSystem && entryDialog)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("SHIFT - Crouch", null);
+            });
+        }
     }
 
     void OnCompleteTrigger()
@@ -37,6 +44,9 @@ public class CrouchMission : MonoBehaviour, IMissionStep
 
         isCompleted = true;
         completeTrigger.OnTriggerEntered -= OnCompleteTrigger;
+
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
 
         if (dialogSystem && completeDialog)
         {

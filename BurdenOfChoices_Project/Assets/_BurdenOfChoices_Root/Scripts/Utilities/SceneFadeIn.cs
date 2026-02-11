@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -6,9 +7,15 @@ using UnityEngine;
 /// </summary>
 public class SceneFadeIn : MonoBehaviour
 {
-
+    [SerializeField] float fadeDelay;
     private void Start()
     {
+        StartCoroutine(FadeDelay());
+    }
+
+    IEnumerator FadeDelay()
+    {
+        yield return new WaitForSeconds(fadeDelay);
         if (FadeController.Instance != null)
             StartCoroutine(FadeController.Instance.FadeIn());
     }

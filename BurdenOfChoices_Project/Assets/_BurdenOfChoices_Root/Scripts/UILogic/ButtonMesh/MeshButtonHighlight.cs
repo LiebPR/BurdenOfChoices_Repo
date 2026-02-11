@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(MeshButtonSelectable))]
 public class MeshButtonHighlight : MonoBehaviour
 {
+    [SerializeField] string highlightSFX = "SFX_UI_";
+    [SerializeField] float volumen = 1f;
+
     MeshButtonSelectable button;
     IButtonVisual visual;
     Camera mainCamera;
@@ -61,6 +64,7 @@ public class MeshButtonHighlight : MonoBehaviour
         if (isHovering && !wasHovering)
         {
             visual.OnHoverEnter();
+            AudioManager.Instance?.PlaySFX2D(highlightSFX, volumen);
         }
 
         //Estado base

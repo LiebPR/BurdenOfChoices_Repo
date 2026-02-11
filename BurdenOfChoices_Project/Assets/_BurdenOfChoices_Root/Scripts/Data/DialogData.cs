@@ -27,7 +27,12 @@ public class DialogData : ScriptableObject
     public float autoAdvanceDelay = 2f;
 
     [Tooltip("Bloquea el control del jugador mientras el diálogo está activo.")]
-    public bool blockPlayerController = true;   
+    public bool blockPlayerController = true;
+
+    [Header("Audio")]
+    public string typingSFXID = "Dialog_";
+    public float typingSFXInterval = 0.05f;
+    public float typingVolume = 0.5f;
 }
 
 //Define una emoción y el sprite asociado.

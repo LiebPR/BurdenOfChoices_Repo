@@ -27,6 +27,9 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] AnimationCurve knockbackCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     [Tooltip("Duración total del knockback.")]
     [SerializeField] float knockbackDuration = 0.3f;
+
+    [Header("Impact VFX")]
+    [SerializeField] GameObject impactVFXPrefab;
     #endregion
 
     #region Internal States
@@ -87,7 +90,7 @@ public class EnemyHealth : MonoBehaviour
     }
 
     #region Public API
-    public void TakeHit(int damage, Vector3 hitDirection, float knockBack)
+    public void TakeHit(int damage, Vector3 hitDirection, float knockBack, Vector3 hitPoint)
     {
         if (isDead) return;
 
@@ -96,6 +99,8 @@ public class EnemyHealth : MonoBehaviour
         LastKncokBack = knockBack;
 
         healthSystem.TakeHit(damage);
+
+        SpawnImpactVFX(hitPoint);
     }
     #endregion
 
@@ -247,6 +252,25 @@ public class EnemyHealth : MonoBehaviour
 
         Quaternion targetRotation = Quaternion.LookRotation(-planarDir.normalized);
         transform.rotation = targetRotation;
+    }
+
+    void SpawnImpactVFX(Vector3 position)
+    {
+        if (impactVFXPrefab == null) return;
+
+        GameObject vfxInstance = Instantiate(impactVFXPrefab, position, Quaternion.identity);
+
+        // Opcional: destruir el VFX automáticamente tras su duración
+        ParticleSystem ps = vfxInstance.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            Destroy(vfxInstance, ps.main.duration + ps.main.startLifetime.constantMax);
+        }
+        else
+        {
+            // Si es un VisualEffect (VFX Graph)
+            Destroy(vfxInstance, 0.1f); // Ajusta según duración
+        }
     }
     #endregion
 }

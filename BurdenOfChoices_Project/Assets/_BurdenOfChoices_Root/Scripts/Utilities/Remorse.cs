@@ -22,6 +22,25 @@ public class Remorse : MonoBehaviour
         }
     }
 
+    public float RemorsePercentage
+    {
+        get
+        {
+            if (enemies == null || enemies.Length == 0)
+                return 0f;
+
+            int deadEnemies = 0;
+
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                if (enemies[i].CurrentState == EnemyState.Death)
+                    deadEnemies++;
+            }
+
+            return (float)deadEnemies / enemies.Length;
+        }
+    }
+
     private void Update()
     {
         CalculatRemorse();

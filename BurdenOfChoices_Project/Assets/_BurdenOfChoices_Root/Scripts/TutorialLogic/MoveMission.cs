@@ -5,12 +5,14 @@ using UnityEngine;
 public class MoveMission : MonoBehaviour, IMissionStep
 {
     #region Inspector
+    [SerializeField] UITutorialMenu tutorialMenu;
     [SerializeField] DialogSystem dialogSystem;
     [SerializeField] DialogData entryDialog;
     [SerializeField] DialogData completeDialog;
     [SerializeField] Transform player;
     [SerializeField] float delayBeforeStart = 1f;
     [SerializeField] float movementThreshold = 0.1f;
+
     #endregion
 
     bool forward, back, left, right;
@@ -33,7 +35,13 @@ public class MoveMission : MonoBehaviour, IMissionStep
         yield return new WaitForSeconds(delayBeforeStart);
 
         if (dialogSystem && entryDialog)
-            dialogSystem.StartDialog(entryDialog);
+        {
+            dialogSystem.StartDialog(entryDialog, () =>
+            {
+                if (tutorialMenu != null)
+                    tutorialMenu.Show("WASD - MOVE", null);
+            });
+        }
 
         lastPos = player.position;
         active = true;
@@ -60,6 +68,9 @@ public class MoveMission : MonoBehaviour, IMissionStep
     {
         isCompleted = true;
         active = false;
+
+        if (tutorialMenu != null)
+            tutorialMenu.Hide();
 
         if (dialogSystem && completeDialog)
         {
