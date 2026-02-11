@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2719760783187810063}
   - component: {fileID: 1628607469607471671}
   - component: {fileID: 4120540230577732423}
+  - component: {fileID: -7717001520685953461}
   m_Layer: 0
   m_Name: PF_SmallRock_Throwable
   m_TagString: Untagged
@@ -175,6 +176,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &-7717001520685953461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1255117138835621576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.1
+  impactSFXID: SFX_Object_RockImpact
+  volume: 0.4
 --- !u!1 &5151894729625927154
 GameObject:
   m_ObjectHideFlags: 0

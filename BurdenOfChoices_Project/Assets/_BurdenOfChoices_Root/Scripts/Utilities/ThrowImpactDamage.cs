@@ -104,6 +104,7 @@ public class ThrowImpactDamage : MonoBehaviour
         SpawnBreakVFX();
         SpawnImpact(collision.contacts[0].point);
         Destroy(gameObject);
+        AudioManager.Instance.PlaySFX2D("SFX_Object_GlassBroken", 0.5f);
     }
     bool IsBreakLayer(int layer)
     {

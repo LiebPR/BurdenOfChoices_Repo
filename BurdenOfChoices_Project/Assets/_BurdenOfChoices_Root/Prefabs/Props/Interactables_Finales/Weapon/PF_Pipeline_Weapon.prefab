@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5558972429391909689}
   - component: {fileID: 3268713782794834354}
   - component: {fileID: 2060557564449636004}
+  - component: {fileID: 7864234062323544266}
   m_Layer: 0
   m_Name: PF_Pipeline_Weapon
   m_TagString: Untagged
@@ -142,6 +143,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.14539719, y: 0.5418625, z: 0.083724976}
   m_Center: {x: 0.030836105, y: 0.25990486, z: 0}
+--- !u!114 &7864234062323544266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310265268783744682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.1
+  impactSFXID: SFX_Object_MetalImpact
+  volume: 0.4
 --- !u!1 &641467759151654679
 GameObject:
   m_ObjectHideFlags: 0

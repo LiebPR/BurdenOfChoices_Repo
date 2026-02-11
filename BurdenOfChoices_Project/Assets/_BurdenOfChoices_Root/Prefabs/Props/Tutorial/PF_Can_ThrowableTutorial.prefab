@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3699742485160514899}
   - component: {fileID: 3671360871256490147}
   - component: {fileID: 8212306946507642436}
+  - component: {fileID: -3445054435842463895}
   m_Layer: 0
   m_Name: PF_Can_ThrowableTutorial
   m_TagString: Untagged
@@ -203,6 +204,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectID: 0
+--- !u!114 &-3445054435842463895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7681564573385017303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.1
+  impactSFXID: SFX_Object_CanImpact
+  volume: 0.4
 --- !u!1 &8838061811076049419
 GameObject:
   m_ObjectHideFlags: 0

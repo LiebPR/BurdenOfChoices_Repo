@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 7440364790853352708}
   - component: {fileID: 3831386469944394858}
   - component: {fileID: 4389468220095572241}
+  - component: {fileID: 6624424051563625256}
   m_Layer: 0
   m_Name: PF_Brick_ThrowableTutorial
   m_TagString: Untagged
@@ -234,6 +235,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectID: 0
+--- !u!114 &6624424051563625256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8838093390887151658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.1
+  impactSFXID: SFX_Object_RockImpact
+  volume: 0.4
 --- !u!1001 &3333861319111096746
 PrefabInstance:
   m_ObjectHideFlags: 0

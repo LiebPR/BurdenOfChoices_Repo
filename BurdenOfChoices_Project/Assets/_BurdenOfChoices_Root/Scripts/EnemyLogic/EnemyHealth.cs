@@ -109,9 +109,6 @@ public class EnemyHealth : MonoBehaviour
     {
         if (isDead) return;
 
-        // Instanciar VFX en el último punto de golpe
-        SpawnImpactVFX(transform.position + LastHitDirection.normalized); // o pasa la posición real del hit desde TakeHit
-
         if (lastHitDamage >= instantKillDamage && currentHealth <= 0)
         {
             deadAfterStun = false;
@@ -272,7 +269,7 @@ public class EnemyHealth : MonoBehaviour
         else
         {
             // Si es un VisualEffect (VFX Graph)
-            Destroy(vfxInstance, 2f); // Ajusta según duración
+            Destroy(vfxInstance, 0.1f); // Ajusta según duración
         }
     }
     #endregion

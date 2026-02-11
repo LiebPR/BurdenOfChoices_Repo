@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 4425480066172685066}
   - component: {fileID: 3481114678532627109}
   - component: {fileID: 5972921637163718168}
+  - component: {fileID: -6985929511210861764}
   m_Layer: 0
   m_Name: PF_WoodBox_Puzzle
   m_TagString: Untagged
@@ -176,6 +177,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2518196, y: 0.25048828, z: 0.25473404}
   m_Center: {x: -0.0035629272, y: 0.12768555, z: 0.0000019073486}
+--- !u!114 &-6985929511210861764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317678987508240423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.1
+  impactSFXID: SFX_Object_WoodImpact
+  volume: 0.4
 --- !u!1 &8283626156711501401
 GameObject:
   m_ObjectHideFlags: 0

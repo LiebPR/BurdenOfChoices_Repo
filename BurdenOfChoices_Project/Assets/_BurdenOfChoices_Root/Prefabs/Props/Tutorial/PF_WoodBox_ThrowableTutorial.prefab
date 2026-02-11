@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3481114678532627109}
   - component: {fileID: 5972921637163718168}
   - component: {fileID: 7601034319267498708}
+  - component: {fileID: 3221284705852709840}
   m_Layer: 0
   m_Name: PF_WoodBox_ThrowableTutorial
   m_TagString: Untagged
@@ -203,6 +204,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectID: 0
+--- !u!114 &3221284705852709840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317678987508240423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c0c7b410b6aec4989343c1ffe8920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  soundEmitterLayer:
+    serializedVersion: 2
+    m_Bits: 776
+  rayDistance: 0.3
+  impactSFXID: SFX_Object_WoodImpact
+  volume: 0.2
 --- !u!1 &8283626156711501401
 GameObject:
   m_ObjectHideFlags: 0
