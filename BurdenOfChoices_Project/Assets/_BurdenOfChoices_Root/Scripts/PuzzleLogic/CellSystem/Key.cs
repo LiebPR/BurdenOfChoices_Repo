@@ -64,6 +64,7 @@ public class Key : MonoBehaviour, IInteractable, IPickListener
         if(anim != null)
         {
             anim.SetBool(IsCatchHash, true);
+            AudioManager.Instance.PlaySFX2D("SFX_Object_PickKey", 0.5f);
         }
     }
 

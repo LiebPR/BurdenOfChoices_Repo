@@ -99,6 +99,7 @@ public class PlayerHealth : MonoBehaviour
                 Debug.LogWarning("No hay respawn point asignado. Se cargará la LoseScene");
         }
 
+        FadeController.Instance.FadeOut(0.5f);
         //Si ya no hay respawn disponible -> perder
         SceneController.Instance.LoadScene("SCN_LoseMenu");
     }

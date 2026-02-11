@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: Bibbo
   lines:
-  - Woohoo! Im free
+  - Woohoo! Im free.
   - 'What have you done?! '
-  - "I don\u2019t know if i trust you\u2026 but I need you "
+  - "I don\u2019t know if i trust you\u2026 but I need. you "
   emotions:
   - name: Happy
     portrait: {fileID: 21300000, guid: 92ecf6837443b0943a78ac597974fbe0, type: 3}
@@ -28,3 +28,6 @@ MonoBehaviour:
   typeSpeed: 0.03
   autoAdvanceDelay: 2
   blockPlayerController: 1
+  typingSFXID: Dialog_Bibbo
+  typingSFXInterval: 0.05
+  typingVolume: 0.3

@@ -14,7 +14,7 @@ public class LifeStatuePuzzle : MonoBehaviour, ILifeFeedback
     public void Consume()
     {
         if (consumed) return;
-
+        AudioManager.Instance.PlaySFX2D("SFX_StatueBreak", 0.7f);
         consumed = true;
         Instantiate(explosionVFX, transform.position, Quaternion.identity);
         Destroy(gameObject);

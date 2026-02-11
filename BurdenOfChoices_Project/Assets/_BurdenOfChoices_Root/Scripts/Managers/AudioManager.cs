@@ -291,10 +291,36 @@ public class AudioManager : MonoBehaviour
         if (emitter != null) emitter.Stop(0);
     }
 
-    public void StopSFX2D(AudioSource source)
+    public void StopSFX2D(AudioSource source, float fadeOutTime = 0.1f)
     {
          if (source == null) return;
          Destroy(source.gameObject);
+        StartCoroutine(FadeOutAndDestroy(source, fadeOutTime));
+    }
+
+    public void StopAllSFX(float fadeOutTime = 0.2f)
+    {
+        AudioSource[] sources = sfxContainer.GetComponentsInChildren<AudioSource>();
+
+        foreach (var source in sources)
+        {
+            StartCoroutine(FadeOutAndDestroy(source, fadeOutTime));
+        }
+    }
+
+    public void StopAllAmbient(float fadeOutTime = 0.5f)
+    {
+        // Ambient global
+        if (ambientSource.isPlaying)
+            StartCoroutine(FadeVolume(ambientSource, 0, fadeOutTime, true));
+
+        // Ambient 3D
+        AudioEmitter[] emitters = sfxContainer.GetComponentsInChildren<AudioEmitter>();
+
+        foreach (var emitter in emitters)
+        {
+            emitter.Stop(fadeOutTime);
+        }
     }
     #endregion
 
@@ -311,6 +337,22 @@ public class AudioManager : MonoBehaviour
         }
         source.volume = targetVolume;
         if (stopAfterFade) source.Stop();
+    }
+
+    System.Collections.IEnumerator FadeOutAndDestroy(AudioSource source, float duration)
+    {
+        float startVolume = source.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            source.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        source.Stop();
+        Destroy(source.gameObject);
     }
     #endregion
 }

@@ -41,7 +41,6 @@ public class Pillar : MonoBehaviour
             }
             return;
         }
-
         activated = true;
         feedbackRoutine = StartCoroutine(PushReaction());
         statue.DropStatue(transform.forward);
@@ -56,6 +55,7 @@ public class Pillar : MonoBehaviour
             feedbackRoutine = null;
         }
 
+        AudioManager.Instance.PlaySFX2D("SFX_RestorePuzzle", 0.8f);
         activated = false;
         transform.position = originalPosition;
     }
@@ -65,6 +65,7 @@ public class Pillar : MonoBehaviour
     IEnumerator PushReaction()
     {
         Vector3 backPos = transform.position - transform.forward * pushDistance;
+        AudioManager.Instance.PlaySFX2D("SFX_Pillar");
 
         float t = 0f;
         while(t < pushDuration)

@@ -94,6 +94,7 @@ public class PuzzleRoomTrigger : MonoBehaviour
     {
         if (keyPrefab == null || keyDropPoint == null) return;
 
+        AudioManager.Instance.PlaySFX2D("SFX_SpawnKey", 0.6f);
         Instantiate(keyPrefab, keyDropPoint.position, Quaternion.identity);
     }
     #endregion

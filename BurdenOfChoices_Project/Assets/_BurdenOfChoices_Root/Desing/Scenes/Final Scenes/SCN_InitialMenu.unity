@@ -277,6 +277,8 @@ MonoBehaviour:
   musicClips:
   - {fileID: 8300000, guid: 60f891eb97a538640af8355cd9d14f4c, type: 3}
   - {fileID: 8300000, guid: 75510f35322018f41807c569902c3c85, type: 3}
+  - {fileID: 8300000, guid: 20924ca798f93254ea934788d0c6d09c, type: 3}
+  - {fileID: 8300000, guid: 217df051ef6bf60459e07b1d02716172, type: 3}
   ambientClips:
   - {fileID: 8300000, guid: 087fd8f3e0a363e4a8e2cecbb5eb9cf5, type: 3}
   sfxClips:
@@ -322,6 +324,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b9f18314a45294f479778cde433b1b39, type: 3}
   - {fileID: 8300000, guid: bfa69f64cbd98c2438b3bb78c6e89f9e, type: 3}
   - {fileID: 8300000, guid: 17bfa44e8db96a8428a0338ed1d51c92, type: 3}
+  - {fileID: 8300000, guid: cbaec351e789df747842c6bd2c3816e1, type: 3}
+  - {fileID: 8300000, guid: aff048ab8cebd4d438d5564a0f2fcba8, type: 3}
+  - {fileID: 8300000, guid: c953404f4326c0842af1a0603a3ee6eb, type: 3}
+  - {fileID: 8300000, guid: c364a9abd7f0e2b45ace9ecdf2bc20ca, type: 3}
+  - {fileID: 8300000, guid: 2fb71ee525978554db2b4e66f9e4da3f, type: 3}
   sfxDatabase:
   - id: SFX_Grace_Attack1
     mainClip: {fileID: 8300000, guid: b6c386ae07164354d9a9b8bf465a9746, type: 3}
@@ -338,6 +345,16 @@ MonoBehaviour:
     - {fileID: 8300000, guid: d699dced9eb83724ebfb85db50016338, type: 3}
     - {fileID: 8300000, guid: 69d6efcde2eeba8449504ec22ec61be6, type: 3}
     - {fileID: 8300000, guid: 8dbc7713561187e44a8841962f80d103, type: 3}
+  - id: Dialog_Bibbo
+    mainClip: {fileID: 8300000, guid: f27e19dc5e7cdb24a9fb76bc8a95c552, type: 3}
+    isRandom: 1
+    randomClips:
+    - {fileID: 8300000, guid: f27e19dc5e7cdb24a9fb76bc8a95c552, type: 3}
+    - {fileID: 8300000, guid: d57f7b0405781eb48becb91d3dc7b371, type: 3}
+    - {fileID: 8300000, guid: 1a84a5e6af281b943b6e708bb48f28fb, type: 3}
+    - {fileID: 8300000, guid: 4434ad7bc50afdd4e8a65e2984ea19d4, type: 3}
+    - {fileID: 8300000, guid: 340994e69f29f74408726d4dcae4539b, type: 3}
+    - {fileID: 8300000, guid: 6b02404d6fd92fc4ea2f7cb5cb8bcfa5, type: 3}
 --- !u!4 &151707395
 Transform:
   m_ObjectHideFlags: 0
