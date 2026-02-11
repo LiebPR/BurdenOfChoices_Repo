@@ -193,7 +193,7 @@ public class PlayerHealth : MonoBehaviour
     IEnumerator RespawnRoutine(Transform respawnPoint)
     {
         if (fadeController != null)
-            yield return fadeController.FadeOut();
+            yield return fadeController.FadeOut(0.5f);
 
         ReappearAtPoint(respawnPoint);
 

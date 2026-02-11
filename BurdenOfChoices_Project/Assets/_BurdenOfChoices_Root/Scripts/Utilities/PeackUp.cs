@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Unity.VisualScripting.Member;
 
 public class PeackUp : MonoBehaviour, IInteractable
 {
@@ -6,6 +7,7 @@ public class PeackUp : MonoBehaviour, IInteractable
     [SerializeField] Animator peackUpAnim;
     [SerializeField] PeackUpHandler peackUpHandler;
 
+    AudioEmitter idleEmitter;
     #region Animator Parameters
     static readonly int OnCollectHash = Animator.StringToHash("Collect");
     #endregion
@@ -14,6 +16,7 @@ public class PeackUp : MonoBehaviour, IInteractable
     public void OnPress()
     {
         peackUpAnim.SetBool(OnCollectHash, true);
+        AudioManager.Instance.PlaySFX2D("SFX_PickUp_Pick");
     }
 
     public void OnRelease()
@@ -21,6 +24,8 @@ public class PeackUp : MonoBehaviour, IInteractable
         peackUpHandler.RegisterPeackUp();
         Destroy(peackUpVFX);
         Destroy(gameObject);
+        if (idleEmitter != null)
+            idleEmitter.Stop(0.1f);
     }
 
     public void OnHighlight(){}
