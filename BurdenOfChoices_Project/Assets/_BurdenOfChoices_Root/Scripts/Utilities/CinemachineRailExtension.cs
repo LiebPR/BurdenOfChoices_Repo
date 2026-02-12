@@ -36,6 +36,7 @@ public class CinemachineRailExtension : CinemachineExtension
 
     protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
     {
+        if (!Application.isPlaying) return;
         if (stage != CinemachineCore.Stage.Body) return;
         if (!player || !pointA || !pointB) return;
 

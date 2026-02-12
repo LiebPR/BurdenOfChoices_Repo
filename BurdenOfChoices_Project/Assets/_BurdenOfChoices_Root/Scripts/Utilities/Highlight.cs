@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
-
 public class Highlight : MonoBehaviour
 {
     [SerializeField] Material highlightMaterial;
