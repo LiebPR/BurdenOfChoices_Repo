@@ -767,6 +767,7 @@ MonoBehaviour:
   button: {fileID: 1625121855}
   highlightSFXID: SFX_UI_ButtonHighlight
   volumen: 0.5
+  disableClick: 1
 --- !u!224 &1625121861
 RectTransform:
   m_ObjectHideFlags: 0
@@ -800,7 +801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: SCN_AlejandroMainMenu
-  delaySeconds: 0.2
+  delaySeconds: 0
 --- !u!1 &1634512873
 GameObject:
   m_ObjectHideFlags: 0

@@ -29,6 +29,10 @@ public class UIButtonFocusFeedback : MonoBehaviour, ISelectHandler, IDeselectHan
     [SerializeField] string highlightSFXID; //ID del sonido en AudioManager
     [SerializeField] float volumen = 0.8f;
 
+    [Header("Mode")]
+    [Tooltip("Si está activo, solo hace la animación de presionar, no invoca Button.onClick")]
+    [SerializeField] bool disableClick = false;
+
     RectTransform arrowRect;
     bool isHovered;
     Coroutine arrowCoroutine;
@@ -133,23 +137,21 @@ public class UIButtonFocusFeedback : MonoBehaviour, ISelectHandler, IDeselectHan
         }
     }
 
-
     public void OnPointerDown(PointerEventData eventData) => PressStart();
     public void OnPointerUp(PointerEventData eventData) => PressEnd();
 
     public void PressStart()
     {
-        // Cancelar animación idle si hay
+        if (isPressed) return;
+        isPressed = true;
+
         if (arrowCoroutine != null)
         {
             StopCoroutine(arrowCoroutine);
             arrowCoroutine = null;
         }
 
-        // Forzar Navigation Mode
         UIInputModeManager.Instance.ForceNavigationMode();
-
-        // Iniciar animación de acercamiento y encogimiento
         StartCoroutine(PressAnimationWithDelay());
     }
 
@@ -176,16 +178,18 @@ public class UIButtonFocusFeedback : MonoBehaviour, ISelectHandler, IDeselectHan
         // Pequeño retraso para que se aprecie la animación
         yield return new WaitForSeconds(0.05f);
 
-        // Ejecutar OnClick
-        if (button != null)
+        // Invocar Button.onClick solo si disableClick es false
+        if (!disableClick && button != null)
             button.onClick.Invoke();
 
-        // Volver flecha y texto a su estado original o iniciar idle
+        // Volver flecha y texto a estado original
         arrowRect.anchoredPosition = arrowOffset;
         buttonText.localScale = Vector3.one;
 
         if (UIInputModeManager.Instance.CurrentMode == UIInputModeManager.InputMode.Navigation)
             arrowCoroutine = StartCoroutine(ArrowIdleAnimation());
+
+        isPressed = false;
     }
 
     public void PressEnd()
@@ -193,13 +197,8 @@ public class UIButtonFocusFeedback : MonoBehaviour, ISelectHandler, IDeselectHan
         if (!isPressed) return;
         isPressed = false;
 
-        // Ejecutar OnClick al soltar
-        if (button != null)
-            button.onClick.Invoke();
-
+        // NO invocamos Button.onClick aquí
         if (UIInputModeManager.Instance.CurrentMode == UIInputModeManager.InputMode.Navigation)
             arrowCoroutine = StartCoroutine(ArrowIdleAnimation());
     }
-
-
 }

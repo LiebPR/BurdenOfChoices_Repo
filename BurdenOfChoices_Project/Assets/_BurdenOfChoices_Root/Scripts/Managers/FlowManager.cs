@@ -18,6 +18,7 @@ public class FlowManager : MonoBehaviour
 
         if (GameFlowContext.ReturnFromLevel)
         {
+            restoringFromLevel = true; // Bloqueamos inputs mientras restauramos
             CurrentState = FlowState.PlantSelectedLocked;
         }
         else
@@ -26,7 +27,7 @@ public class FlowManager : MonoBehaviour
         }
     }
     #endregion
-
+    bool restoringFromLevel;
     public enum FlowState
     {
         WaitingForStartButton,
@@ -72,12 +73,14 @@ public class FlowManager : MonoBehaviour
 
                 GameFlowContext.Clear();
             }
+            StartCoroutine(EndRestoreLock());
         }
     }
 
     // Llamar desde botón Start UI
     public void OnStartButtonPressed()
     {
+        if (restoringFromLevel) return; // Protección
         CurrentState = FlowState.WaitingForPlantSelection;
 
         foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -90,6 +93,7 @@ public class FlowManager : MonoBehaviour
     // Llamar desde MeshButtonSelectable cuando se pulsa
     public void OnPlantSelected(MeshButtonSelectable plant)
     {
+        if (restoringFromLevel) return;
         if (CurrentState != FlowState.WaitingForPlantSelection) return;
 
         CurrentState = FlowState.PlantSelectedLocked;
@@ -117,6 +121,7 @@ public class FlowManager : MonoBehaviour
     // Llamar desde Escape o botón UI de volver atrás
     public void OnBackPressed()
     {
+        if (restoringFromLevel) return;
         if (CurrentState != FlowState.PlantSelectedLocked) return;
 
         CurrentState = FlowState.WaitingForPlantSelection;
@@ -160,4 +165,10 @@ public class FlowManager : MonoBehaviour
     }
 
     public MeshButtonSelectable GetLockedPlant() => lockedPlant;
+
+    IEnumerator EndRestoreLock()
+    {
+        yield return null; // Espera un frame
+        restoringFromLevel = false; // Se permite input otra vez
+    }
 }

@@ -50,6 +50,10 @@ public class Cell : MonoBehaviour
             yield return new WaitForSeconds(openDelay);
 
         if (doorAnimator != null)
+        {
             doorAnimator.SetBool(IsCellOpenHash, true);
+            AudioManager.Instance.PlaySFX2D("SFX_CellDoor");
+        }
+            
     }
 }

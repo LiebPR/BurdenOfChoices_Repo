@@ -106,7 +106,7 @@ public class Key : MonoBehaviour, IInteractable, IPickListener
             //Animator 
             if (anim != null)
                 anim.SetBool(IsConsumeHash, true);
-
+            AudioManager.Instance.PlaySFX2D("SFX_Lock", 0.5f);
             transform.SetParent(null);
             transform.position = consumePoint.position;
             transform.rotation = consumePoint.rotation;
