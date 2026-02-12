@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class FlowManager : MonoBehaviour
 {
+    [Header("UI")]
+    [SerializeField] private GameObject mainCanvas; // Canvas que contiene Start Button
+    [SerializeField] private Button backButton;      // Botón Back que aparece tras Start
+
     #region Instance
     public static FlowManager Instance;
 
@@ -45,6 +50,11 @@ public class FlowManager : MonoBehaviour
 
     private void Start()
     {
+        if (backButton != null)
+            backButton.gameObject.SetActive(false);
+        // Asumiendo que backButton está asignado en el inspector
+        backButton.onClick.AddListener(OnBackPressed);
+
         if (GameFlowContext.ReturnFromLevel)
         {
             var targetPlant = FindPlantByLevelData(GameFlowContext.LastPlayedLevel);
@@ -77,18 +87,36 @@ public class FlowManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OnBackPressed();
+        }
+    }
+
     // Llamar desde botón Start UI
     public void OnStartButtonPressed()
     {
         if (restoringFromLevel) return; // Protección
         CurrentState = FlowState.WaitingForPlantSelection;
 
+        // Desactiva canvas principal
+        if (mainCanvas != null)
+            mainCanvas.SetActive(false);
+
+        // Activa botón Back
+        if (backButton != null)
+            backButton.gameObject.SetActive(true);
+
+        // Activa selección de plantas
         foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             plant.SetSelectable(true);
             plant.Deselect();
         }
     }
+
 
     // Llamar desde MeshButtonSelectable cuando se pulsa
     public void OnPlantSelected(MeshButtonSelectable plant)
@@ -105,7 +133,10 @@ public class FlowManager : MonoBehaviour
                 p.SetSelectable(false);
         }
 
-        //Aquí cambiamos el comportamiento según si es un tutorial
+        // Ocultar botón Back mientras estás en el panel de info/tutorial
+        if (backButton != null)
+            backButton.gameObject.SetActive(false);
+
         if (plant.IsTutorial)
         {
             tutorialPanel.SetTutorial(plant.LevelData.levelName);
@@ -122,21 +153,58 @@ public class FlowManager : MonoBehaviour
     public void OnBackPressed()
     {
         if (restoringFromLevel) return;
-        if (CurrentState != FlowState.PlantSelectedLocked) return;
 
-        CurrentState = FlowState.WaitingForPlantSelection;
-
-        foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(
-            FindObjectsInactive.Include, FindObjectsSortMode.None))
+        switch (CurrentState)
         {
-            plant.SetSelectable(true);
-            plant.Deselect();
-        }
+            case FlowState.PlantSelectedLocked:
+                // Volver a selección de plantas
+                CurrentState = FlowState.WaitingForPlantSelection;
 
-        lockedPlant = null;
-        levelInfoPanel.gameObject.SetActive(false);
-        tutorialPanel.HidePanel();
+                foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    plant.SetSelectable(true);
+                    plant.Deselect();
+                }
+
+                lockedPlant = null;
+                levelInfoPanel.gameObject.SetActive(false);
+                tutorialPanel.HidePanel();
+
+                // Mostrar botón Back nuevamente
+                if (backButton != null)
+                    backButton.gameObject.SetActive(true);
+                break;
+
+            case FlowState.WaitingForPlantSelection:
+                // Volver al canvas principal
+                CurrentState = FlowState.WaitingForStartButton;
+
+                if (mainCanvas != null)
+                    mainCanvas.SetActive(true);
+
+                if (backButton != null)
+                    backButton.gameObject.SetActive(false);
+
+                foreach (var plant in Object.FindObjectsByType<MeshButtonSelectable>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    plant.SetSelectable(false);
+                    plant.Deselect();
+                }
+
+                lockedPlant = null;
+                levelInfoPanel.gameObject.SetActive(false);
+                tutorialPanel.HidePanel();
+                break;
+
+            default:
+                // No hacer nada en WaitingForStartButton
+                break;
+        }
     }
+
+
 
     MeshButtonSelectable FindPlantByLevelData(LevelData data)
     {
